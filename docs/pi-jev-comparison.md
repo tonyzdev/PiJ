@@ -34,4 +34,12 @@ left a type-invalid rename. Both exhausted their token budgets and omitted
 requested tests/docs. This strengthens the case for testing the earlier
 placement; it still provides no completed-task or head-to-head advantage.
 
+The frozen policy then ran [two pairs on a new session-mode task](session-mode-evidence-experiment.md).
+Only lexical-1 completed the stated task. Jev-1 passed runtime behavior but
+failed typecheck; Jev-2 restored the oldest selection and added no tests.
+Both Jev runs finished sooner, but the deliverables were not equivalent. These
+repeats provide no reason to claim a PiJ efficiency advantage or enable the
+dependency preprocessor by default. They also do not prove that Jev caused
+the generated defects.
+
 Primary implementation references: [tool gate](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/gate.ts), [output judge](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/output.ts), [extension](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/index.ts), [client](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/client.ts). See our [experiment results](experiment-results.md) for the boundary between working integration and demonstrated benefit.

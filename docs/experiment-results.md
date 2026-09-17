@@ -2,7 +2,15 @@
 
 These are development observations, not performance claims. Initial runs use `alibaba/qwen3-coder-next`; the later comparison names its alternate model explicitly. Both use Vercel AI Gateway. Reported dollar values use the pinned Pi catalog, including its cache rates, not billing receipts; Jev fees are not included. Raw traces and disposable workspaces stay local.
 
-Latest follow-up: [dependency evidence before investigation](dependency-evidence-experiment.md)
+Latest follow-up: [session-mode transfer check](session-mode-evidence-experiment.md)
+ran two lexical/Jev pairs at frozen `d672736`. Only lexical-1 completed the task.
+Jev-1 passed all eight behavioral holdouts but its added tests failed typecheck;
+lexical-2 omitted tree restoration (7/8); Jev-2 selected the oldest record (4/8)
+and added no tests. Jev finished sooner in both pairs, without equivalent
+accepted delivery. Original patches, independent logs and replay hashes are
+published; normal product defaults remain unchanged.
+
+The preceding [dependency evidence before investigation](dependency-evidence-experiment.md)
 ran a lexical/Jev pair at `f0c4d47`. Both exhausted the token budget. The Jev
 partial repair passed the original seven holdouts and exact user-entry
 ownership, but failed generated-row display and omitted requested tests/docs.

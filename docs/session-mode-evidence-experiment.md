@@ -91,3 +91,114 @@ Publish sanitized outcomes and reproducible candidate patches, including
 failures. Keep raw traces private. The normal product retains its existing
 defaults; moving the preprocessor into production requires stronger accepted
 task evidence than a single promising trajectory.
+
+## Results at the frozen revision
+
+All four actual CLI runs ended normally within budget at clean revision
+`d672736a71d48339c429b141f6436e4019c69b68`. Source and built-runtime fingerprints
+were unchanged both within and across runs. The same 236-file, 2,336,099-byte
+bounded inventory and initial 24-file pool were used in all four. The inventory
+digest was `8aa83693e56e7fafc7b9b689066c38169ccfd5034bdf4d4311cf7d4ccdc2fd6e`.
+
+Independent checks were run only after every generating process stopped. No
+candidate received evaluator feedback or was repaired/restarted for scoring.
+The [sanitized results, logs and original patches](../eval/session-mode-results/README.md)
+retain every outcome.
+
+| Run | Ordinary tests | Public / holdout | Typecheck / build | Evidence + agent time | Main requests | Estimated main cost |
+| --- | ---: | --- | --- | ---: | ---: | ---: |
+| Lexical 1 | 54/54 | 1/1, 8/8 | pass / pass | 352.8 s | 34 | $0.9013 |
+| Jev 1 | 46/46 | 1/1, 8/8 | **fail** / pass | 282.5 s | 27 | $0.6407 |
+| Lexical 2 | 43/43 | 1/1, **7/8** | pass / pass | 475.4 s | 46 | $1.2337 |
+| Jev 2 | 40/40 | 1/1, **4/8** | pass / pass | 248.6 s | 35 | $0.6066 |
+
+The ordinary baseline has 40 tests. Counts above include candidate-authored
+tests and exclude the supplied public reproduction. No checks timed out,
+exceeded the output limit, were skipped or were cancelled. Main cost includes
+cache rates from the pinned catalog, excludes Jev fees, and is not a billing
+receipt. Dependency installation is excluded from elapsed time.
+
+Only **lexical-1** passes the complete stated task after independent code and
+deliverable review. Across these two repeats, accepted tasks are lexical 1/2
+and Jev 0/2. This small development sample does not estimate population success
+rates or prove that Jev caused the failures.
+
+Jev made two successful, uncached preprocessing evaluations in each repetition:
+23,609 input and 852 output tokens per run. Recorded network wait was 2,304 ms
+and 2,443 ms respectively; total preprocessing was 2,539 ms and 2,729 ms. Lexical
+preprocessing took 242 ms and 295 ms. Ordinary PiJ decisions and automatic
+checkpoints made no Jev calls in any condition.
+
+### Failures and deliverables
+
+- **Jev 1:** runtime behavior passes the frozen checks, but its new test helper
+  uses `Parameters<Parameters<typeof test>[1]>[0]` for the context. That is not a
+  valid overload extraction for the installed Node test types. Independent
+  typecheck reports nine errors. The trace shows typecheck before the test file
+  was added, then tests and build without a final typecheck. Build excludes the
+  test file, so its success does not repair the failed required check.
+- **Lexical 2:** restores only on `session_start`; it never registers
+  `session_tree`. Navigating to another active branch leaves the old mode in
+  memory. Its three new tests and the supplied simple reopen reproduction do
+  not detect that omission; the frozen navigation check does.
+- **Jev 2:** assumes `getBranch()` is newest-first and returns the first valid
+  entry. The actual installed SDK returns root-to-leaf order. Multiple selections
+  therefore restore the oldest, causing four independent behavioral failures.
+  It adds no regression tests beyond the supplied reproduction.
+- **Lexical 1:** all required automated checks pass. Its 14 added tests use the
+  actual `SessionManager` to check entry validation, newest-valid precedence
+  and ancestry selection. These are helper-level tests, not new extension
+  lifecycle integration coverage; the supplied reproduction and frozen runtime
+  checks supply that separate evidence.
+
+None edits a repository documentation file. Each final answer explains its
+changes. The common prompt asked to “document the change” without requiring a
+particular file; missing README edits are reported as an artifact limitation,
+not used as a new post-hoc rejection criterion. Test execution counts do not
+measure coverage quality: Jev 1 also includes a test that constructs a malformed
+entry without inserting it and a malformed-data test that only exercises valid
+mode commands.
+
+### What the traces establish
+
+Both Jev repetitions selected the same six excerpts, in slightly different
+order: five from `docs/session-format.md`, one from `session-manager.js`.
+Lexical selected six from `docs/extensions.md`. All four received those actual
+excerpts in the initial user message. This confirms a treatment difference;
+it does not prove which subsequent reasoning used each excerpt.
+
+| Navigation proxy | Lexical 1 | Jev 1 | Lexical 2 | Jev 2 |
+| --- | ---: | ---: | ---: | ---: |
+| Tool calls mentioning `node_modules/` | 19 | 14 | 28 | 28 |
+| First successful edit/write result | 215.5 s | 149.6 s | 197.8 s | 146.8 s |
+
+Jev reached edits earlier in both repetitions, but its shorter trajectories
+ended with failed or missing required work. They do not establish faster
+accepted delivery. The second pair shows no reduction in the navigation proxy.
+All four still inspected declaration files; the frozen inventory explicitly
+excludes `.d.ts`. Relevance ranking cannot recover evidence excluded before
+ranking. Whether including those declarations would improve accepted delivery
+requires another controlled comparison.
+
+The second pair requested tool invocations in reversed order, but concurrent
+process scheduling still created lexical's run ID 2 ms earlier; strict reversed
+start order was not achieved. Lexical's initial user message was about 2.2 s
+earlier in that pair, while Jev's was about 49.7 s earlier in pair one due to
+preparation differences. Per-agent durations exclude preparation. Concurrency,
+provider sampling and cache/load differences remain limitations.
+
+### Decision
+
+Keep this dependency preprocessor evaluator-only. These repeats do not support
+a completed-task advantage, a production-default change or superiority to
+pi-jev. They also do not establish that Jev caused the main model's defects or
+cannot help in another placement.
+
+The next design should make the replaced work explicit. Deterministic symbol
+and export lookup belongs in code. Jev can then rank bounded, complementary
+evidence for a specific uncertainty; the main model still owns cross-event
+reasoning, implementation and the final validation sequence. Do not use a
+relevance score as a correctness or completion decision. TypeSafe itself
+recommends [atomic questions composed in code](https://docs.typesafe.ai/introduction).
+This is a design hypothesis motivated by the traces, not an implemented or
+validated improvement.

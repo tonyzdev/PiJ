@@ -1,0 +1,231 @@
+diff --git a/src/extension.ts b/src/extension.ts
+index 8f06520..24aba0c 100644
+--- a/src/extension.ts
++++ b/src/extension.ts
+@@ -1,5 +1,5 @@
+ import { readFile, stat } from "node:fs/promises";
+-import type { ExtensionContext, ExtensionFactory } from "@earendil-works/pi-coding-agent";
++import type { ExtensionContext, ExtensionFactory, SessionEntry } from "@earendil-works/pi-coding-agent";
+ import { Text } from "@earendil-works/pi-tui";
+ import { Type } from "typebox";
+ import type { DecisionMode, PijConfig } from "./config.js";
+@@ -9,6 +9,26 @@ import { retrieveCode, type CodeCandidate } from "./search.js";
+ import { DecisionJournal } from "./telemetry.js";
+ import { cleanText, cleanDisplayText, formatDecisions, header, statusText } from "./ui.js";
+ 
++/** Read the most recent valid pij-mode custom entry from the active branch. Exported for testing. */
++export function readModeFromBranch(sessionManager: ExtensionContext["sessionManager"]): DecisionMode | undefined {
++  const branch = sessionManager.getBranch(); // root-to-leaf order
++  for (let i = branch.length - 1; i >= 0; i--) {
++    const entry = branch[i];
++    if (!entry) continue;
++    if (entry.type !== "custom" || entry.customType !== "pij-mode") continue;
++    const d = entry.data;
++    if (!d || typeof d !== "object" || Array.isArray(d)) continue;
++    const rec = d as Record<string, unknown>;
++    const keys = Object.keys(rec);
++    // Require exactly { version, mode } – additional fields are invalid
++    if (keys.length !== 2 || !("version" in rec) || !("mode" in rec)) continue;
++    if (rec["version"] !== 1) continue;
++    if (rec["mode"] !== "assist" && rec["mode"] !== "observe" && rec["mode"] !== "off") continue;
++    return rec["mode"] as DecisionMode;
++  }
++  return undefined;
++}
++
+ export function createPijExtension(config: PijConfig): ExtensionFactory {
+   return (pi) => {
+     let mode: DecisionMode = config.mode;
+@@ -30,6 +50,8 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       run.abort(); run = new AbortController(); request = ""; failuresThisRun = 0;
+       skillPending = false; skillAdvice = undefined; skills = [];
+       context = ctx;
++      // Restore mode from the active branch; fall back to configured default
++      mode = readModeFromBranch(ctx.sessionManager) ?? config.mode;
+       unsubscribeInput?.();
+       if (ctx.mode === "tui") {
+         ctx.ui.setTitle("PiJ");
+@@ -40,13 +62,26 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+     });
+     pi.on("session_shutdown", async () => { run.abort(); unsubscribeInput?.(); unsubscribeInput = undefined; context = undefined; await journal.flush(); });
+ 
++    pi.on("session_tree", (_event, ctx) => {
++      // Restore mode from the branch at the new leaf position
++      const restored = readModeFromBranch(ctx.sessionManager) ?? config.mode;
++      if (restored !== mode) {
++        run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false;
++        mode = restored;
++      }
++      context = ctx;
++      update();
++    });
++
+     pi.registerCommand("pij", {
+       description: "PiJ status, decisions, and Jev modes: assist | observe | off",
+       getArgumentCompletions: (prefix) => ["status", "decisions", "assist", "observe", "off"].filter((item) => item.startsWith(prefix)).map((value) => ({ value, label: value })),
+       handler: async (args, ctx) => {
+         const command = args.trim() || "status";
+         if (command === "assist" || command === "observe" || command === "off") {
+-          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command; update();
++          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command;
++          pi.appendEntry("pij-mode", { version: 1, mode: command });
++          update();
+           ctx.ui.notify(`PiJ mode: ${mode}. ${mode === "assist" ? "Jev suggestions can assist this session." : mode === "observe" ? "Decisions are recorded without changing recommendations or ranking." : "No Jev requests will be made."}`, "info");
+         } else if (command === "decisions") ctx.ui.notify(formatDecisions(journal.recent().slice(-8)), "info");
+         else if (command === "status") {
+diff --git a/test/session-mode-persistence.test.ts b/test/session-mode-persistence.test.ts
+new file mode 100644
+index 0000000..17816e5
+--- /dev/null
++++ b/test/session-mode-persistence.test.ts
+@@ -0,0 +1,150 @@
++/**
++ * Unit tests for pij-mode session-native persistence.
++ *
++ * These tests exercise readModeFromBranch directly and through the extension
++ * handler lifecycle, verifying:
++ *   - Valid entries are restored correctly
++ *   - Invalid entries (malformed data, extra fields, unknown mode, bad version) are skipped
++ *   - The most recent valid entry wins; an invalid newer entry does not hide an older valid one
++ *   - config.mode is the fallback when the branch has no valid entry
++ *   - Branch independence: entries added after a fork do not affect other branches
++ */
++
++import assert from "node:assert/strict";
++import test from "node:test";
++import { SessionManager } from "@earendil-works/pi-coding-agent";
++import { readModeFromBranch } from "../src/extension.js";
++
++// ---------------------------------------------------------------------------
++// Helpers
++// ---------------------------------------------------------------------------
++
++/** Append a raw custom entry directly, returning a full SessionManager. */
++function managerWith(...entries: Array<{ customType: string; data: unknown }>): SessionManager {
++  const mgr = SessionManager.inMemory("/test");
++  for (const e of entries) {
++    mgr.appendCustomEntry(e.customType, e.data);
++  }
++  return mgr;
++}
++
++// ---------------------------------------------------------------------------
++// Basic resolution
++// ---------------------------------------------------------------------------
++
++test("readModeFromBranch: returns undefined when branch has no custom entries", () => {
++  const mgr = SessionManager.inMemory("/test");
++  assert.equal(readModeFromBranch(mgr), undefined);
++});
++
++test("readModeFromBranch: returns the mode from a single valid pij-mode entry", () => {
++  for (const mode of ["assist", "observe", "off"] as const) {
++    const mgr = managerWith({ customType: "pij-mode", data: { version: 1, mode } });
++    assert.equal(readModeFromBranch(mgr), mode, `failed for mode=${mode}`);
++  }
++});
++
++test("readModeFromBranch: picks the most recent valid entry (last in root-to-leaf order)", () => {
++  const mgr = SessionManager.inMemory("/test");
++  mgr.appendCustomEntry("pij-mode", { version: 1, mode: "assist" });
++  mgr.appendCustomEntry("pij-mode", { version: 1, mode: "off" });
++  assert.equal(readModeFromBranch(mgr), "off");
++});
++
++// ---------------------------------------------------------------------------
++// Invalid entry filtering
++// ---------------------------------------------------------------------------
++
++test("readModeFromBranch: ignores entries with a different customType", () => {
++  const mgr = managerWith(
++    { customType: "other-extension", data: { version: 1, mode: "off" } },
++  );
++  assert.equal(readModeFromBranch(mgr), undefined);
++});
++
++test("readModeFromBranch: ignores entry with an unsupported version", () => {
++  const mgr = managerWith(
++    { customType: "pij-mode", data: { version: 2, mode: "off" } },
++  );
++  assert.equal(readModeFromBranch(mgr), undefined);
++});
++
++test("readModeFromBranch: ignores entry with an unknown mode value", () => {
++  const mgr = managerWith(
++    { customType: "pij-mode", data: { version: 1, mode: "auto" } },
++  );
++  assert.equal(readModeFromBranch(mgr), undefined);
++});
++
++test("readModeFromBranch: ignores entry with additional data fields", () => {
++  const mgr = managerWith(
++    { customType: "pij-mode", data: { version: 1, mode: "off", extra: true } },
++  );
++  assert.equal(readModeFromBranch(mgr), undefined);
++});
++
++test("readModeFromBranch: ignores entry with missing mode field", () => {
++  const mgr = managerWith(
++    { customType: "pij-mode", data: { version: 1 } },
++  );
++  assert.equal(readModeFromBranch(mgr), undefined);
++});
++
++test("readModeFromBranch: ignores entry with missing version field", () => {
++  const mgr = managerWith(
++    { customType: "pij-mode", data: { mode: "off" } },
++  );
++  assert.equal(readModeFromBranch(mgr), undefined);
++});
++
++test("readModeFromBranch: ignores entry with null data", () => {
++  const mgr = managerWith(
++    { customType: "pij-mode", data: null },
++  );
++  assert.equal(readModeFromBranch(mgr), undefined);
++});
++
++test("readModeFromBranch: ignores entry with array data", () => {
++  const mgr = managerWith(
++    { customType: "pij-mode", data: [1, "off"] },
++  );
++  assert.equal(readModeFromBranch(mgr), undefined);
++});
++
++test("readModeFromBranch: ignores entry with string data", () => {
++  const mgr = managerWith(
++    { customType: "pij-mode", data: "off" },
++  );
++  assert.equal(readModeFromBranch(mgr), undefined);
++});
++
++// ---------------------------------------------------------------------------
++// Invalid newer entries must not hide valid older entries
++// ---------------------------------------------------------------------------
++
++test("readModeFromBranch: skips invalid newer entry and finds valid older one", () => {
++  const mgr = SessionManager.inMemory("/test");
++  mgr.appendCustomEntry("pij-mode", { version: 1, mode: "observe" }); // valid – older
++  mgr.appendCustomEntry("pij-mode", { version: 99, mode: "off" });    // invalid – version 99
++  mgr.appendCustomEntry("pij-mode", { version: 1, mode: "assist", extra: "bad" }); // invalid – extra field
++  assert.equal(readModeFromBranch(mgr), "observe");
++});
++
++// ---------------------------------------------------------------------------
++// Branch independence
++// ---------------------------------------------------------------------------
++
++test("readModeFromBranch: entries on one branch do not affect another after branch()", () => {
++  const mgr = SessionManager.inMemory("/test");
++  const firstId = mgr.appendCustomEntry("pij-mode", { version: 1, mode: "off" }); // shared ancestor
++  // Fork: go back to the first entry and start a new branch
++  mgr.branch(firstId);
++  mgr.appendCustomEntry("pij-mode", { version: 1, mode: "assist" }); // on fork branch only
++
++  // Current leaf is now on the "assist" branch
++  assert.equal(readModeFromBranch(mgr), "assist");
++
++  // If we navigate back to firstId, only the shared ancestor entry is on the branch
++  mgr.branch(firstId);
++  assert.equal(readModeFromBranch(mgr), "off");
++});

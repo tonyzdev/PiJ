@@ -1,0 +1,1420 @@
+{
+  "schemaVersion": 1,
+  "task": "session-mode",
+  "protocol": "docs/session-mode-evidence-experiment.md",
+  "interpretation": "Two descriptive repetitions on one new development task with a frozen dependency evidence policy. Runtime acceptance and requested deliverables are recorded separately. No head-to-head with pi-jev or general product advantage is established.",
+  "cost": "Main-model catalog estimates including cache, excluding Jev fees; not billing receipts.",
+  "firstEditMetric": "Initial user message timestamp to first successful edit/write result; excludes preprocessing and startup.",
+  "navigationMetric": "Tool execution arguments containing node_modules/; a navigation proxy, not unique facts read or causal substitution.",
+  "jeVPlacement": "Two parent-side preprocessing evaluations per Jev run. Ordinary PiJ decisions, source briefing and automatic checkpoints off in both conditions.",
+  "records": [
+    {
+      "id": "lexical-1",
+      "runId": "2026-09-17T22-04-43.348Z-session-mode-1-dependency-lexical",
+      "sample": 1,
+      "mode": "lexical",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "d672736a71d48339c429b141f6436e4019c69b68",
+        "dirty": false,
+        "sourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "trackedSourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 156,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d672736a71d48339c429b141f6436e4019c69b68",
+        "dirty": false,
+        "sourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "trackedSourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 156,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "requests": 34,
+      "tokens": 1536729,
+      "usage": {
+        "input": 36,
+        "output": 14884,
+        "cacheRead": 1457636,
+        "cacheWrite": 64173,
+        "estimatedUsd": 0.9013075499999998
+      },
+      "elapsedMs": 352603,
+      "evidenceAndAgentElapsedMs": 352845,
+      "calls": {
+        "bash": 27,
+        "read": 8,
+        "edit": 3,
+        "write": 1
+      },
+      "dependencyPathCalls": 19,
+      "evidenceDelivered": true,
+      "firstEdit": {
+        "toolIndex": 23,
+        "secondsToToolResult": 215.517
+      },
+      "runtimeAccepted": true,
+      "allChecksPassed": true,
+      "completeDeliverable": true,
+      "deliverableReview": {
+        "completeDeliverable": true,
+        "newTests": 14,
+        "repositoryDocumentationChanged": false,
+        "finalAnswerDocumentsChange": true,
+        "blockingFindings": [],
+        "coverageLimitations": [
+          "New tests exercise the reader with the actual SDK SessionManager, not extension lifecycle integration as their header suggests.",
+          "The added branch test checks descendant-to-ancestor movement, not divergent runtime forks; frozen independent acceptance supplies that coverage."
+        ]
+      },
+      "dependencyEvidence": {
+        "packages": [
+          "@earendil-works/pi-coding-agent@0.85.1",
+          "ai@7.0.105"
+        ],
+        "filesScanned": 236,
+        "bytesRead": 2336099,
+        "inventoryDigest": "8aa83693e56e7fafc7b9b689066c38169ccfd5034bdf4d4311cf7d4ccdc2fd6e",
+        "inventoryTruncated": true,
+        "filePool": [
+          "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/rpc.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/models.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/custom-provider.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/settings.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/usage.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/tui.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/export-html/template.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/package-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/main.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/keybindings.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/compaction.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/package-manager-cli.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sessions.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/providers.md",
+          "node_modules/ai/dist/internal/index.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.js"
+        ],
+        "selectedFiles": [
+          "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/rpc.md"
+        ],
+        "candidates": [
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 1729,
+            "bytes": 2265,
+            "sha256": "81641b7e714d67b42ca198d8a988949b0f99937a359575f64eac728301e9f952"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 2353,
+            "bytes": 2299,
+            "sha256": "4aad91003a977d2053f30409a47b292d72db1021e0a9db47790e7f45f05105e4"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 1705,
+            "bytes": 2184,
+            "sha256": "0df9fddf0d8a4b41dda244e8ee3cb1e813eca71bdcad101365cf5fe4ccfe62b0"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 985,
+            "bytes": 2365,
+            "sha256": "f7c20a323bc32bf49088a7f138df82430551f6fad94f82da5af6e7ba7b727829"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 2017,
+            "bytes": 2223,
+            "sha256": "be0d6314900f359dee2fbdea5f97e21d2e4b2ac303d282700af18738a54ae2a6"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 553,
+            "bytes": 2204,
+            "sha256": "4ee6f33c93d4f2d8306d415a0d388e2e32cca9c1afdf144725b9e56098e1dda7"
+          }
+        ],
+        "elapsedMs": 242,
+        "decisions": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 54,
+          "pass": 54,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "lexical-1-ordinary.txt",
+        "visible": "lexical-1-visible.txt",
+        "holdout": "lexical-1-holdout.txt",
+        "check": "lexical-1-check.txt",
+        "build": "lexical-1-build.txt"
+      },
+      "candidate": {
+        "patch": "lexical-1.patch",
+        "patchSha256": "126b4b8f1345ca88bf061e16725b408ee713cb2a003fc734e6b2119efeb759a1",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "src/extension.ts": "ce2ea5e03dae038adca52d28e737d5292c61424a4e3c2efbc01333fd913f1626",
+          "test/session-mode-persistence.test.ts": "6d8c2598ee393cbb356de2c77970a02c04e60285831e3660fb830e5dd3e13aad"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 2,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "jev-1",
+      "runId": "2026-09-17T22-04-43.349Z-session-mode-1-dependency-jev",
+      "sample": 1,
+      "mode": "jev",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "d672736a71d48339c429b141f6436e4019c69b68",
+        "dirty": false,
+        "sourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "trackedSourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 156,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d672736a71d48339c429b141f6436e4019c69b68",
+        "dirty": false,
+        "sourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "trackedSourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 156,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "requests": 27,
+      "tokens": 968853,
+      "usage": {
+        "input": 29,
+        "output": 11407,
+        "cacheRead": 904584,
+        "cacheWrite": 52833,
+        "estimatedUsd": 0.6406909499999999
+      },
+      "elapsedMs": 279983,
+      "evidenceAndAgentElapsedMs": 282522,
+      "calls": {
+        "bash": 24,
+        "read": 6,
+        "edit": 2,
+        "write": 1
+      },
+      "dependencyPathCalls": 14,
+      "evidenceDelivered": true,
+      "firstEdit": {
+        "toolIndex": 22,
+        "secondsToToolResult": 149.6
+      },
+      "runtimeAccepted": true,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 6,
+        "repositoryDocumentationChanged": false,
+        "finalAnswerDocumentsChange": true,
+        "blockingFindings": [
+          {
+            "path": "test/session-persistence.test.ts",
+            "line": 27,
+            "issue": "Invalid Node TestContext overload extraction; required typecheck fails with nine diagnostics."
+          }
+        ],
+        "coverageLimitations": [
+          "Invalid-newer test constructs badEntry without inserting it.",
+          "Malformed-record test exercises defaults and valid mode commands without providing malformed records.",
+          "No new tree, runtime fork or cancellation coverage."
+        ]
+      },
+      "dependencyEvidence": {
+        "packages": [
+          "@earendil-works/pi-coding-agent@0.85.1",
+          "ai@7.0.105"
+        ],
+        "filesScanned": 236,
+        "bytesRead": 2336099,
+        "inventoryDigest": "8aa83693e56e7fafc7b9b689066c38169ccfd5034bdf4d4311cf7d4ccdc2fd6e",
+        "inventoryTruncated": true,
+        "filePool": [
+          "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/rpc.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/models.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/custom-provider.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/settings.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/usage.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/tui.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/export-html/template.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/package-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/main.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/keybindings.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/compaction.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/package-manager-cli.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sessions.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/providers.md",
+          "node_modules/ai/dist/internal/index.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.js"
+        ],
+        "selectedFiles": [
+          "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md"
+        ],
+        "candidates": [
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+            "startLine": 385,
+            "bytes": 1932,
+            "sha256": "95d1fe0a7be9b5b4789011a402ac5c693153b095910a04422c8b13721bf83cb5"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+            "startLine": 241,
+            "bytes": 2165,
+            "sha256": "76e90e8fa3404b32332a2b369b16ecaeb90132859d55e82a640f70a58d35ddce"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+            "startLine": 409,
+            "bytes": 1571,
+            "sha256": "7b7d3d71a12d8665bc399c039b5ad6e900d26fb24f4abd9b04f302e9565bfc1c"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+            "startLine": 313,
+            "bytes": 1741,
+            "sha256": "f4a630539174b123b01d321ca4c1f3abd9ca21dfae897f55829144ada5bb441e"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+            "startLine": 265,
+            "bytes": 1599,
+            "sha256": "75b1f74142d8ce6d9d7ac2cec156d25646f37d2fe0913be396c47bad38aaba1d"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+            "startLine": 1225,
+            "bytes": 2354,
+            "sha256": "dbeb126785f279ed196b5a1f5729568ab6beb5db764cff66c3b6b5f563ae58ad"
+          }
+        ],
+        "elapsedMs": 2539,
+        "decisions": [
+          {
+            "status": "ok",
+            "answers": {
+              "f0": {
+                "type": "noul",
+                "noul": 0.14
+              },
+              "f1": {
+                "type": "noul",
+                "noul": 0.51
+              },
+              "f2": {
+                "type": "noul",
+                "noul": 0.42
+              },
+              "f3": {
+                "type": "noul",
+                "noul": 0.08
+              },
+              "f4": {
+                "type": "noul",
+                "noul": 0.62
+              },
+              "f5": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "f6": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f7": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "f8": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f9": {
+                "type": "noul",
+                "noul": 0.08
+              },
+              "f10": {
+                "type": "noul",
+                "noul": 0.66
+              },
+              "f11": {
+                "type": "noul",
+                "noul": 0.1
+              },
+              "f12": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "f13": {
+                "type": "noul",
+                "noul": 0.11
+              },
+              "f14": {
+                "type": "noul",
+                "noul": 0.16
+              },
+              "f15": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "f16": {
+                "type": "noul",
+                "noul": 0.22
+              },
+              "f17": {
+                "type": "noul",
+                "noul": 0.17
+              },
+              "f18": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f19": {
+                "type": "noul",
+                "noul": 0.32
+              },
+              "f20": {
+                "type": "noul",
+                "noul": 0.33
+              },
+              "f21": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f22": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "f23": {
+                "type": "noul",
+                "noul": 0.39
+              }
+            },
+            "model": "typesafe-ai/jev",
+            "inputTokens": 8830,
+            "outputTokens": 426,
+            "latencyMs": 1360,
+            "cached": false
+          },
+          {
+            "status": "ok",
+            "answers": {
+              "w0": {
+                "type": "noul",
+                "noul": 0.83
+              },
+              "w1": {
+                "type": "noul",
+                "noul": 0.85
+              },
+              "w2": {
+                "type": "noul",
+                "noul": 0.23
+              },
+              "w3": {
+                "type": "noul",
+                "noul": 0.58
+              },
+              "w4": {
+                "type": "noul",
+                "noul": 0.83
+              },
+              "w5": {
+                "type": "noul",
+                "noul": 0.23
+              },
+              "w6": {
+                "type": "noul",
+                "noul": 0.66
+              },
+              "w7": {
+                "type": "noul",
+                "noul": 0.18
+              },
+              "w8": {
+                "type": "noul",
+                "noul": 0.79
+              },
+              "w9": {
+                "type": "noul",
+                "noul": 0.67
+              },
+              "w10": {
+                "type": "noul",
+                "noul": 0.46
+              },
+              "w11": {
+                "type": "noul",
+                "noul": 0.19
+              },
+              "w12": {
+                "type": "noul",
+                "noul": 0.21
+              },
+              "w13": {
+                "type": "noul",
+                "noul": 0.24
+              },
+              "w14": {
+                "type": "noul",
+                "noul": 0.25
+              },
+              "w15": {
+                "type": "noul",
+                "noul": 0.26
+              },
+              "w16": {
+                "type": "noul",
+                "noul": 0.78
+              },
+              "w17": {
+                "type": "noul",
+                "noul": 0.72
+              },
+              "w18": {
+                "type": "noul",
+                "noul": 0.69
+              },
+              "w19": {
+                "type": "noul",
+                "noul": 0.65
+              },
+              "w20": {
+                "type": "noul",
+                "noul": 0.49
+              },
+              "w21": {
+                "type": "noul",
+                "noul": 0.33
+              },
+              "w22": {
+                "type": "noul",
+                "noul": 0.64
+              },
+              "w23": {
+                "type": "noul",
+                "noul": 0.47
+              }
+            },
+            "model": "typesafe-ai/jev",
+            "inputTokens": 14779,
+            "outputTokens": 426,
+            "latencyMs": 944,
+            "cached": false
+          }
+        ]
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 46,
+          "pass": 46,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 2,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "jev-1-ordinary.txt",
+        "visible": "jev-1-visible.txt",
+        "holdout": "jev-1-holdout.txt",
+        "check": "jev-1-check.txt",
+        "build": "jev-1-build.txt"
+      },
+      "candidate": {
+        "patch": "jev-1.patch",
+        "patchSha256": "9f667eea547a89f5e303da40985c776ec0e9e0da418fbe02f33c72a3541c147a",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "src/extension.ts": "b4f18b45abbbd50a0e699434ebe95970c5580f670a3f7597e5e873bb8719a0a5",
+          "test/session-persistence.test.ts": "e0373d4cce4ff87223700830b51b02a133d4fd1842c251566d266e5c7133e526"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 2,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "lexical-2",
+      "runId": "2026-09-17T22-11-48.412Z-session-mode-2-dependency-lexical",
+      "sample": 2,
+      "mode": "lexical",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "d672736a71d48339c429b141f6436e4019c69b68",
+        "dirty": false,
+        "sourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "trackedSourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 156,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d672736a71d48339c429b141f6436e4019c69b68",
+        "dirty": false,
+        "sourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "trackedSourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 156,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "requests": 46,
+      "tokens": 2114582,
+      "usage": {
+        "input": 48,
+        "output": 22185,
+        "cacheRead": 2013210,
+        "cacheWrite": 79139,
+        "estimatedUsd": 1.2336532499999995
+      },
+      "elapsedMs": 475060,
+      "evidenceAndAgentElapsedMs": 475355,
+      "calls": {
+        "bash": 39,
+        "read": 7,
+        "edit": 5,
+        "write": 1
+      },
+      "dependencyPathCalls": 28,
+      "evidenceDelivered": true,
+      "firstEdit": {
+        "toolIndex": 27,
+        "secondsToToolResult": 197.832
+      },
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 3,
+        "repositoryDocumentationChanged": false,
+        "finalAnswerDocumentsChange": true,
+        "blockingFindings": [
+          {
+            "path": "src/extension.ts",
+            "line": 54,
+            "issue": "Restores on session_start but omits session_tree; navigating to off leaves assist active and allows Jev calls."
+          }
+        ],
+        "coverageLimitations": [
+          "No new navigation test.",
+          "One extra-field subcase is inert, although a later test genuinely inserts invalid records."
+        ]
+      },
+      "dependencyEvidence": {
+        "packages": [
+          "@earendil-works/pi-coding-agent@0.85.1",
+          "ai@7.0.105"
+        ],
+        "filesScanned": 236,
+        "bytesRead": 2336099,
+        "inventoryDigest": "8aa83693e56e7fafc7b9b689066c38169ccfd5034bdf4d4311cf7d4ccdc2fd6e",
+        "inventoryTruncated": true,
+        "filePool": [
+          "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/rpc.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/models.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/custom-provider.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/settings.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/usage.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/tui.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/export-html/template.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/package-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/main.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/keybindings.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/compaction.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/package-manager-cli.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sessions.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/providers.md",
+          "node_modules/ai/dist/internal/index.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.js"
+        ],
+        "selectedFiles": [
+          "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/rpc.md"
+        ],
+        "candidates": [
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 1729,
+            "bytes": 2265,
+            "sha256": "81641b7e714d67b42ca198d8a988949b0f99937a359575f64eac728301e9f952"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 2353,
+            "bytes": 2299,
+            "sha256": "4aad91003a977d2053f30409a47b292d72db1021e0a9db47790e7f45f05105e4"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 1705,
+            "bytes": 2184,
+            "sha256": "0df9fddf0d8a4b41dda244e8ee3cb1e813eca71bdcad101365cf5fe4ccfe62b0"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 985,
+            "bytes": 2365,
+            "sha256": "f7c20a323bc32bf49088a7f138df82430551f6fad94f82da5af6e7ba7b727829"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 2017,
+            "bytes": 2223,
+            "sha256": "be0d6314900f359dee2fbdea5f97e21d2e4b2ac303d282700af18738a54ae2a6"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 553,
+            "bytes": 2204,
+            "sha256": "4ee6f33c93d4f2d8306d415a0d388e2e32cca9c1afdf144725b9e56098e1dda7"
+          }
+        ],
+        "elapsedMs": 295,
+        "decisions": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 43,
+          "pass": 43,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 7,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "session mode: tree navigation restores ancestors and divergent branches immediately"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "lexical-2-ordinary.txt",
+        "visible": "lexical-2-visible.txt",
+        "holdout": "lexical-2-holdout.txt",
+        "check": "lexical-2-check.txt",
+        "build": "lexical-2-build.txt"
+      },
+      "candidate": {
+        "patch": "lexical-2.patch",
+        "patchSha256": "10b52369a8a67e0a62d107ff4f8cdd5dc5f91169dc4e6b0f2e1143686f66e05d",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "src/extension.ts": "12998220010ac13dfea70d0c40271abc6c2bafc54b61b8c77eb8f39b886b86cd",
+          "test/session-persistence.test.ts": "c3e9f7c72e3348b76a44a3d2266116f839c353a115fe032022f0e24ce121d60e"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 2,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "jev-2",
+      "runId": "2026-09-17T22-11-48.414Z-session-mode-2-dependency-jev",
+      "sample": 2,
+      "mode": "jev",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "d672736a71d48339c429b141f6436e4019c69b68",
+        "dirty": false,
+        "sourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "trackedSourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 156,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d672736a71d48339c429b141f6436e4019c69b68",
+        "dirty": false,
+        "sourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "trackedSourceDigest": "e61c67bb6c3727d88fe413cfff05af1ba3b7f0b41b4c422e855a8bae6977824a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 156,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "requests": 35,
+      "tokens": 1044172,
+      "usage": {
+        "input": 37,
+        "output": 10113,
+        "cacheRead": 992106,
+        "cacheWrite": 41916,
+        "estimatedUsd": 0.6066227999999999
+      },
+      "elapsedMs": 245852,
+      "evidenceAndAgentElapsedMs": 248581,
+      "calls": {
+        "bash": 42,
+        "edit": 3
+      },
+      "dependencyPathCalls": 28,
+      "evidenceDelivered": true,
+      "firstEdit": {
+        "toolIndex": 31,
+        "secondsToToolResult": 146.802
+      },
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "repositoryDocumentationChanged": false,
+        "finalAnswerDocumentsChange": true,
+        "blockingFindings": [
+          {
+            "path": "src/extension.ts",
+            "line": 20,
+            "issue": "Forward traversal of root-to-leaf getBranch() restores oldest valid mode instead of latest."
+          },
+          {
+            "issue": "No candidate-authored regression tests beyond the supplied reproduction."
+          }
+        ],
+        "coverageLimitations": [
+          "The candidate's 41 passing tests are the 40 existing tests plus the supplied reproduction.",
+          "Final answer repeats the incorrect newest-first assumption."
+        ]
+      },
+      "dependencyEvidence": {
+        "packages": [
+          "@earendil-works/pi-coding-agent@0.85.1",
+          "ai@7.0.105"
+        ],
+        "filesScanned": 236,
+        "bytesRead": 2336099,
+        "inventoryDigest": "8aa83693e56e7fafc7b9b689066c38169ccfd5034bdf4d4311cf7d4ccdc2fd6e",
+        "inventoryTruncated": true,
+        "filePool": [
+          "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/rpc.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/models.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/custom-provider.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/settings.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/usage.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/tui.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/export-html/template.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/package-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/main.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/keybindings.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/compaction.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/package-manager-cli.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sessions.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/providers.md",
+          "node_modules/ai/dist/internal/index.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.js"
+        ],
+        "selectedFiles": [
+          "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md"
+        ],
+        "candidates": [
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+            "startLine": 409,
+            "bytes": 1571,
+            "sha256": "7b7d3d71a12d8665bc399c039b5ad6e900d26fb24f4abd9b04f302e9565bfc1c"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+            "startLine": 241,
+            "bytes": 2165,
+            "sha256": "76e90e8fa3404b32332a2b369b16ecaeb90132859d55e82a640f70a58d35ddce"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+            "startLine": 385,
+            "bytes": 1932,
+            "sha256": "95d1fe0a7be9b5b4789011a402ac5c693153b095910a04422c8b13721bf83cb5"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+            "startLine": 313,
+            "bytes": 1741,
+            "sha256": "f4a630539174b123b01d321ca4c1f3abd9ca21dfae897f55829144ada5bb441e"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+            "startLine": 265,
+            "bytes": 1599,
+            "sha256": "75b1f74142d8ce6d9d7ac2cec156d25646f37d2fe0913be396c47bad38aaba1d"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+            "startLine": 1225,
+            "bytes": 2354,
+            "sha256": "dbeb126785f279ed196b5a1f5729568ab6beb5db764cff66c3b6b5f563ae58ad"
+          }
+        ],
+        "elapsedMs": 2729,
+        "decisions": [
+          {
+            "status": "ok",
+            "answers": {
+              "f0": {
+                "type": "noul",
+                "noul": 0.14
+              },
+              "f1": {
+                "type": "noul",
+                "noul": 0.5
+              },
+              "f2": {
+                "type": "noul",
+                "noul": 0.42
+              },
+              "f3": {
+                "type": "noul",
+                "noul": 0.09
+              },
+              "f4": {
+                "type": "noul",
+                "noul": 0.62
+              },
+              "f5": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "f6": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f7": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "f8": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "f9": {
+                "type": "noul",
+                "noul": 0.08
+              },
+              "f10": {
+                "type": "noul",
+                "noul": 0.69
+              },
+              "f11": {
+                "type": "noul",
+                "noul": 0.11
+              },
+              "f12": {
+                "type": "noul",
+                "noul": 0.06
+              },
+              "f13": {
+                "type": "noul",
+                "noul": 0.11
+              },
+              "f14": {
+                "type": "noul",
+                "noul": 0.17
+              },
+              "f15": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "f16": {
+                "type": "noul",
+                "noul": 0.23
+              },
+              "f17": {
+                "type": "noul",
+                "noul": 0.17
+              },
+              "f18": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f19": {
+                "type": "noul",
+                "noul": 0.36
+              },
+              "f20": {
+                "type": "noul",
+                "noul": 0.33
+              },
+              "f21": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "f22": {
+                "type": "noul",
+                "noul": 0.06
+              },
+              "f23": {
+                "type": "noul",
+                "noul": 0.4
+              }
+            },
+            "model": "typesafe-ai/jev",
+            "inputTokens": 8830,
+            "outputTokens": 426,
+            "latencyMs": 1197,
+            "cached": false
+          },
+          {
+            "status": "ok",
+            "answers": {
+              "w0": {
+                "type": "noul",
+                "noul": 0.83
+              },
+              "w1": {
+                "type": "noul",
+                "noul": 0.83
+              },
+              "w2": {
+                "type": "noul",
+                "noul": 0.23
+              },
+              "w3": {
+                "type": "noul",
+                "noul": 0.58
+              },
+              "w4": {
+                "type": "noul",
+                "noul": 0.84
+              },
+              "w5": {
+                "type": "noul",
+                "noul": 0.22
+              },
+              "w6": {
+                "type": "noul",
+                "noul": 0.68
+              },
+              "w7": {
+                "type": "noul",
+                "noul": 0.17
+              },
+              "w8": {
+                "type": "noul",
+                "noul": 0.79
+              },
+              "w9": {
+                "type": "noul",
+                "noul": 0.66
+              },
+              "w10": {
+                "type": "noul",
+                "noul": 0.44
+              },
+              "w11": {
+                "type": "noul",
+                "noul": 0.2
+              },
+              "w12": {
+                "type": "noul",
+                "noul": 0.21
+              },
+              "w13": {
+                "type": "noul",
+                "noul": 0.23
+              },
+              "w14": {
+                "type": "noul",
+                "noul": 0.24
+              },
+              "w15": {
+                "type": "noul",
+                "noul": 0.3
+              },
+              "w16": {
+                "type": "noul",
+                "noul": 0.78
+              },
+              "w17": {
+                "type": "noul",
+                "noul": 0.73
+              },
+              "w18": {
+                "type": "noul",
+                "noul": 0.67
+              },
+              "w19": {
+                "type": "noul",
+                "noul": 0.61
+              },
+              "w20": {
+                "type": "noul",
+                "noul": 0.53
+              },
+              "w21": {
+                "type": "noul",
+                "noul": 0.35
+              },
+              "w22": {
+                "type": "noul",
+                "noul": 0.65
+              },
+              "w23": {
+                "type": "noul",
+                "noul": 0.46
+              }
+            },
+            "model": "typesafe-ai/jev",
+            "inputTokens": 14779,
+            "outputTokens": 426,
+            "latencyMs": 1246,
+            "cached": false
+          }
+        ]
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 4,
+          "fail": 4,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "session mode: disk reopen restores all explicit selections over a different configured default",
+            "session mode: tree navigation restores ancestors and divergent branches immediately",
+            "session mode: public runtime fork inherits selected ancestry and keeps parent/fork/new sessions independent",
+            "session mode: restored modes preserve ranking, skill advice and triage effects; restored off makes zero Jev calls"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "jev-2-ordinary.txt",
+        "visible": "jev-2-visible.txt",
+        "holdout": "jev-2-holdout.txt",
+        "check": "jev-2-check.txt",
+        "build": "jev-2-build.txt"
+      },
+      "candidate": {
+        "patch": "jev-2.patch",
+        "patchSha256": "aa6ff628cae28e3d1e177ed90faebe9bf9cc52a5c984c1329623c145f323f9ad",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "src/extension.ts": "6d0a3f126d7ad955b1291146603f771f8c7c9e6964c35cd140c8c4d2cf87a499"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 1,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    }
+  ]
+}
