@@ -21,7 +21,7 @@ These are hypotheses, not a feature checklist. Reject or revise experiments that
 
 Extend the existing `pij_search` tool, keeping literal-pattern search available. A query without patterns enables bounded source discovery: enumerate permitted source files, build small source cards, select candidates, and return actual source windows with line references. Candidate selection and window relevance are independent typed judgments. Do not return invented summaries. Small source windows keep the inference local; lexical retrieval and ordinary read/bash remain recovery paths.
 
-The initial prototype is opt-in through an explicit natural-language tool invocation. It must state file/window limits, truncation, fallback and ranking status. Only measured gains justify making it more automatic. The comparison must separate the benefit of a new retrieval tool from the incremental contribution of Jev.
+The initial prototype is opt-in through an explicit natural-language tool invocation. It must state file/window limits, truncation, fallback and ranking status. Only measured gains justify enabling automatic retrieval by default. The comparison must separate the benefit of a new retrieval tool from the incremental contribution of Jev.
 
 ### Revision: optional initial evidence briefing
 
@@ -29,7 +29,7 @@ The initial live repair runs and the real CLI repository task did not call `pij_
 
 An explicitly enabled `PIJ_SOURCE_BRIEFING=1` experiment now acquires source evidence before the first coding-model request of each user prompt. It injects at most six distinct files' exact excerpts from the same bounded candidates. Assist reranks with Jev; off and observe inject deterministic discovery order, so a paired off/assist comparison isolates Jev's contribution. The default remains disabled. No skills, tools or existing conversation messages are removed. Each new prompt refreshes the snapshot, which is labeled as predating edits. Missing discovery tools or failed evaluation leave ordinary investigation available. This is a local workspace mechanism: excluded dependency APIs and unscanned sources are still gaps.
 
-The hypothesis is fewer model-driven source-selection rounds without lower acceptance, after counting the initial retrieval, context tokens and Jev latency. Initial evidence must not be described as implementation correctness or instruction fulfillment. A real CLI run generated its own session identifier despite being asked for the actual runtime ID; satisfying explicit task constraints remains a separate problem from finding generally relevant code.
+The snapshot is placed beside its activating user request, before later assistant/tool observations. A consumed steering message suppresses the previous request's advice; it must not reappear as fresh evidence after each tool response. The hypothesis is fewer model-driven source-selection rounds without lower acceptance, after counting the initial retrieval, context tokens and Jev latency. Initial evidence must not be described as implementation correctness or instruction fulfillment. A real CLI run generated its own session identifier despite being asked for the actual runtime ID; satisfying explicit task constraints remains a separate problem from finding generally relevant code.
 
 Global constraints:
 

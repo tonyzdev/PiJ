@@ -33,5 +33,5 @@ export function statusText(config: PijConfig, mode: DecisionMode, journal: Decis
 
 export function formatDecisions(records: DecisionRecord[]): string {
   if (!records.length) return "No Jev decisions recorded yet.";
-  return records.map((record) => cleanText(`${record.at.slice(11, 19)}  ${record.mode.padEnd(7)} ${record.kind.padEnd(15)} ${record.status === "fallback" ? `fallback:${record.reason}` : record.cached ? "cached" : "ok"}  ${record.latencyMs}ms`)).join("\n");
+  return records.map((record) => cleanText(`${record.at.slice(11, 19)}  ${record.mode.padEnd(7)} ${record.kind.padEnd(15)} ${record.status === "fallback" ? `fallback:${record.reason}` : record.cached ? "cached" : "ok"}  ${record.latencyMs}ms${record.sessionId ? `  session=${record.sessionId}` : ""}${record.userMessageId ? `  user=${record.userMessageId}` : ""}`)).join("\n");
 }

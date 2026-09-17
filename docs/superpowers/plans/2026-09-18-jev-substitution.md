@@ -48,3 +48,7 @@ Files: `src/extension.ts`, `eval/run.ts`, `test/integration.test.ts`, `package.j
 ## Pilot-driven revision
 
 The optional search tool was not selected in the first live runs. Add an explicitly enabled initial evidence snapshot, comparing the same candidates with deterministic and Jev selection; keep the normal default unchanged. Repair the request-budget hook (Pi swallows extension exceptions), per-response output cap, task verifier isolation, and real CLI test environment before further comparisons. See `docs/experiment-results.md` for failed pilots. Full-task gains remain unproven.
+
+## Decision trace identity
+
+The real CLI task exposed the risk of inventing a session ID or using Pi's per-model-turn index. Associate decision metadata with the actual `sessionManager.getSessionId()` and the most recent user message entry ID on its current branch. Capture those IDs before awaiting evaluation, so cancellation or a session switch cannot relabel an in-flight result. Keep fields optional when reading old records and include them in the decisions presentation. Validate multiple decisions, successive user prompts, and a session switch through the real Pi SDK. This establishes trace identity, not adoption or task benefit.

@@ -92,6 +92,9 @@ for (const mode of ["assist", "observe", "off"] satisfies DecisionMode[]) {
     if (retrieval === "briefing") {
       assert.ok(modelRequests[0]!.includes("refreshToken"));
       assert.equal(modelRequests[0]!.includes("Jev ranked initial snapshot"), mode === "assist");
+      const conversation = JSON.parse(modelRequests[3]!).messages as { role: string; content: unknown }[];
+      const snapshotIndex = conversation.findIndex((message) => JSON.stringify(message.content).includes("PiJ source evidence"));
+      assert.ok(snapshotIndex > 0 && snapshotIndex < conversation.findIndex((message) => message.role === "assistant"), "initial evidence must precede subsequent tool observations, not arrive as a fresh user message after every tool");
     }
     const search = session.messages.find((m) => m.role === "toolResult" && m.toolName === "pij_search");
     const searchText = JSON.stringify(search);
@@ -108,6 +111,12 @@ for (const mode of ["assist", "observe", "off"] satisfies DecisionMode[]) {
     const transcript = modelRequests.join("\n");
     assert.equal(transcript.includes("PiJ skill suggestion"), mode === "assist");
     const records = await readRecentDecisions(home);
+    const userEntry = session.sessionManager.getBranch().findLast((entry) => entry.type === "message" && entry.message.role === "user");
+    assert.ok(userEntry);
+    for (const row of records) {
+      assert.equal(row.sessionId, session.sessionId);
+      assert.equal(row.userMessageId, userEntry.id);
+    }
     if (mode === "off") { assert.equal(jevCalls, 0); assert.equal(records.length, 0); }
     else { assert.equal(jevCalls, retrieval === "briefing" ? 5 : 4); assert.equal(records.length, jevCalls); }
     if (retrieval === "briefing") {
@@ -116,6 +125,18 @@ for (const mode of ["assist", "observe", "off"] satisfies DecisionMode[]) {
       assert.ok(modelRequests.at(-1)!.includes("changedSnapshot"));
       const latest = await readRecentDecisions(home);
       assert.equal(latest.filter((row) => row.kind === "source_briefing").length, mode === "off" ? 0 : 2);
+      if (mode !== "off") assert.notEqual(latest.at(-1)!.userMessageId, userEntry.id);
+      const previousSession = session.sessionId;
+      const { session: switchedSession } = await createAgentSession({ cwd, agentDir: home, model: runtime.getModel("pij-fixture", "fixture"), modelRuntime: runtime, resourceLoader: resources, settingsManager: settings, sessionManager: SessionManager.inMemory() });
+      t.after(() => switchedSession.dispose());
+      await switchedSession.bindExtensions({});
+      assert.notEqual(switchedSession.sessionId, previousSession);
+      await switchedSession.prompt("Inspect token refresh in this new session.");
+      const switched = await readRecentDecisions(home);
+      if (mode !== "off") {
+        assert.equal(switched.at(-1)!.sessionId, switchedSession.sessionId);
+        assert.notEqual(switched.at(-1)!.userMessageId, latest.at(-1)!.userMessageId);
+      }
     }
   });
 }

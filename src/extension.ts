@@ -19,6 +19,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
     let skillAdvice: string | undefined;
     let briefingPending = false;
     let sourceAdvice: string | undefined;
+    let adviceUserId: string | undefined;
     let failuresThisRun = 0;
     let run = new AbortController();
     let context: ExtensionContext | undefined;
@@ -26,13 +27,20 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
     const journal = new DecisionJournal(config.home);
     const client = new JevClient(config);
     const update = () => context?.ui.setStatus("pij", cleanText(statusText(config, mode, journal, journal.recent().at(-1))));
-    const engineFor = (decisionMode: DecisionMode) => new DecisionEngine(client, async (observation) => { await journal.record(decisionMode, observation); update(); });
+    const engineFor = (decisionMode: DecisionMode, ctx: ExtensionContext) => {
+      // Bind to real persisted entries before an asynchronous decision can cross
+      // a session change. Pi's turnIndex counts model loops, not user prompts.
+      const user = ctx.sessionManager.getBranch().findLast((entry) => entry.type === "message" && entry.message.role === "user");
+      const scope = { sessionId: ctx.sessionManager.getSessionId(), userMessageId: user?.id };
+      return new DecisionEngine(client, async (observation) => { await journal.record(decisionMode, observation, scope); update(); });
+    };
     const signalFor = (signal?: AbortSignal) => signal ? AbortSignal.any([signal, run.signal]) : run.signal;
 
     pi.on("session_start", (_event, ctx) => {
       run.abort(); run = new AbortController(); request = ""; failuresThisRun = 0;
       skillPending = false; skillAdvice = undefined; skills = [];
       briefingPending = false; sourceAdvice = undefined;
+      adviceUserId = undefined;
       context = ctx;
       unsubscribeInput?.();
       if (ctx.mode === "tui") {
@@ -74,6 +82,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
       skills = event.systemPromptOptions.skills ?? [];
       skillAdvice = undefined;
       sourceAdvice = undefined;
+      adviceUserId = undefined;
       briefingPending = config.sourceBriefing === true && Boolean(request.trim());
       skillPending = mode !== "off" && !/^\/skill:|<skill(?:\s|>)/.test(event.prompt);
       update();
@@ -83,6 +92,8 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
     // decisions only in context, where TUI, SDK and RPC abort all reach fetch.
     pi.on("context", async (event, ctx) => {
       const signal = signalFor(ctx.signal);
+      const userId = ctx.sessionManager.getBranch().findLast((entry) => entry.type === "message" && entry.message.role === "user")?.id;
+      adviceUserId ??= userId;
       if (briefingPending && ctx.signal && !signal.aborted) {
         briefingPending = false;
         const currentMode = mode;
@@ -90,7 +101,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
           const found = await discoverCode({ cwd: ctx.cwd, query: request.slice(0, 2000), signal });
           let selected = found.candidates;
           if (currentMode !== "off") {
-            const ranked = await engineFor(currentMode).rankCode(request, selected, signal, "source_briefing");
+            const ranked = await engineFor(currentMode, ctx).rankCode(request, selected, signal, "source_briefing");
             if (currentMode === "assist") selected = ranked;
           }
           // A shortlist should cover different files before spending context on
@@ -111,7 +122,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
       if (skillPending && ctx.signal && !signal.aborted) {
         skillPending = false;
         const currentMode = mode;
-        const suggestions = await engineFor(currentMode).recommendSkills(request, skills, async (path) => {
+        const suggestions = await engineFor(currentMode, ctx).recommendSkills(request, skills, async (path) => {
           if ((await stat(path)).size > 200_000) throw new Error("Skill too large for advisory inspection.");
           return readFile(path, "utf8");
         }, signal);
@@ -119,10 +130,14 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
           skillAdvice = `PiJ skill suggestion (advisory): consider loading ${suggestions.map((skill) => `${JSON.stringify(skill.name)} at ${JSON.stringify(skill.filePath)}`).join("; ")}. Verify that each skill matches the user's request. The full skill roster remains available. User-selected skills take precedence.`;
         }
       }
-      if (signal.aborted) return;
+      if (signal.aborted || !userId || userId !== adviceUserId) return;
       const advice = [sourceAdvice, mode === "assist" ? skillAdvice : undefined].filter(Boolean).join("\n\n");
       if (!advice) return;
-      return { messages: [...event.messages, { role: "custom", customType: "pij-evidence", display: false, content: advice, timestamp: Date.now() }] };
+      const anchor = event.messages.findLastIndex((message) => message.role === "user");
+      if (anchor < 0) return;
+      // Keep initial evidence beside the request that caused it. Appending a
+      // fresh user-like message after every tool obscures newer observations.
+      return { messages: [...event.messages.slice(0, anchor + 1), { role: "custom", customType: "pij-evidence", display: false, content: advice, timestamp: Date.now() }, ...event.messages.slice(anchor + 1)] };
     });
 
     pi.on("tool_result", async (event, ctx) => {
@@ -131,7 +146,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
       const signal = signalFor(ctx.signal);
       const currentMode = mode;
       const output = event.content.filter((part) => part.type === "text").map((part) => part.text).join("\n");
-      const suggestion = await engineFor(currentMode).triage(event.toolName, output, request, signal);
+      const suggestion = await engineFor(currentMode, ctx).triage(event.toolName, output, request, signal);
       if (currentMode !== "assist" || mode !== currentMode || signal.aborted || !suggestion) return;
       return { content: [...event.content, { type: "text" as const, text: `\n${suggestion}` }] };
     });
@@ -158,7 +173,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
         let ranked: CodeCandidate[] = found.candidates;
         if (mode !== "off") {
           const decisionSignal = signalFor(signal);
-          const evaluated = await engineFor(currentMode).rankCode(params.query, found.candidates, decisionSignal);
+          const evaluated = await engineFor(currentMode, ctx).rankCode(params.query, found.candidates, decisionSignal);
           if (currentMode === "assist" && mode === currentMode && !decisionSignal.aborted) ranked = evaluated;
         }
         signal?.throwIfAborted();
