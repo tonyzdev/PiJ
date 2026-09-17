@@ -1,0 +1,56 @@
+import assert from "node:assert/strict";
+import { once } from "node:events";
+import { mkdir, mkdtemp, readFile, rm } from "node:fs/promises";
+import { createServer } from "node:http";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import test from "node:test";
+import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager } from "@earendil-works/pi-coding-agent";
+import { loadConfig } from "../src/config.js";
+import { createPijExtension } from "../src/extension.js";
+
+test("mode selection survives a saved SDK session being reopened", { timeout: 10000 }, async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "pij-mode-visible-"));
+  const cwd = join(root, "project"), home = join(root, "agent");
+  await mkdir(cwd);
+  const sessions: Awaited<ReturnType<typeof createAgentSession>>["session"][] = [];
+  let requests = 0;
+  const http = createServer(async (req, res) => {
+    for await (const _ of req) { /* Drain local request. */ }
+    requests++;
+    res.writeHead(200, { "Content-Type": "text/event-stream" });
+    res.write(`data: ${JSON.stringify({ id: "local", object: "chat.completion.chunk", model: "fixture", choices: [{ index: 0, delta: { role: "assistant", content: "Saved." }, finish_reason: null }] })}\n\n`);
+    res.write(`data: ${JSON.stringify({ id: "local", object: "chat.completion.chunk", model: "fixture", choices: [{ index: 0, delta: {}, finish_reason: "stop" }] })}\n\n`);
+    res.end("data: [DONE]\n\n");
+  });
+  t.after(async () => {
+    for (const session of sessions) { await session.abort(); session.dispose(); }
+    http.closeAllConnections();
+    await new Promise<void>((resolve) => http.close(() => resolve()));
+    await rm(root, { recursive: true, force: true });
+  });
+  http.listen(0, "127.0.0.1"); await once(http, "listening");
+  const address = http.address(); assert.ok(address && typeof address === "object");
+  const runtime = await ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
+  runtime.registerProvider("mode-visible-local", { baseUrl: `http://127.0.0.1:${address.port}/v1`, api: "openai-completions", apiKey: "local-fixture", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 32000, maxTokens: 128 }] });
+  const notices: string[] = [];
+  async function open(manager: SessionManager) {
+    const settings = SettingsManager.inMemory({ retry: { enabled: false }, compaction: { enabled: false } });
+    const resources = new DefaultResourceLoader({ cwd, agentDir: home, settingsManager: settings, noExtensions: true, noSkills: true, noThemes: true, noPromptTemplates: true, agentsFilesOverride: () => ({ agentsFiles: [] }), skillsOverride: () => ({ skills: [], diagnostics: [] }), extensionFactories: [createPijExtension(loadConfig({ PIJ_HOME: home, PIJ_MODE: "assist" }))] });
+    await resources.reload(); assert.deepEqual(resources.getExtensions().errors, []);
+    const { session } = await createAgentSession({ cwd, agentDir: home, modelRuntime: runtime, model: runtime.getModel("mode-visible-local", "fixture"), resourceLoader: resources, settingsManager: settings, sessionManager: manager, tools: [] });
+    sessions.push(session);
+    await session.bindExtensions({ uiContext: { ...session.extensionRunner.createContext().ui, notify: (message) => notices.push(message) } });
+    return session;
+  }
+  const original = await open(SessionManager.create(cwd, join(root, "sessions")));
+  await original.prompt("/pij off");
+  await original.prompt("Save this local fixture session.");
+  const path = original.sessionFile; assert.ok(path);
+  assert.match(await readFile(path, "utf8"), /"pij-mode"/, "saved Pi session must own the mode selection");
+  original.dispose();
+  const reopened = await open(SessionManager.open(path));
+  await reopened.prompt("/pij status");
+  assert.match(notices.at(-1)!, /Mode: off\b/, "reopen must restore off instead of the configured assist default");
+  assert.equal(requests, 1, "mode/status commands do not invoke the model");
+});

@@ -1,4 +1,5 @@
 import { lstat, realpath } from "node:fs/promises";
+import { tmpdir } from "node:os";
 import { delimiter, dirname, isAbsolute, join, relative, resolve, sep } from "node:path";
 
 function inside(root: string, target: string): boolean {
@@ -33,13 +34,23 @@ export function shellEnvironment(cwd: string): NodeJS.ProcessEnv {
 
 /** The live benchmark currently requires macOS Seatbelt. It never silently runs unsandboxed. */
 export function sandboxProfile(cwd: string, protectedRoots: string[], options: { allowLoopback?: boolean } = {}): string {
+  // Candidates and evaluator reference checkouts share the host temporary
+  // roots. Protect their contents as well as the user's home. The explicit
+  // workspace allowance below still permits this candidate's own dependencies
+  // and TMPDIR. Include canonical and symlink spellings used on macOS.
+  const privateRoots = new Set([...protectedRoots, "/tmp", "/private/tmp", "/var/folders", "/private/var/folders", tmpdir()]);
+  const ancestors: string[] = [];
+  for (let path = dirname(cwd); path !== dirname(path); path = dirname(path)) ancestors.push(path);
   return [
     "(version 1)", "(allow default)", "(deny network*)", "(deny file-write*)",
     ...(options.allowLoopback ? [
       '(allow network* (local ip "localhost:*") (remote ip "localhost:*"))',
       `(allow network* (local unix-socket (subpath ${JSON.stringify(cwd)})) (remote unix-socket (subpath ${JSON.stringify(cwd)})))`,
     ] : []),
-    ...protectedRoots.map((root) => `(deny file-read* (subpath ${JSON.stringify(root)}))`),
+    ...[...privateRoots].map((root) => `(deny file-read* (subpath ${JSON.stringify(root)}))`),
+    // Node resolves absolute entrypoints by lstat-ing ancestor directories.
+    // Metadata access does not permit their enumeration or sibling contents.
+    ...(ancestors.length ? [`(allow file-read-metadata ${ancestors.map((path) => `(literal ${JSON.stringify(path)})`).join(" ")})`] : []),
     `(allow file-read* (subpath ${JSON.stringify(cwd)}))`,
     `(allow file-write* (subpath ${JSON.stringify(cwd)}) (literal \"/dev/null\"))`,
   ].join("\n");

@@ -1,0 +1,34 @@
+TAP version 13
+# Subtest: mode selection survives a saved SDK session being reopened
+not ok 1 - mode selection survives a saved SDK session being reopened
+  ---
+  duration_ms: 74.072208
+  type: 'test'
+  location: '<candidate>/test/session-mode-visible.test.ts:1:583'
+  failureType: 'testCodeFailure'
+  error: 'saved Pi session must own the mode selection'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    {"type":"session","version":3,"id":"01a0b163-e337-7110-b15d-9896b3cc0e9f","timestamp":"2026-09-17T22:01:48.600Z","cwd":"<candidate>/.tmp/pij-mode-visible-y86tWV/project"}
+    {"type":"model_change","id":"8d7ff60e","parentId":null,"timestamp":"2026-09-17T22:01:48.605Z","provider":"mode-visible-local","modelId":"fixture"}
+    {"type":"thinking_level_change","id":"7ee2afb1","parentId":"8d7ff60e","timestamp":"2026-09-17T22:01:48.606Z","thinkingLevel":"off"}
+    {"type":"message","id":"14187a20","parentId":"7ee2afb1","timestamp":"2026-09-17T22:01:48.610Z","message":{"role":"user","content":[{"type":"text","text":"Save this local fixture session."}],"timestamp":1789682508609}}
+    {"type":"message","id":"45e952b8","parentId":"14187a20","timestamp":"2026-09-17T22:01:48.654Z","message":{"role":"assistant","content":[{"type":"text","text":"Saved."}],"api":"openai-completions","provider":"mode-visible-local","model":"fixture","usage":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"totalTokens":0,"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0,"total":0}},"stopReason":"stop","timestamp":1789682508639,"responseId":"local","rawStopReason":"stop"}}
+
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (<candidate>/test/session-mode-visible.test.ts:50:10)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 0
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 831.698459

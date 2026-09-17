@@ -152,3 +152,10 @@ top of `seed.patch`. The unchanged visible reproduction is supplied separately
 by `eval/checkpoint-fixture/visible`. Frozen seven-test and additional two-test
 scores remain separate. The candidate patches are evidence, not proposed
 product fixes. Raw model traces remain private and ignored.
+
+Later control review found that the original sandbox did not block reads of
+peer workspaces under shared temporary roots. The two traces above contain no
+explicit other-candidate project paths in their 53/41 tool calls; that narrow
+scan is not proof against every indirect access. The original pair did not
+establish peer read isolation. Subsequent runs use the corrected profile and
+real-CLI peer-read regressions described in the session-mode experiment.

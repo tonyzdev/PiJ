@@ -19,6 +19,7 @@ async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" 
   await mkdir(localDocs, { recursive: true });
   await writeFile(join(localDocs, "extensions.md"), "LOCAL_SDK_DOCUMENTATION\n");
   await writeFile(join(protectedRoot, "marker.txt"), "NON_SECRET_ISOLATION_MARKER\n");
+  await writeFile(join(root, "peer-candidate.txt"), "SYNTHETIC_PEER_CANDIDATE\n");
   const env: NodeJS.ProcessEnv = { HOME: join(cwd, ".home"), PIJ_EVAL_WORKSPACE: cwd, PIJ_EVAL_STATS: join(root, "stats.json"), PIJ_EVAL_TURNS: "12", PIJ_EVAL_TOKENS: "100000", PIJ_ISOLATION_SENTINEL: "synthetic-inherited-marker", PIJ_EVAL_PROTECTED_HOME: protectedHome === "valid" ? protectedRoot : protectedHome === "workspace" ? join(cwd, ".home") : undefined };
   const previous = Object.fromEntries(Object.keys(env).map((key) => [key, process.env[key]]));
   for (const [key, value] of Object.entries(env)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; }
@@ -29,6 +30,7 @@ async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" 
     'printf "%s" "${PIJ_ISOLATION_SENTINEL-unset}" > environment.txt',
     `cat ${shellQuote(resolve("package.json"))} > /dev/null`,
     "printf permitted > proof.txt",
+    `cat ${shellQuote(join(root, "peer-candidate.txt"))}`,
   ];
   if (checkpoint) {
     await Promise.all([mkdir(join(cwd, "src")), mkdir(join(cwd, "test"))]);
@@ -94,7 +96,7 @@ async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" 
 
 test("loaded CLI control protects the real home and development repository despite rewritten HOME", { skip: process.platform !== "darwin", timeout: 10000 }, async (t) => {
   const result = await loadedControlFixture(t, "valid");
-  assert.equal(result.requests, 7);
+  assert.equal(result.requests, 8);
   assert.equal(result.results[0]?.isError, true, "protected marker read must fail");
   assert.equal(result.results[1]?.isError, true, "outside write must fail");
   await assert.rejects(access(join(result.root, "outside.txt")));
@@ -102,30 +104,35 @@ test("loaded CLI control protects the real home and development repository despi
   assert.equal(result.results[3]?.isError, true, "development repository read must fail");
   assert.equal(await readFile(join(result.cwd, "proof.txt"), "utf8"), "permitted");
   assert.ok(!JSON.stringify(result.results).includes("NON_SECRET_ISOLATION_MARKER"));
-  assert.equal(result.results[5]?.isError, false, "advertised SDK documentation must be readable within the task clone");
-  assert.ok(JSON.stringify(result.results[5]).includes("LOCAL_SDK_DOCUMENTATION"));
+  assert.equal(result.results[5]?.isError, true, "peer candidate read must fail");
+  assert.ok(!JSON.stringify(result.results).includes("SYNTHETIC_PEER_CANDIDATE"));
+  assert.equal(result.results[6]?.isError, false, "advertised SDK documentation must be readable within the task clone");
+  assert.ok(JSON.stringify(result.results[6]).includes("LOCAL_SDK_DOCUMENTATION"));
 });
 
 test("actual CLI startup retains protected roots when launched in a separate task checkout", { skip: process.platform !== "darwin", timeout: 15000 }, async (t) => {
   const result = await loadedControlFixture(t, "valid", true);
-  assert.equal(result.requests, 7);
+  assert.equal(result.requests, 8);
   assert.equal(result.results[0]?.isError, true);
   assert.equal(result.results[1]?.isError, true);
   assert.equal(result.results[3]?.isError, true);
   await assert.rejects(access(join(result.root, "outside.txt")));
   assert.equal(await readFile(join(result.cwd, "environment.txt"), "utf8"), "unset");
   assert.equal(await readFile(join(result.cwd, "proof.txt"), "utf8"), "permitted");
-  assert.equal(result.results[5]?.isError, false, "the real CLI must advertise the clone's installed SDK docs");
-  assert.ok(JSON.stringify(result.results[5]).includes("LOCAL_SDK_DOCUMENTATION"));
+  assert.equal(result.results[5]?.isError, true, "the real CLI must deny other candidate trees");
+  assert.ok(!JSON.stringify(result.results).includes("SYNTHETIC_PEER_CANDIDATE"));
+  assert.equal(result.results[6]?.isError, false, "the real CLI must advertise the clone's installed SDK docs");
+  assert.ok(JSON.stringify(result.results[6]).includes("LOCAL_SDK_DOCUMENTATION"));
 });
 
 test("actual CLI loads the checkpoint extension without weakening isolation", { skip: process.platform !== "darwin", timeout: 15000 }, async (t) => {
   const result = await loadedControlFixture(t, "valid", true, true);
   assert.equal(result.checkpointReady, true, result.stderr);
   assert.deepEqual(result.checkpointProcesses, ["start", "stop"]);
-  assert.equal(result.requests, 8);
+  assert.equal(result.requests, 9);
   assert.equal(result.results[0]?.isError, true);
   assert.equal(result.results[3]?.isError, true);
+  assert.equal(result.results[5]?.isError, true);
   assert.equal(await readFile(join(result.cwd, "proof.txt"), "utf8"), "permitted");
 });
 
