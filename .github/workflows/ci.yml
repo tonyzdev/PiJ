@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  verify:
+    name: Node ${{ matrix.node }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        node: ['22.19.0', '24']
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - name: Install ripgrep
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y ripgrep
+      - name: Install dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Check types
+        run: npm run check
+      - name: Run offline tests
+        run: npm test
+      - name: Build
+        run: npm run build
+      - name: Verify package installation
+        env:
+          PIJ_HOME: ${{ runner.temp }}/pij-home
+          PI_OFFLINE: '1'
+          PI_TELEMETRY: '0'
+        run: |
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP"
+          npm install --ignore-scripts --no-audit --no-fund --prefix "$RUNNER_TEMP/pij-install" "$RUNNER_TEMP/pij-agent-0.1.0.tgz"
+          cd "$RUNNER_TEMP"
+          ./pij-install/node_modules/.bin/pij --version
+          ./pij-install/node_modules/.bin/pij doctor --json
+          ./pij-install/node_modules/.bin/pij --pi-help > /dev/null

@@ -1,0 +1,61 @@
+{
+  "name": "pij-agent",
+  "version": "0.1.0",
+  "description": "A terminal coding agent with Jev in the loop: skill selection, code ranking, and failure triage.",
+  "type": "module",
+  "license": "MIT",
+  "bin": {
+    "pij": "bin/pij.mjs"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "docs",
+    ".env.example",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md",
+    "README.zh-CN.md",
+    "CONTRIBUTING.md"
+  ],
+  "engines": {
+    "node": ">=22.19.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "check": "tsc --noEmit",
+    "test": "tsx --test test/*.test.ts",
+    "start": "node bin/pij.mjs",
+    "dev": "tsx src/cli.ts",
+    "prepack": "npm run build"
+  },
+  "dependencies": {
+    "@ai-sdk/gateway": "4.0.85",
+    "@earendil-works/pi-coding-agent": "0.85.1",
+    "@earendil-works/pi-tui": "0.85.1",
+    "ai": "7.0.105",
+    "minimatch": "10.2.6",
+    "typebox": "1.3.27"
+  },
+  "devDependencies": {
+    "@types/node": "22.19.19",
+    "tsx": "4.22.1",
+    "typescript": "5.9.3"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tonyzdev/PiJ.git"
+  },
+  "homepage": "https://github.com/tonyzdev/PiJ#readme",
+  "bugs": {
+    "url": "https://github.com/tonyzdev/PiJ/issues"
+  },
+  "keywords": [
+    "coding-agent",
+    "jev",
+    "typesafe",
+    "pi",
+    "terminal",
+    "ai-agent"
+  ]
+}
