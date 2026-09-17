@@ -14,7 +14,9 @@ Reviewed 2026-09-18 against [pi-jev revision b3478fd](https://github.com/y0usaf/
 
 The competitor's automatically invoked hooks and visible verdicts are advantages in integration and inspectability. Its lightweight distribution also lets existing Pi users keep their setup. PiJ's domain-specific retrieval and Gateway support are practical differences, but readily reproducible features, not a demonstrated moat.
 
-PiJ currently lacks complete decision-to-action lineage and proven task-level gains. In live pilots, models ignored its optional source tool. The initial automatic briefing is an experiment to replace some serial source-selection work, with a deterministic off baseline to isolate the incremental role of Jev. It remains disabled by default.
+PiJ records actual session and user-message identifiers, but still lacks complete decision-to-action lineage and proven general task-level gains. In live pilots, models ignored its optional source tool. Initial automatic briefing is an experiment to replace some serial source-selection work, with a deterministic off baseline. Assist also enables failure triage, so the current comparison does not isolate ranking alone. It remains disabled by default.
+
+In a single Sonnet 4.6 pair for each of two repair tasks, both off and assist passed all independent acceptance checks. Assist was faster and cheaper on document lifecycle, slower and more expensive on queue pagination. Earlier Qwen runs failed in both modes. These results establish neither consistent coding gains nor superiority to pi-jev, which has not been run head-to-head.
 
 Our intended distinction is measurable reduction of wasted coding investigation while preserving independent acceptance. We do not claim PiJ is generally faster, cheaper, safer or more accurate. The competitor's risk gate and our retrieval feature have different objectives; a future head-to-head must report those objectives separately and hold the main model and budgets constant.
 

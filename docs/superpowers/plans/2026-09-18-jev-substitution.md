@@ -48,7 +48,7 @@ Files: `src/extension.ts`, `eval/run.ts`, `test/integration.test.ts`, `package.j
 ## Continuing evaluation
 
 - [x] Fix real-CLI isolation and documentation hints based on actual traces; retain invalid and failed pilots.
-- [ ] Repeat controlled off/assist tasks with an independently verified alternate main model, include the held-out queue task and a real CLI repository task, then read traces and publish bounded conclusions.
+- [x] Run controlled off/assist tasks with an independently verified alternate main model, include the second queue task and a real CLI repository task, then read traces and publish bounded conclusions. Repeated runs and a clean isolation of ranking remain future work; single pairs gave mixed efficiency and equal acceptance.
 - [ ] Choose the next substitution experiment from demonstrated wasted reasoning, rather than adding Jev calls for their own sake.
 
 ## Pilot-driven revision

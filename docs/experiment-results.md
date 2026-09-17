@@ -1,6 +1,6 @@
 # Experiment ledger
 
-These are development observations, not performance claims. The main model is `alibaba/qwen3-coder-next` through Vercel AI Gateway. Reported dollar values use the pinned Pi catalog, not billing receipts; Jev fees are not included. Raw traces and disposable workspaces stay local.
+These are development observations, not performance claims. Initial runs use `alibaba/qwen3-coder-next`; the later comparison names its alternate model explicitly. Both use Vercel AI Gateway. Reported dollar values use the pinned Pi catalog, including its cache rates, not billing receipts; Jev fees are not included. Raw traces and disposable workspaces stay local.
 
 ## 2026-09-18: optional question-driven search
 
@@ -67,6 +67,25 @@ The simultaneous actual-CLI assist run stopped after 29 admitted requests at the
 
 That CLI trace exposed a further environment confound: Pi's system prompt advertised SDK documentation in the development installation, which the corrected sandbox denies. The model eventually found the clone's installed dependency, but wasted multiple attempts on the advertised path. The harness now rewrites these documentation hints to the clone's SDK location without weakening isolation. Both loaded-extension and actual-CLI regression tests follow the advertised path and read a local marker while confirming protected reads remain denied. This correction is a harness improvement, not a Jev benefit.
 
-### Next comparison
+### Alternate-model comparison: mixed efficiency, equal acceptance
 
-Run the same off/assist protocol with `anthropic/claude-sonnet-4.6`, whose Gateway access was separately verified, and include the held-out queue task. This tests whether the observed result persists with a different coding model; it must not erase the failed Qwen runs. Keep model choice identical within each pair, report independent acceptance, and preserve negative results.
+At clean revision `e69426d`, `anthropic/claude-sonnet-4.6` ran both tasks with the same per-run limits: 36 requests, 450,000 reported tokens, 16,384 output tokens per response, 360 seconds, and initial evidence enabled. Each condition started fresh. All four completed, passed independent acceptance, and retained unchanged source/build digests. This is one run per condition/task, not a statistical performance evaluation or a comparison with pi-jev.
+
+| Task | Mode | Acceptance | Requests / reads | Reported tokens including cache | Elapsed | Estimated main cost |
+| --- | --- | --- | --- | ---: | ---: | ---: |
+| Document lifecycle | off | 11/11 | 21 / 14 | 355,293 | 346.9 s | $0.4698 |
+| Document lifecycle | assist | 11/11 | 19 / 16 | 244,043 | 294.3 s | $0.3639 |
+| Queue pagination | off | 12/12 | 14 / 12 | 197,097 | 200.7 s | $0.3536 |
+| Queue pagination | assist | 12/12 | 23 / 10 | 300,986 | 284.1 s | $0.4331 |
+
+Assist recorded three successful Jev requests in each task: initial ranking plus two failure triages. Document wait totaled 2,824 ms, with 7,544 / 454 Jev input/output tokens; queue wait totaled 1,878 ms, with 8,698 / 436 tokens. The optional `pij_search` tool was never invoked in these runs either.
+
+The document assist run was faster and cheaper; the queue assist run was slower and more expensive. Traces show both configurations still reading most relevant source files and repairing their own tests or implementations. The source snapshot did not consistently remove investigation. Assist also changes failure advice, so this experiment does not isolate ranking from triage. Model sampling, generated test differences, shared provider load and single-run variance prevent attributing either difference to a particular Jev decision. No general efficiency advantage is established.
+
+The real `pij` CLI also ran with Sonnet against the pinned public PiJ task. It stopped at the token budget after 21 admitted requests, 131.8 seconds and 691,827 reported tokens (including 604,530 cache-read tokens); estimated main cost was $0.5746. Two successful Jev evaluations waited 1,762 ms. The partial patch correctly obtains the actual session ID and adds presentation fields. An independent check, all 40 existing tests, and build passed, but it adds none of the requested new tests or documentation.
+
+Independent review identified that its generated turn UUID changes only in `before_agent_start`, which queued steering/follow-up messages bypass. A separate real-SDK regression, adapted to the candidate's `turnId` field and legacy literal-search API, confirmed two consumed user messages receive the same turn ID. Existing tests passing therefore does not establish feature acceptance. The task is incomplete and the generated patch was not merged.
+
+### Next experiment boundary
+
+Keep automatic briefing opt-in. Before claiming substitution, identify a concrete investigation step that disappears when Jev is enabled and measure the decision's actual adoption. Repeat complete-task comparisons, distinguish ranking from failure advice, and add a larger real-repository task where source selection is a meaningful bottleneck. The current two small repair projects and one unfinished real repository change cannot establish a product advantage.
