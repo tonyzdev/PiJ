@@ -16,6 +16,9 @@ async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" 
   const protectedRoot = join(root, "actual-home");
   await Promise.all([mkdir(cwd), mkdir(protectedRoot)]);
   await Promise.all([mkdir(join(cwd, ".home")), mkdir(join(cwd, ".tmp"))]);
+  const localDocs = join(cwd, "node_modules", "@earendil-works", "pi-coding-agent", "docs");
+  await mkdir(localDocs, { recursive: true });
+  await writeFile(join(localDocs, "extensions.md"), "LOCAL_SDK_DOCUMENTATION\n");
   await writeFile(join(protectedRoot, "marker.txt"), "NON_SECRET_ISOLATION_MARKER\n");
   const env: NodeJS.ProcessEnv = { HOME: join(cwd, ".home"), PIJ_EVAL_WORKSPACE: cwd, PIJ_EVAL_STATS: join(root, "stats.json"), PIJ_EVAL_TURNS: "12", PIJ_EVAL_TOKENS: "100000", PIJ_ISOLATION_SENTINEL: "synthetic-inherited-marker", PIJ_EVAL_PROTECTED_HOME: protectedHome === "valid" ? protectedRoot : protectedHome === "workspace" ? join(cwd, ".home") : undefined };
   const previous = Object.fromEntries(Object.keys(env).map((key) => [key, process.env[key]]));
@@ -30,8 +33,14 @@ async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" 
   ];
   let requests = 0;
   const http = createServer(async (req, res) => {
-    for await (const _ of req) { /* Local deterministic provider only. */ }
-    const command = commands[requests++];
+    const chunks: Buffer[] = [];
+    for await (const chunk of req) chunks.push(Buffer.from(chunk));
+    const body = JSON.parse(Buffer.concat(chunks).toString()) as { messages: { role: string; content: string }[] };
+    const system = body.messages.filter((message) => message.role === "system").map((message) => message.content).join("\n");
+    const docs = system.match(/^- Additional docs: (.+)$/m)?.[1];
+    // Follow the documentation path actually advertised to the coding model.
+    const command = commands[requests] ?? (requests === commands.length && docs ? `cat ${shellQuote(join(docs, "extensions.md"))}` : undefined);
+    requests++;
     const delta = command ? { role: "assistant", tool_calls: [{ index: 0, id: `call_${requests}`, type: "function", function: { name: "bash", arguments: JSON.stringify({ command }) } }] } : { role: "assistant", content: "Fixture complete." };
     res.writeHead(200, { "Content-Type": "text/event-stream" });
     res.write(`data: ${JSON.stringify({ id: `r${requests}`, object: "chat.completion.chunk", model: "fixture", choices: [{ index: 0, delta, finish_reason: null }] })}\n\n`);
@@ -70,7 +79,7 @@ async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" 
 
 test("loaded CLI control protects the real home and development repository despite rewritten HOME", { skip: process.platform !== "darwin", timeout: 10000 }, async (t) => {
   const result = await loadedControlFixture(t, "valid");
-  assert.equal(result.requests, 6);
+  assert.equal(result.requests, 7);
   assert.equal(result.results[0]?.isError, true, "protected marker read must fail");
   assert.equal(result.results[1]?.isError, true, "outside write must fail");
   await assert.rejects(access(join(result.root, "outside.txt")));
@@ -78,17 +87,21 @@ test("loaded CLI control protects the real home and development repository despi
   assert.equal(result.results[3]?.isError, true, "development repository read must fail");
   assert.equal(await readFile(join(result.cwd, "proof.txt"), "utf8"), "permitted");
   assert.ok(!JSON.stringify(result.results).includes("NON_SECRET_ISOLATION_MARKER"));
+  assert.equal(result.results[5]?.isError, false, "advertised SDK documentation must be readable within the task clone");
+  assert.ok(JSON.stringify(result.results[5]).includes("LOCAL_SDK_DOCUMENTATION"));
 });
 
 test("actual CLI startup retains protected roots when launched in a separate task checkout", { skip: process.platform !== "darwin", timeout: 15000 }, async (t) => {
   const result = await loadedControlFixture(t, "valid", true);
-  assert.equal(result.requests, 6);
+  assert.equal(result.requests, 7);
   assert.equal(result.results[0]?.isError, true);
   assert.equal(result.results[1]?.isError, true);
   assert.equal(result.results[3]?.isError, true);
   await assert.rejects(access(join(result.root, "outside.txt")));
   assert.equal(await readFile(join(result.cwd, "environment.txt"), "utf8"), "unset");
   assert.equal(await readFile(join(result.cwd, "proof.txt"), "utf8"), "permitted");
+  assert.equal(result.results[5]?.isError, false, "the real CLI must advertise the clone's installed SDK docs");
+  assert.ok(JSON.stringify(result.results[5]).includes("LOCAL_SDK_DOCUMENTATION"));
 });
 
 for (const invalid of ["missing", "workspace"] as const) {

@@ -51,3 +51,22 @@ The first fixed-budget briefing batch was stopped after its actual CLI trace sho
 The correction passes the parent's actual protected home explicitly, separately protects the development repository, and keeps a blocking control active if configuration is invalid. Runtime integration tests must load the extension with rewritten `HOME` and attempt real bash reads/writes. The SDK runner also needs incremental trace persistence and graceful interruption so a stopped run remains inspectable.
 
 Trace inspection also found repeated identical searches. The initial evidence had been appended as a new user-like message after every tool response. It now remains beside the request that generated it, before newer observations, with a runtime ordering regression test. Whether this placement caused the observed repetition is unproven; the next controlled run must assess behavior.
+
+### Fixed-revision briefing pair: no task benefit observed
+
+At clean revision `6cfd540`, both document-lifecycle runs used initial evidence, 36 model requests, 450,000 reported tokens, a 16,384-token output allowance, and 360 seconds. Source and built-runtime digests remained unchanged. Off selected deterministic evidence; assist ranked the same candidates with Jev and retained its existing failure triage. This compares the whole assist configuration, not ranking in isolation.
+
+| Configuration | Acceptance | Read calls | Main input/output tokens | Estimated main cost | Termination |
+| --- | --- | ---: | --- | ---: | --- |
+| PiJ off, initial evidence | 4/11; failed | 12 | 114,241 / 35,915 | $0.1002 | 360-second deadline |
+| PiJ assist, initial evidence | 4/11; failed | 17 | 402,744 / 26,201 | $0.2328 | 360-second deadline |
+
+Assist made three successful Jev requests (initial ranking and two failure triages), totaling 2,383 ms recorded wait and 8,687 / 454 input/output tokens. Both failed independent cancellation, stale-completion, deep-copy, TTL and listener-cleanup checks. Traces show syntax repair and cross-module interface errors; the off run also exhausted a response's output allowance while writing a test. Neither used the optional search tool. One run per condition cannot establish a general regression, but it provides no support for a speed, cost or acceptance benefit. Better reference-file overlap did not translate into a correct repair here.
+
+The simultaneous actual-CLI assist run stopped after 29 admitted requests at the token budget (698,793 reported tokens; a response can overshoot the admission budget). It performed 7 reads, 25 bash calls and one edit in 152 seconds, costing an estimated $0.3510 for the main model. Jev recorded three evaluations, including one cache hit, and 1,832 ms wait. The only patch added two required type fields without populating them; an independent type check failed. No generated changes were merged.
+
+That CLI trace exposed a further environment confound: Pi's system prompt advertised SDK documentation in the development installation, which the corrected sandbox denies. The model eventually found the clone's installed dependency, but wasted multiple attempts on the advertised path. The harness now rewrites these documentation hints to the clone's SDK location without weakening isolation. Both loaded-extension and actual-CLI regression tests follow the advertised path and read a local marker while confirming protected reads remain denied. This correction is a harness improvement, not a Jev benefit.
+
+### Next comparison
+
+Run the same off/assist protocol with `anthropic/claude-sonnet-4.6`, whose Gateway access was separately verified, and include the held-out queue task. This tests whether the observed result persists with a different coding model; it must not erase the failed Qwen runs. Keep model choice identical within each pair, report independent acceptance, and preserve negative results.

@@ -43,7 +43,13 @@ Files: `src/extension.ts`, `eval/run.ts`, `test/integration.test.ts`, `package.j
 - [x] Verify new tool mode in real Pi runtime, cancellation, observe/off behavior and fallback. Preserve existing literal search behavior.
 - [x] Build a bounded SDK runner selecting a verified available main model, with explicit mode/task/round/time settings, isolated settings and process environment.
 - [x] Run baseline tasks, inspect failures and compare paired runs. Revise the experiment when the evidence contradicts it.
-- [ ] Review source, run full checks, commit and push verified changes and sanitized results. Record limitations and the next experiment rather than marking the overall research objective complete.
+- [x] Review source, run full checks, commit and push verified changes and sanitized results. Record limitations and the next experiment rather than marking the overall research objective complete.
+
+## Continuing evaluation
+
+- [x] Fix real-CLI isolation and documentation hints based on actual traces; retain invalid and failed pilots.
+- [ ] Repeat controlled off/assist tasks with an independently verified alternate main model, include the held-out queue task and a real CLI repository task, then read traces and publish bounded conclusions.
+- [ ] Choose the next substitution experiment from demonstrated wasted reasoning, rather than adding Jev calls for their own sake.
 
 ## Pilot-driven revision
 

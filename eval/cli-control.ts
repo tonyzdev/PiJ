@@ -43,6 +43,12 @@ const control: ExtensionFactory = async (pi) => {
     return;
   }
   const budget = installEvalBudget(pi, budgets);
+  // Pi advertises documentation beside the executable. This runner executes
+  // the development build against a separate clone with its own dependencies;
+  // keep those hints inside the same workspace as the agent's tools.
+  const installedSdk = dirname(dirname(fileURLToPath(import.meta.resolve("@earendil-works/pi-coding-agent"))));
+  const workspaceSdk = resolve(cwd, "node_modules", "@earendil-works", "pi-coding-agent");
+  pi.on("before_agent_start", (event) => ({ systemPrompt: event.systemPrompt.replaceAll(installedSdk, workspaceSdk) }));
   pi.registerTool(createBashToolDefinition(cwd, {
     exposeSessionEnvironment: false,
     spawnHook: ({ command }) => ({ cwd, env: shellEnvironment(cwd), command: `/usr/bin/sandbox-exec -p ${shellQuote(profile)} /bin/bash --noprofile --norc -c ${shellQuote(command)}` }),
