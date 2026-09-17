@@ -1,0 +1,14 @@
+[
+  "compound-order-retains-microseconds-priority-and-ascii-id",
+  "forward-pages-cover-ties-without-gaps-or-duplicates",
+  "backward-chooses-nearest-rows-in-canonical-order",
+  "cursors-exist-only-when-matching-rows-exist",
+  "cursor-scope-binds-tenant-and-entire-status-set",
+  "equivalent-filters-changing-limit-and-direction-reuse-cursors",
+  "deleting-a-cursor-anchor-does-not-shift-continuation",
+  "malformed-unsupported-and-incorrectly-typed-cursors-reject",
+  "invalid-query-values-and-two-directions-reject",
+  "empty-pages-and-filters-have-no-navigation-cursors",
+  "seeded-corpus-walks-both-directions-with-varying-page-sizes",
+  "tenant-copy-summary-and-activity-behavior-stay-intact"
+]

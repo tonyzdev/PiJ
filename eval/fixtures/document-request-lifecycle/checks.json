@@ -1,0 +1,13 @@
+[
+  "document-and-preview-share-one-flight",
+  "scope-identity-and-collision-safe-cache",
+  "each-subscriber-cancels-independently",
+  "preaborted-cold-inflight-and-cached-reads",
+  "all-cancelled-detach-and-old-success-cannot-own-new-flight",
+  "old-failure-cannot-remove-replacement",
+  "transport-rejection-and-synchronous-throw-are-retryable",
+  "deep-copy-per-subscriber-and-cache-read",
+  "ttl-starts-at-completion-and-expires-at-exact-boundary",
+  "subscriber-listeners-are-removed-on-success-error-and-abort",
+  "search-and-http-contract-remain-intact"
+]
