@@ -1,0 +1,106 @@
+diff --git a/README.md b/README.md
+index e878e60..6f3acd7 100644
+--- a/README.md
++++ b/README.md
+@@ -155,3 +155,14 @@ See the [verification record](docs/verification.md), [architecture](docs/design.
+ PiJ builds on [Pi](https://github.com/earendil-works/pi) and integrates [TypeSafe's Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev), directly or through [Vercel AI Gateway](https://vercel.com/changelog/typesafe-ai-jev-now-available-on-ai-gateway). PiJ is an independent project.
+ 
+ MIT licensed. Dependencies retain their own licenses; see [third-party notices](THIRD_PARTY_NOTICES.md).
++
++### Decision ownership
++
++Decision metadata records the actual Pi session ID and an opaque `turnId` for
++the consumed user message. Steering and follow-up messages receive a distinct
++identity when Pi consumes them; repeated evaluations and cache hits for one
++message retain its identity. Ownership is captured before asynchronous work, so
++a cancelled decision stays attributed to the message and session that began it.
++`turnId` is a persisted user-entry ID, not the number of model loops. Journals
++continue to omit prompts, source text and credentials; old rows without these
++fields remain readable. `assist`, `observe` and `off` retain their prior behavior.
+diff --git a/src/extension.ts b/src/extension.ts
+index 89229cb..255f769 100644
+--- a/src/extension.ts
++++ b/src/extension.ts
+@@ -1,4 +1,3 @@
+-import { randomUUID } from "node:crypto";
+ import { readFile, stat } from "node:fs/promises";
+ import type { ExtensionContext, ExtensionFactory } from "@earendil-works/pi-coding-agent";
+ import { Text } from "@earendil-works/pi-tui";
+@@ -21,24 +20,22 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+     let run = new AbortController();
+     let context: ExtensionContext | undefined;
+     let unsubscribeInput: (() => void) | undefined;
+-    // Session and turn identifiers for decision metadata. Never contain prompts, content, or credentials.
+-    let sessionId: string | undefined;
+-    let turnId: string | undefined;
+     const journal = new DecisionJournal(config.home);
+     const client = new JevClient(config);
+     const update = () => context?.ui.setStatus("pij", cleanText(statusText(config, mode, journal, journal.recent().at(-1))));
+-    const engineFor = (decisionMode: DecisionMode) => new DecisionEngine(client, async (observation) => { await journal.record(decisionMode, observation, { sessionId, turnId }); update(); });
++    const engineFor = (decisionMode: DecisionMode, ctx: ExtensionContext) => {
++      // A run can consume several steering/follow-up messages. Snapshot the
++      // current persisted user entry before any asynchronous decision work.
++      const user = ctx.sessionManager.getBranch().findLast((entry) => entry.type === "message" && entry.message.role === "user");
++      const scope = { sessionId: ctx.sessionManager.getSessionId(), turnId: user?.id };
++      return new DecisionEngine(client, async (observation) => { await journal.record(decisionMode, observation, scope); update(); });
++    };
+     const signalFor = (signal?: AbortSignal) => signal ? AbortSignal.any([signal, run.signal]) : run.signal;
+ 
+     pi.on("session_start", (_event, ctx) => {
+       run.abort(); run = new AbortController(); request = ""; failuresThisRun = 0;
+       skillPending = false; skillAdvice = undefined; skills = [];
+       context = ctx;
+-      // Capture the session identity from the Pi runtime. The session manager
+-      // assigns a stable UUID per session file; switching sessions produces a
+-      // new ID. We never read or store session content here.
+-      sessionId = ctx.sessionManager.getSessionId();
+-      turnId = undefined;
+       unsubscribeInput?.();
+       if (ctx.mode === "tui") {
+         ctx.ui.setTitle("PiJ");
+@@ -76,10 +73,6 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+     pi.on("before_agent_start", (event, ctx) => {
+       context = ctx;
+       run.abort(); run = new AbortController(); failuresThisRun = 0; request = event.prompt;
+-      // Assign a fresh turn ID for each user prompt. All Jev evaluations within
+-      // this agent run share the same turnId; the next user prompt gets a new one.
+-      // We use randomUUID() so the ID is opaque and carries no session content.
+-      turnId = randomUUID();
+       skills = event.systemPromptOptions.skills ?? [];
+       skillAdvice = undefined;
+       skillPending = mode !== "off" && !/^\/skill:|<skill(?:\s|>)/.test(event.prompt);
+@@ -93,7 +86,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       if (skillPending && ctx.signal && !signal.aborted) {
+         skillPending = false;
+         const currentMode = mode;
+-        const suggestions = await engineFor(currentMode).recommendSkills(request, skills, async (path) => {
++        const suggestions = await engineFor(currentMode, ctx).recommendSkills(request, skills, async (path) => {
+           if ((await stat(path)).size > 200_000) throw new Error("Skill too large for advisory inspection.");
+           return readFile(path, "utf8");
+         }, signal);
+@@ -111,7 +104,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       const signal = signalFor(ctx.signal);
+       const currentMode = mode;
+       const output = event.content.filter((part) => part.type === "text").map((part) => part.text).join("\n");
+-      const suggestion = await engineFor(currentMode).triage(event.toolName, output, request, signal);
++      const suggestion = await engineFor(currentMode, ctx).triage(event.toolName, output, request, signal);
+       if (currentMode !== "assist" || mode !== currentMode || signal.aborted || !suggestion) return;
+       return { content: [...event.content, { type: "text" as const, text: `\n${suggestion}` }] };
+     });
+@@ -130,13 +123,14 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       }),
+       async execute(_id, params, signal, onUpdate, ctx) {
+         context = ctx;
++        const currentMode = mode;
++        const engine = engineFor(currentMode, ctx);
+         onUpdate?.({ content: [{ type: "text", text: "Searching source files…" }], details: {} });
+         const found = await retrieveCode({ cwd: ctx.cwd, patterns: params.patterns, path: params.path, glob: params.glob, signal });
+-        const currentMode = mode;
+         let ranked: CodeCandidate[] = found.candidates;
+         if (mode !== "off") {
+           const decisionSignal = signalFor(signal);
+-          const evaluated = await engineFor(currentMode).rankCode(params.query, found.candidates, decisionSignal);
++          const evaluated = await engine.rankCode(params.query, found.candidates, decisionSignal);
+           if (currentMode === "assist" && mode === currentMode && !decisionSignal.aborted) ranked = evaluated;
+         }
+         signal?.throwIfAborted();

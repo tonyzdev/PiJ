@@ -1,0 +1,30 @@
+{
+  "variant": "minimal reference with turnId renamed to userMessageId",
+  "passed": true,
+  "checks": {
+    "visible": {
+      "exitCode": 0,
+      "timedOut": false,
+      "outputExceeded": false,
+      "tests": 1,
+      "pass": 1,
+      "fail": 0
+    },
+    "holdout": {
+      "exitCode": 0,
+      "timedOut": false,
+      "outputExceeded": false,
+      "tests": 7,
+      "pass": 7,
+      "fail": 0
+    },
+    "check": {
+      "exitCode": 0,
+      "timedOut": false,
+      "outputExceeded": false,
+      "tests": 0,
+      "pass": 0,
+      "fail": 0
+    }
+  }
+}

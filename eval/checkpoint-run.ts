@@ -1,0 +1,168 @@
+import { execFile, spawn } from "node:child_process";
+import { createWriteStream } from "node:fs";
+import { mkdir, mkdtemp, readFile, realpath, writeFile, lstat, rm } from "node:fs/promises";
+import { homedir, tmpdir } from "node:os";
+import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
+import { parseArgs, promisify } from "node:util";
+import { shellEnvironment } from "./sandbox.js";
+import { validateBudgets, type EvalBudgetSnapshot, type EvalUsage } from "./budget.js";
+import { captureSourceProvenance } from "./provenance.js";
+import { prepareWorkspace } from "./checkpoint-fixture/verify.js";
+import { readRecentDecisions } from "../src/telemetry.js";
+
+const { values } = parseArgs({ options: {
+  mode: { type: "string", default: "off" }, model: { type: "string", default: "anthropic/claude-sonnet-4.6" },
+  checkpoint: { type: "string", default: "manual" }, thinking: { type: "string", default: "medium" },
+  seconds: { type: "string", default: "480" }, turns: { type: "string", default: "48" },
+  tokens: { type: "string", default: "1600000" }, "max-output-tokens": { type: "string", default: "16384" },
+  briefing: { type: "boolean", default: false },
+} });
+const budgets = validateBudgets({ turns: Number(values.turns), seconds: Number(values.seconds), tokens: Number(values.tokens), maxOutputTokens: Number(values["max-output-tokens"]) });
+if (process.platform !== "darwin") throw new Error("Real CLI evaluation currently requires macOS sandbox-exec.");
+if (values.mode !== "assist" && values.mode !== "observe" && values.mode !== "off") throw new Error("Use --mode assist, observe, or off.");
+if (values.mode !== "off" || values.briefing || !["manual", "dependencies", "jev"].includes(values.checkpoint!)) throw new Error("Checkpoint comparison requires --mode off, no briefing, and a valid --checkpoint mode.");
+const key = process.env.AI_GATEWAY_API_KEY;
+if (!key) throw new Error("Load AI_GATEWAY_API_KEY in the harness environment.");
+const project = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+// Capture this in the parent before shellEnvironment rewrites the child's HOME.
+const protectedHome = await realpath(homedir());
+const runId = `${new Date().toISOString().replaceAll(":", "-")}-checkpoint-${values.checkpoint}`;
+const source = await captureSourceProvenance(project);
+const output = join(project, ".pij", "evals", runId);
+const root = await realpath(await mkdtemp(join(process.platform === "darwin" ? "/private/tmp" : tmpdir(), "pij-df-")));
+const cwd = join(root, "project");
+const exec = promisify(execFile);
+await mkdir(output, { recursive: true, mode: 0o700 });
+// A pinned public revision, with no local .env, sessions, research or unstaged changes.
+await prepareWorkspace(cwd);
+const baseline = (await exec("git", ["rev-parse", "HEAD"], { cwd })).stdout.trim();
+if ((await lstat(join(cwd, "node_modules"))).isSymbolicLink()) await rm(join(cwd, "node_modules"));
+await exec("npm", ["ci", "--ignore-scripts", "--no-audit", "--no-fund"], { cwd, timeout: 120000, maxBuffer: 1024 * 1024 });
+const prompt = (await readFile(join(project, "eval/checkpoint-fixture/task.md"), "utf8")) + "\nWork autonomously. Inspect and fix the implementation, run type checks, the full test suite and build, and document the change. Do not publish or commit.";
+await writeFile(join(output, "task.txt"), prompt, { mode: 0o600 });
+const trace = createWriteStream(join(output, "cli-trace.jsonl"), { mode: 0o600 });
+const errors = createWriteStream(join(output, "stderr.txt"), { mode: 0o600 });
+const child = spawn(process.execPath, [
+  join(project, "bin", "pij.mjs"), "--jev-mode", values.mode,
+  "--mode", "json", "--print", "--provider", "vercel-ai-gateway", "--model", values.model!, "--thinking", values.thinking!,
+  "--no-context-files", "--no-skills", "--no-prompt-templates", "--no-extensions", "--offline",
+  "--extension", join(project, "eval", "cli-control.ts"),
+  "--extension", join(project, "eval", "checkpoint-extension.ts"),
+  "--session-dir", join(output, "sessions"), prompt,
+], {
+  cwd, detached: true, stdio: ["ignore", "pipe", "pipe", "ipc"],
+  env: {
+    ...shellEnvironment(cwd), AI_GATEWAY_API_KEY: key, PIJ_JEV_PROVIDER: "vercel", PIJ_HOME: join(output, "home"),
+    PIJ_EVAL_WORKSPACE: cwd, PIJ_EVAL_STATS: join(output, "control.json"), PIJ_EVAL_TURNS: values.turns,
+    PIJ_EVAL_PROTECTED_HOME: protectedHome,
+    PIJ_CHECKPOINT_MODE: values.checkpoint, PIJ_CHECKPOINT_LOG: join(output, "checkpoints.jsonl"),
+    PIJ_EVAL_TOKENS: String(budgets.tokens), PIJ_EVAL_SECONDS: String(budgets.seconds), PIJ_EVAL_MAX_OUTPUT_TOKENS: String(budgets.maxOutputTokens),
+    PIJ_SOURCE_BRIEFING: values.briefing ? "1" : "0",
+    PI_OFFLINE: "1", PI_TELEMETRY: "0", PI_SKIP_VERSION_CHECK: "1",
+  },
+});
+let pending = "";
+let pendingError = "";
+let turns = 0;
+let assistantMessages = 0;
+let providerResponses = 0;
+let reportedTokens = 0;
+const observedUsage: EvalUsage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, estimatedUsd: 0 };
+const calls: Record<string, number> = {};
+let timedOut = false;
+let interrupted = false;
+let backupBudgetStop = false;
+let modelError = false;
+let checkpointReady = false;
+let checkpointStartupError = false;
+let stopping = false;
+const checkpointGroups = new Set<number>();
+const killCheckpoint = (pid: number) => { try { process.kill(-pid, "SIGKILL"); } catch {} };
+let forcedKill: ReturnType<typeof setTimeout> | undefined;
+const stopChild = () => {
+  stopping = true;
+  for (const pid of checkpointGroups) killCheckpoint(pid);
+  if (!child.pid) return;
+  try { process.kill(-child.pid, "SIGTERM"); } catch { return; }
+  forcedKill ??= setTimeout(() => { if (child.pid) try { process.kill(-child.pid, "SIGKILL"); } catch {} }, 1000);
+};
+const interrupt = () => { interrupted = true; stopChild(); };
+process.on("SIGTERM", interrupt);
+child.on("message", (message) => {
+  const event = message as { type?: string; mode?: string; phase?: string; pid?: number };
+  if (event.type === "pij_checkpoint_ready" && event.mode === values.checkpoint) {
+    checkpointReady = true;
+    child.send({ type: "pij_checkpoint_ack" });
+  }
+  if (event.type === "pij_checkpoint_process" && Number.isSafeInteger(event.pid) && event.pid! > 0) {
+    if (event.phase === "start") { checkpointGroups.add(event.pid!); if (stopping) killCheckpoint(event.pid!); }
+    else if (event.phase === "stop") checkpointGroups.delete(event.pid!);
+  }
+});
+const clean = (text: string) => text.replaceAll(key, "[redacted]");
+const start = performance.now();
+console.log(JSON.stringify({ event: "start", runId, mode: values.mode, briefing: values.briefing, model: values.model, budgets, baseline, source, workspace: cwd, output, pid: child.pid }));
+child.stdout!.setEncoding("utf8");
+child.stdout!.on("data", (data: string) => {
+  pending += data;
+  let newline: number;
+  while ((newline = pending.indexOf("\n")) >= 0) {
+    const line = clean(pending.slice(0, newline)); pending = pending.slice(newline + 1);
+    trace.write(`${line}\n`);
+    try {
+      const event = JSON.parse(line);
+      if (event.type === "turn_start") {
+        turns++;
+        if (!checkpointReady) { checkpointStartupError = true; stopChild(); }
+      }
+      if (event.type === "tool_execution_start") {
+        calls[event.toolName] = (calls[event.toolName] ?? 0) + 1;
+        console.log(JSON.stringify({ event: "tool", turn: turns, tool: event.toolName }));
+      }
+      if (event.type === "message_end" && event.message?.role === "assistant") {
+        assistantMessages++;
+        const usage = event.message.usage;
+        const count = (value: unknown) => typeof value === "number" && Number.isFinite(value) && value >= 0 ? value : 0;
+        reportedTokens += count(usage?.totalTokens);
+        observedUsage.input += count(usage?.input);
+        observedUsage.output += count(usage?.output);
+        observedUsage.cacheRead += count(usage?.cacheRead);
+        observedUsage.cacheWrite += count(usage?.cacheWrite);
+        observedUsage.estimatedUsd += count(usage?.cost?.total);
+        if (event.message.stopReason !== "aborted" || count(usage?.totalTokens) > 0) providerResponses++;
+        if (event.message.stopReason === "error") { modelError = true; console.log(JSON.stringify({ event: "model_error" })); }
+        // Backup only: the in-process budget must prevent this additional response.
+        if (providerResponses > budgets.turns) { backupBudgetStop = true; stopChild(); }
+      }
+    } catch { /* CLI startup text is retained in the raw trace. */ }
+  }
+});
+child.stderr!.setEncoding("utf8");
+child.stderr!.on("data", (data: string) => {
+  pendingError += data;
+  const newline = pendingError.lastIndexOf("\n");
+  if (newline >= 0) { errors.write(clean(pendingError.slice(0, newline + 1))); pendingError = pendingError.slice(newline + 1); }
+});
+const timer = setTimeout(() => { timedOut = true; stopChild(); }, budgets.seconds * 1000);
+let spawnFailed = false;
+let exitSignal: NodeJS.Signals | null = null;
+const exitCode = await new Promise<number | null>((resolveExit) => { child.once("error", () => { spawnFailed = true; resolveExit(null); }); child.once("close", (code, signal) => { exitSignal = signal; resolveExit(code); }); });
+stopping = true;
+for (const pid of checkpointGroups) killCheckpoint(pid);
+clearTimeout(timer);
+if (forcedKill) clearTimeout(forcedKill);
+if (pending) trace.write(clean(pending));
+if (pendingError) errors.write(clean(pendingError));
+await Promise.all([new Promise<void>((done) => trace.end(done)), new Promise<void>((done) => errors.end(done))]);
+const control = await readFile(join(output, "control.json"), "utf8").then((text) => JSON.parse(text) as EvalBudgetSnapshot & { isolationError?: boolean }).catch(() => undefined);
+const decisions = await readRecentDecisions(join(output, "home"), 500);
+const jev = decisions.reduce((sum, row) => ({ calls: sum.calls + 1, successfulNetworkCalls: sum.successfulNetworkCalls + Number(row.status === "ok" && !row.cached), cacheHits: sum.cacheHits + Number(row.cached), fallbacks: sum.fallbacks + Number(row.status === "fallback"), input: sum.input + (row.inputTokens ?? 0), output: sum.output + (row.outputTokens ?? 0), latencyMs: sum.latencyMs + row.latencyMs }), { calls: 0, successfulNetworkCalls: 0, cacheHits: 0, fallbacks: 0, input: 0, output: 0, latencyMs: 0 });
+const checkpointRecords = await readFile(join(output, "checkpoints.jsonl"), "utf8").then((text) => text.trim().split("\n").filter(Boolean).map((line) => JSON.parse(line))).catch(() => []);
+const checkpoint = { mode: values.checkpoint, ready: checkpointReady, startupError: checkpointStartupError, records: checkpointRecords.length, executed: checkpointRecords.filter((row) => row.execution).length, scheduledFiles: checkpointRecords.flatMap((row) => row.selected).length, executionMs: checkpointRecords.reduce((sum, row) => sum + (row.execution?.elapsedMs ?? 0), 0), decisions: checkpointRecords.filter((row) => row.decision).length, decisionMs: checkpointRecords.reduce((sum, row) => sum + (row.decision?.latencyMs ?? 0), 0), inputTokens: checkpointRecords.reduce((sum, row) => sum + (row.decision?.inputTokens ?? 0), 0), outputTokens: checkpointRecords.reduce((sum, row) => sum + (row.decision?.outputTokens ?? 0), 0) };
+const sourceAtEnd = await captureSourceProvenance(project);
+const termination = checkpointStartupError ? "error" : timedOut ? "timeout" : interrupted || exitSignal === "SIGTERM" ? "interrupted" : backupBudgetStop || control?.termination === "budget" ? "budget" : spawnFailed || modelError || !checkpointReady || !control?.requests || control?.isolationError || exitCode !== 0 ? "error" : "completed";
+const result = { runId, checkpoint, thinking: values.thinking, mode: values.mode, briefing: values.briefing, model: values.model, baseline, source, sourceAtEnd, sourceChangedDuringRun: source.sourceDigest !== sourceAtEnd.sourceDigest || source.builtRuntimeDigest !== sourceAtEnd.builtRuntimeDigest || source.head !== sourceAtEnd.head, budgets, termination, budgetReason: control?.budgetReason ?? (backupBudgetStop ? "parent_request_guard" : undefined), requests: control?.requests ?? null, assistantMessages, providerResponses, tokens: control?.tokens ?? reportedTokens, usage: control?.usage ?? observedUsage, calls, jev, workspace: cwd, output, exitCode, exitSignal, timedOut, backupBudgetStop, isolationError: Boolean(control?.isolationError), controlStatsAvailable: !!control, elapsedMs: Math.round(performance.now() - start) };
+await writeFile(join(output, "result.json"), JSON.stringify(result, null, 2), { mode: 0o600 });
+console.log(JSON.stringify({ event: "result", ...result }));
+process.off("SIGTERM", interrupt);

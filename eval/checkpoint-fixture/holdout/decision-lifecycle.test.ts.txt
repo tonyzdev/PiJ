@@ -1,0 +1,230 @@
+import assert from "node:assert/strict";
+import { once } from "node:events";
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { createServer, type ServerResponse } from "node:http";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import test from "node:test";
+import { createAgentSessionRuntime, createAgentSessionServices, createAgentSessionFromServices, ModelRuntime, SessionManager, SettingsManager, type CreateAgentSessionRuntimeFactory } from "@earendil-works/pi-coding-agent";
+import { loadConfig } from "../src/config.js";
+import { createPijExtension } from "../src/extension.js";
+import { readRecentDecisions, type DecisionRecord } from "../src/telemetry.js";
+import { formatDecisions } from "../src/ui.js";
+
+const first = "Locate the queue admission logic: PRIVATE_PROMPT_MARKER";
+const second = "Inspect the token refresh policy: SECOND_PRIVATE_PROMPT";
+const queued = "This is queued, not yet consumed: QUEUED_PRIVATE_PROMPT";
+const search = (query = first) => ({ tool: "pij_search", args: { query, patterns: ["function"] } });
+type Step = ReturnType<typeof search> | "done";
+const identity = (row: DecisionRecord) => {
+  const value = (row as DecisionRecord & { turnId?: string; userMessageId?: string }).userMessageId ?? (row as DecisionRecord & { turnId?: string }).turnId;
+  assert.equal(typeof value, "string", "every runtime decision needs a user-message identity");
+  assert.ok(value!.length > 0);
+  return value;
+};
+
+// This harness is separate from the visible reproduction. The SDK runs its actual
+// queue, tool, HTTP transport, context and abort machinery; no lifecycle handler is mocked.
+async function harness(t: test.TestContext, plan: Step[], mode: "assist" | "observe" | "off" = "assist") {
+  const root = await mkdtemp(join(tmpdir(), "pij-checkpoint-holdout-"));
+  const cwd = join(root, "project");
+  const home = join(root, "agent");
+  await mkdir(cwd);
+  await writeFile(join(cwd, "admission.ts"), "export function admit() { return 'PRIVATE_SOURCE_MARKER'; }\n");
+  await writeFile(join(cwd, "refresh.ts"), "export function refresh() { return 'ready'; }\n");
+  const pending: ServerResponse[] = [];
+  const releases: (() => void)[] = [];
+  const rankWaiters = new Map<number, () => void>();
+  const toolResults: unknown[] = [];
+  let modelCalls = 0;
+  let jevCalls = 0;
+  let protocolError: Error | undefined;
+  const server = createServer(async (req, res) => {
+    try {
+      let text = "";
+      for await (const chunk of req) text += String(chunk);
+      const body = JSON.parse(text) as Record<string, any>;
+      if (req.url === "/v1/systemone") {
+        jevCalls++;
+        pending.push(res);
+        const answers = Object.fromEntries(Object.keys(body.questions).map((id) => [id, { type: "noul", noul: 0.8 }]));
+        releases.push(() => {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ model: "jev-local", answers, usage: { input_tokens: 19, output_tokens: 0 } }));
+        });
+        rankWaiters.get(jevCalls)?.();
+        return;
+      }
+      assert.equal(req.url, "/v1/chat/completions", "fixture must not silently accept another transport");
+      modelCalls++;
+      const step = plan[modelCalls - 1];
+      assert.ok(step, "model made an unplanned call");
+      const delta = step === "done" ? { role: "assistant", content: "complete" } : {
+        role: "assistant", tool_calls: [{ index: 0, id: `fixture_${modelCalls}`, type: "function", function: { name: step.tool, arguments: JSON.stringify(step.args) } }],
+      };
+      res.writeHead(200, { "Content-Type": "text/event-stream" });
+      for (const [part, finish] of [[delta, null], [{}, step === "done" ? "stop" : "tool_calls"]]) {
+        res.write(`data: ${JSON.stringify({ id: `local_${modelCalls}`, object: "chat.completion.chunk", model: "fixture", choices: [{ index: 0, delta: part, finish_reason: finish }] })}\n\n`);
+      }
+      res.end("data: [DONE]\n\n");
+    } catch (error) {
+      protocolError = error as Error;
+      res.writeHead(500); res.end("fixture protocol error");
+    }
+  });
+  server.listen(0, "127.0.0.1");
+  await once(server, "listening");
+  const address = server.address();
+  assert.ok(address && typeof address === "object");
+  const baseUrl = `http://127.0.0.1:${address.port}/v1`;
+  const modelRuntime = await ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
+  modelRuntime.registerProvider("checkpoint-local", { baseUrl, api: "openai-completions", apiKey: "LOCAL_MODEL_KEY", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 32000, maxTokens: 512 }] });
+  const factory: CreateAgentSessionRuntimeFactory = async ({ cwd, agentDir, sessionManager, sessionStartEvent }) => {
+    const services = await createAgentSessionServices({
+      cwd, agentDir, modelRuntime,
+      settingsManager: SettingsManager.inMemory({ retry: { enabled: false }, compaction: { enabled: false } }),
+      resourceLoaderOptions: {
+        noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true,
+        agentsFilesOverride: () => ({ agentsFiles: [] }), skillsOverride: () => ({ skills: [], diagnostics: [] }),
+        extensionFactories: [createPijExtension(loadConfig({ PIJ_HOME: home, PIJ_MODE: mode, TYPESAFE_API_KEY: "LOCAL_JEV_SECRET", PIJ_JEV_ENDPOINT: `${baseUrl}/systemone`, PIJ_JEV_TIMEOUT_MS: "5000" }))],
+      },
+    });
+    assert.deepEqual(services.resourceLoader.getExtensions().errors, []);
+    const result = await createAgentSessionFromServices({ services, sessionManager, sessionStartEvent, model: modelRuntime.getModel("checkpoint-local", "fixture"), tools: ["pij_search"] });
+    result.session.subscribe((event) => { if (event.type === "tool_execution_end") toolResults.push(event.result); });
+    return { ...result, services, diagnostics: services.diagnostics };
+  };
+  const host = await createAgentSessionRuntime(factory, { cwd, agentDir: home, sessionManager: SessionManager.inMemory(cwd) });
+  host.setRebindSession(async (session) => session.bindExtensions({}));
+  await host.session.bindExtensions({});
+  t.after(async () => {
+    await host.session.abort();
+    await host.dispose();
+    for (const res of pending) res.destroy();
+    server.closeAllConnections();
+    await new Promise<void>((resolve) => server.close(() => resolve()));
+    await rm(root, { recursive: true, force: true });
+    assert.ifError(protocolError);
+  });
+  return {
+    host, home, toolResults,
+    waitRank: (number: number) => jevCalls >= number ? Promise.resolve() : new Promise<void>((resolve) => rankWaiters.set(number, resolve)),
+    release: (number: number) => { assert.ok(releases[number - 1]); releases[number - 1]!(); },
+    counts: () => ({ modelCalls, jevCalls }),
+    records: () => readRecentDecisions(home),
+    users: () => host.session.sessionManager.getBranch().filter((entry) => entry.type === "message" && entry.message.role === "user"),
+  };
+}
+
+test("holdout: a queued follow-up owns all of its later decisions, including cache hits", { timeout: 10000 }, async (t) => {
+  const f = await harness(t, [search(), search(), "done", search(), search(), "done"]);
+  const sessionId = f.host.session.sessionId;
+  const running = f.host.session.prompt(first);
+  await f.waitRank(1);
+  await f.host.session.followUp(second);
+  assert.equal(f.users().length, 1, "queued follow-up has not entered the branch yet");
+  f.release(1);
+  await running;
+  assert.equal(f.users().length, 2);
+  const rows = await f.records();
+  assert.equal(rows.length, 4);
+  assert.ok(rows.every((row) => row.kind === "code_rank" && row.status === "ok" && row.sessionId === sessionId));
+  assert.equal(identity(rows[0]!), identity(rows[1]!), "model loops for one user message share identity");
+  assert.equal(identity(rows[2]!), identity(rows[3]!), "follow-up model loops share identity");
+  assert.notEqual(identity(rows[0]!), identity(rows[2]!), "consumed follow-up must own a different identity");
+  assert.deepEqual(rows.map((row) => row.cached), [false, true, true, true]);
+  assert.deepEqual(f.counts(), { modelCalls: 6, jevCalls: 1 });
+});
+
+test("holdout: cancellation after consumed steering retains that message, not a queued follow-up", { timeout: 10000 }, async (t) => {
+  const f = await harness(t, [search(), search(second)]);
+  const sessionId = f.host.session.sessionId;
+  const running = f.host.session.prompt(first);
+  await f.waitRank(1);
+  await f.host.session.steer(second);
+  f.release(1);
+  await f.waitRank(2);
+  const consumed = f.users().map((entry) => entry.id);
+  assert.equal(consumed.length, 2);
+  await f.host.session.followUp(queued);
+  assert.deepEqual(f.users().map((entry) => entry.id), consumed);
+  // Pi's abort() does not promise to discard its follow-up queue. Restore the
+  // queued input explicitly, as the documented clearQueue() API allows.
+  assert.deepEqual(f.host.session.clearQueue(), { steering: [], followUp: [queued] });
+  await f.host.session.abort();
+  await running;
+  assert.deepEqual(f.users().map((entry) => entry.id), consumed);
+  const rows = await f.records();
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0]!.status, "ok");
+  assert.equal(rows[1]!.status, "fallback");
+  assert.equal(rows[1]!.reason, "cancelled");
+  assert.ok(rows.every((row) => row.sessionId === sessionId));
+  assert.notEqual(identity(rows[0]!), identity(rows[1]!), "cancelled ranking belongs to the consumed steering user");
+  assert.deepEqual(f.counts(), { modelCalls: 2, jevCalls: 2 });
+});
+
+test("holdout: runtime replacement settles an old pending decision under its original session", { timeout: 10000 }, async (t) => {
+  const f = await harness(t, [search(), search(second), "done"]);
+  const oldSession = f.host.session;
+  const oldId = oldSession.sessionId;
+  const running = oldSession.prompt(first);
+  await f.waitRank(1);
+  const replacement = await f.host.newSession();
+  await running;
+  assert.equal(replacement.cancelled, false);
+  assert.notEqual(f.host.session, oldSession, "SDK replacement creates a new AgentSession");
+  assert.notEqual(f.host.session.sessionId, oldId);
+  const prior = await f.records();
+  assert.equal(prior.length, 1);
+  assert.equal(prior[0]!.status, "fallback");
+  assert.equal(prior[0]!.reason, "cancelled");
+  assert.equal(prior[0]!.sessionId, oldId);
+  const priorOwner = identity(prior[0]!);
+  const next = f.host.session.prompt(second);
+  await f.waitRank(2);
+  f.release(2);
+  await next;
+  const rows = await f.records();
+  assert.equal(rows.length, 2);
+  assert.equal(rows[0]!.sessionId, oldId);
+  assert.equal(identity(rows[0]!), priorOwner);
+  assert.equal(rows[1]!.sessionId, f.host.session.sessionId);
+  assert.notEqual(identity(rows[1]!), priorOwner);
+});
+
+for (const mode of ["assist", "observe", "off"] as const) {
+  test(`holdout: ${mode} preserves decision mode and metadata privacy`, { timeout: 10000 }, async (t) => {
+    const f = await harness(t, [search(), "done"], mode);
+    const running = f.host.session.prompt(first);
+    if (mode !== "off") { await f.waitRank(1); f.release(1); }
+    await running;
+    const rows = await f.records();
+    assert.equal(f.counts().jevCalls, mode === "off" ? 0 : 1);
+    assert.equal(rows.length, mode === "off" ? 0 : 1);
+    if (mode !== "off") {
+      assert.equal(rows[0]!.mode, mode);
+      assert.equal(rows[0]!.sessionId, f.host.session.sessionId);
+      identity(rows[0]!);
+      const allowed = new Set(["at", "mode", "kind", "status", "latencyMs", "questionCount", "reason", "model", "cached", "inputTokens", "outputTokens", "sessionId", "turnId", "userMessageId"]);
+      assert.ok(Object.keys(rows[0]!).every((key) => allowed.has(key)));
+      const files = await readdir(join(f.home, "decisions"));
+      const raw = (await Promise.all(files.map((name) => readFile(join(f.home, "decisions", name), "utf8")))).join("");
+      for (const secret of [first, second, queued, "PRIVATE_SOURCE_MARKER", "LOCAL_JEV_SECRET", "LOCAL_MODEL_KEY"]) assert.ok(!raw.includes(secret), `journal leaked ${secret}`);
+    }
+    const result = f.toolResults[0] as { details: { reranked: boolean } };
+    assert.equal(result.details.reranked, mode === "assist");
+  });
+}
+
+test("holdout: old journal records without identity fields remain readable and renderable", async (t) => {
+  const root = await mkdtemp(join(tmpdir(), "pij-checkpoint-legacy-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  await mkdir(join(root, "decisions"));
+  const legacy = { at: "2025-01-01T00:00:00.000Z", mode: "observe", kind: "code_rank", status: "ok", latencyMs: 2, questionCount: 2, cached: false, model: "local" };
+  await writeFile(join(root, "decisions", "1-aaaa.jsonl"), JSON.stringify(legacy) + "\n");
+  const rows = await readRecentDecisions(root);
+  assert.deepEqual(rows, [legacy]);
+  assert.match(formatDecisions(rows), /code_rank/);
+  assert.match(formatDecisions(rows), /observe/);
+});

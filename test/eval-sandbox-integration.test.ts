@@ -1,15 +1,14 @@
 import assert from "node:assert/strict";
 import { once } from "node:events";
-import { execFile } from "node:child_process";
+import { spawn } from "node:child_process";
 import { createServer } from "node:http";
 import { access, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
 import { join, resolve } from "node:path";
 import test from "node:test";
-import { promisify } from "node:util";
 import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager } from "@earendil-works/pi-coding-agent";
 import { shellEnvironment, shellQuote } from "../eval/sandbox.js";
 
-async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" | "missing" | "workspace", launchCli = false) {
+async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" | "missing" | "workspace", launchCli = false, checkpoint: boolean | "no-ack" = false) {
   const root = await realpath(await mkdtemp("/private/tmp/pij-iso-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   const cwd = join(root, "clone");
@@ -31,6 +30,12 @@ async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" 
     `cat ${shellQuote(resolve("package.json"))} > /dev/null`,
     "printf permitted > proof.txt",
   ];
+  if (checkpoint) {
+    await Promise.all([mkdir(join(cwd, "src")), mkdir(join(cwd, "test"))]);
+    await writeFile(join(cwd, "src/example.mjs"), "export const value = 1;\n");
+    await writeFile(join(cwd, "test/example.test.mjs"), "import assert from 'node:assert/strict'; import { value } from '../src/example.mjs'; assert.equal(value, 2);\n");
+    commands.push("printf 'export const value = 2;\\n' > src/example.mjs");
+  }
   let requests = 0;
   const http = createServer(async (req, res) => {
     const chunks: Buffer[] = [];
@@ -56,13 +61,23 @@ async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" 
   if (launchCli) {
     await mkdir(home);
     await writeFile(join(home, "models.json"), JSON.stringify({ providers: { fixture: { baseUrl: `http://127.0.0.1:${address.port}/v1`, api: "openai-completions", apiKey: "fixture-only", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 128000, maxTokens: 16384 }] } } }));
-    const pending = promisify(execFile)(process.execPath, [resolve("bin/pij.mjs"), "--jev-mode", "off", "--mode", "json", "--print", "--provider", "fixture", "--model", "fixture", "--thinking", "off", "--no-context-files", "--no-skills", "--no-prompt-templates", "--no-extensions", "--offline", "--extension", resolve("eval/cli-control.ts"), "Run the isolation fixture commands."], {
-      cwd, env: { ...shellEnvironment(cwd), ...env, PIJ_HOME: home, PI_OFFLINE: "1", PI_TELEMETRY: "0", PI_SKIP_VERSION_CHECK: "1" }, timeout: 10000, maxBuffer: 2 * 1024 * 1024,
+    let checkpointReady = false;
+    const checkpointProcesses: string[] = [];
+    const child = spawn(process.execPath, [resolve("bin/pij.mjs"), "--jev-mode", "off", "--mode", "json", "--print", "--provider", "fixture", "--model", "fixture", "--thinking", "off", "--no-context-files", "--no-skills", "--no-prompt-templates", "--no-extensions", "--offline", "--extension", resolve("eval/cli-control.ts"), ...(checkpoint ? ["--extension", resolve("eval/checkpoint-extension.ts")] : []), "Run the isolation fixture commands."], {
+      cwd, env: { ...shellEnvironment(cwd), ...env, PIJ_HOME: home, PI_OFFLINE: "1", PI_TELEMETRY: "0", PI_SKIP_VERSION_CHECK: "1", ...(checkpoint ? { PIJ_CHECKPOINT_MODE: "dependencies", PIJ_CHECKPOINT_LOG: join(root, "checkpoints.jsonl") } : {}) }, timeout: 10000, stdio: ["ignore", "pipe", "pipe", "ipc"],
     });
-    pending.child.stdin?.end();
-    const result = await pending;
+    child.on("message", (message) => {
+      const event = message as { type?: string; phase?: string };
+      if (event.type === "pij_checkpoint_ready") { checkpointReady = true; if (checkpoint !== "no-ack") child.send({ type: "pij_checkpoint_ack" }); }
+      if (event.type === "pij_checkpoint_process") checkpointProcesses.push(event.phase!);
+    });
+    const result = { stdout: "", stderr: "" };
+    child.stdout!.on("data", (data: Buffer) => { result.stdout += data.toString(); });
+    child.stderr!.on("data", (data: Buffer) => { result.stderr += data.toString(); });
+    const [exitCode] = await once(child, "close");
+    if (checkpoint !== "no-ack") assert.equal(exitCode, 0, result.stderr);
     const events = result.stdout.split("\n").flatMap((line) => { try { return [JSON.parse(line) as { type?: string; message?: { role?: string; isError?: boolean } }]; } catch { return []; } });
-    return { root, cwd, requests, results: events.filter((event) => event.type === "message_end" && event.message?.role === "toolResult").map((event) => event.message!) };
+    return { root, cwd, requests, checkpointReady, checkpointProcesses, stderr: result.stderr, results: events.filter((event) => event.type === "message_end" && event.message?.role === "toolResult").map((event) => event.message!) };
   }
   const runtime = await ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
   runtime.registerProvider("fixture", { baseUrl: `http://127.0.0.1:${address.port}/v1`, api: "openai-completions", apiKey: "fixture-only", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 128000, maxTokens: 16384 }] });
@@ -104,6 +119,16 @@ test("actual CLI startup retains protected roots when launched in a separate tas
   assert.ok(JSON.stringify(result.results[5]).includes("LOCAL_SDK_DOCUMENTATION"));
 });
 
+test("actual CLI loads the checkpoint extension without weakening isolation", { skip: process.platform !== "darwin", timeout: 15000 }, async (t) => {
+  const result = await loadedControlFixture(t, "valid", true, true);
+  assert.equal(result.checkpointReady, true, result.stderr);
+  assert.deepEqual(result.checkpointProcesses, ["start", "stop"]);
+  assert.equal(result.requests, 8);
+  assert.equal(result.results[0]?.isError, true);
+  assert.equal(result.results[3]?.isError, true);
+  assert.equal(await readFile(join(result.cwd, "proof.txt"), "utf8"), "permitted");
+});
+
 for (const invalid of ["missing", "workspace"] as const) {
   test(`loaded CLI control fails closed for ${invalid} protected-home configuration`, { skip: process.platform !== "darwin", timeout: 10000 }, async (t) => {
     const result = await loadedControlFixture(t, invalid);
@@ -111,3 +136,10 @@ for (const invalid of ["missing", "workspace"] as const) {
     assert.equal(result.results.length, 0);
   });
 }
+
+test("actual CLI sends no model request when checkpoint readiness is not acknowledged", { skip: process.platform !== "darwin", timeout: 15000 }, async (t) => {
+  const result = await loadedControlFixture(t, "valid", true, "no-ack");
+  assert.equal(result.checkpointReady, true);
+  assert.equal(result.requests, 0);
+  assert.deepEqual(result.checkpointProcesses, []);
+});

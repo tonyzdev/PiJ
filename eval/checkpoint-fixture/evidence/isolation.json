@@ -1,0 +1,8 @@
+{
+  "expectationMatched": true,
+  "exitCode": 0,
+  "reachableCommits": 1,
+  "remoteCount": 0,
+  "stdout": "{\"blockedHome\":true,\"blockedDevelopmentRepository\":true,\"blockedReference\":true,\"allowedCandidateSource\":true,\"allowedDependencies\":true,\"credentialEnvironmentStripped\":true}\n",
+  "stderr": ""
+}
