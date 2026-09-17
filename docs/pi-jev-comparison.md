@@ -20,4 +20,11 @@ In a single Sonnet 4.6 pair for each of two repair tasks, both off and assist pa
 
 Our intended distinction is measurable reduction of wasted coding investigation while preserving independent acceptance. We do not claim PiJ is generally faster, cheaper, safer or more accurate. The competitor's risk gate and our retrieval feature have different objectives; a future head-to-head must report those objectives separately and hold the main model and budgets constant.
 
+The later [post-edit checkpoint experiment](checkpoint-experiment.md) does not
+change that conclusion. All three CLI runs were incomplete, and the Jev
+condition never reached an edit or a Jev call. A deterministic scheduler gave
+useful intermediate feedback, but the candidate still failed post-run review.
+An automatic hook alone therefore does not establish either useful Jev
+substitution or an advantage over the competitor's integration.
+
 Primary implementation references: [tool gate](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/gate.ts), [output judge](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/output.ts), [extension](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/index.ts), [client](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/client.ts). See our [experiment results](experiment-results.md) for the boundary between working integration and demonstrated benefit.

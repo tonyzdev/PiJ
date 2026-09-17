@@ -2,6 +2,14 @@
 
 These are development observations, not performance claims. Initial runs use `alibaba/qwen3-coder-next`; the later comparison names its alternate model explicitly. Both use Vercel AI Gateway. Reported dollar values use the pinned Pi catalog, including its cache rates, not billing receipts; Jev fees are not included. Raw traces and disposable workspaces stay local.
 
+Latest follow-up: the [post-edit test checkpoint experiment](checkpoint-experiment.md)
+ran three actual CLI conditions at `eaeec35`. All timed out; the Jev condition
+never edited and therefore never called Jev. The dependency selector exposed
+useful intermediate failures, but its generated patch passed the original seven
+holdouts while retaining a wrong-entry attribution defect and a UI mismatch.
+This is an integration-placement and acceptance-gap finding, not evidence of
+Jev selection accuracy or a completed repair.
+
 ## 2026-09-18: optional question-driven search
 
 Both constructed document-lifecycle repair runs had the same 240-second wall-clock limit and requested 28 model requests / 150,000 tokens. Neither called `pij_search`; both read 13 files. A fresh independent sandboxed acceptance run found 4 of 11 invariants passing in each workspace, including different subsets. Neither completed the task.

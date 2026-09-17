@@ -67,3 +67,68 @@ plausible baseline and is not covered by this first three-condition experiment.
 This run supplies a visible reproduction and enables medium thinking. Earlier
 recovery runs lacked that reproduction and used thinking off, so their cost and
 acceptance are not comparable to this protocol.
+
+## First actual CLI run: no Jev selection opportunity
+
+All three ran from clean revision `eaeec35`, with unchanged source and built
+runtime digests throughout. Each reached the 480-second deadline before completing
+the task. Preparation time is excluded; the Jev condition's dependency install
+delayed its CLI start by about a minute. Shared provider load, caching and single
+trajectories prevent attributing the differences below to the selectors.
+
+| Condition | Admitted requests | Reported tokens incl. cache | Estimated main cost | Automatic checkpoints | Visible regression | Prespecified holdout |
+| --- | ---: | ---: | ---: | ---: | --- | --- |
+| manual | 34 | 1,007,792 | $0.8123 | 0 | 0/1 | 5/7 |
+| dependencies | 21 | 666,354 | $1.0682 | 3 | 1/1 | 7/7 |
+| jev | 31 | 1,225,640 | $0.9038 | 0 | 0/1 | 5/7 |
+
+**The Jev condition never edited source or tests, so it made zero Jev requests.**
+This run does not measure Jev's selection accuracy or compare its decisions with
+the dependency selector. It demonstrates that this post-edit integration can
+remain completely inactive while a real coding task exhausts its budget.
+Of its 44 tool calls, 35 had installed-dependency paths in their arguments; the
+trace shows extended exploration of Pi SDK lifecycle behavior. That is an
+observed bottleneck in this trajectory, not proof that Jev could solve it.
+
+The dependency condition's three checkpoints executed six test files in 3,218 ms.
+The first reported a missing identity after an intermediate source edit; the
+second reported a reused identity after a telemetry change; the third passed the
+visible regression after a message lifecycle hook was added. Each result appeared
+as a persistent checkpoint message. The model also issued three manual test
+commands. The trace supports that feedback was available before further edits;
+it does not establish that every edit was caused by the checkpoint.
+
+Independent ordinary tests passed 41/41 for manual (including a generated debug
+test), and 40/40 for each automatic condition. All typechecks and builds passed.
+Neither manual nor Jev corrected the visible steering defect. None finished the
+requested documentation or complete regression work, and no generated patch was
+merged. Dollar figures use Pi's pinned model catalog, include cached usage and
+are not invoices. The interrupted final requests may have unreported usage.
+
+### Post-run review exposed a holdout gap
+
+The dependency candidate's **7/7 does not establish correct attribution**. It
+updates `userMessageId` from `getLeafId()` in `before_agent_start` and
+`message_start`. The pinned SDK has not persisted the new user entry at those
+points, so a changing ID can identify a preceding non-user entry instead. The
+original holdout checks stable/different identities across messages but never
+compares them with the actual user entries. It therefore misses this defect.
+The candidate also writes `userMessageId` while its decisions UI still reads
+only `turnId`, hiding the new identity in the display.
+
+A separate post-hoc local-SDK diagnostic confirmed both findings: both journal
+IDs differed from the final branch's actual user entry IDs, the second pointed
+to a `toolResult` entry, and the new field rendered as `t:--------`. These two
+additional diagnostic checks passed **0/2**, separately from the original 7/7.
+See the [sanitized diagnostic output](../eval/checkpoint-fixture/evidence/post-hoc-dependencies.txt).
+
+The original seven scores and fixtures are retained. This is a post-hoc review
+finding, not a retroactive relabeling of the frozen test. Future acceptance must
+assert exact entry ownership and rendering of newly written rows, and validate
+those assertions on both a correct reference and these counterexamples.
+
+The [structured run summary](../eval/checkpoint-results.json) records provenance,
+usage, the original independent checks and checkpoint selections. The useful
+next step is to address a demonstrated expensive decision *before* adding more
+hooks. These runs justify neither making checkpoints a product default nor
+claiming a performance advantage over Pi or pi-jev.

@@ -1,0 +1,454 @@
+{
+  "protocol": "docs/checkpoint-experiment.md",
+  "scope": "One incomplete actual CLI trajectory per condition. This is not a benchmark or a Jev selection comparison: the Jev condition made zero edits and zero Jev calls. Prespecified holdout results are preserved; post-hoc review found a missing direct-entry-ID assertion and a UI field mismatch in the dependencies candidate.",
+  "runs": [
+    {
+      "runId": "2026-09-17T21-15-25.412Z-checkpoint-dependencies",
+      "checkpoint": {
+        "mode": "dependencies",
+        "ready": true,
+        "startupError": false,
+        "records": 3,
+        "executed": 3,
+        "scheduledFiles": 6,
+        "executionMs": 3218,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0
+      },
+      "thinking": "medium",
+      "mode": "off",
+      "briefing": false,
+      "model": "anthropic/claude-sonnet-4.6",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "eaeec35f27ba82e3ed3681e6b539fbdd5a60a9c3",
+        "dirty": false,
+        "sourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "trackedSourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 123,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "eaeec35f27ba82e3ed3681e6b539fbdd5a60a9c3",
+        "dirty": false,
+        "sourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "trackedSourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 123,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 48,
+        "seconds": 480,
+        "tokens": 1600000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "timeout",
+      "requests": 21,
+      "assistantMessages": 20,
+      "providerResponses": 20,
+      "tokens": 666354,
+      "usage": {
+        "input": 30,
+        "output": 23635,
+        "cacheRead": 491727,
+        "cacheWrite": 150962,
+        "estimatedUsd": 1.0682406
+      },
+      "calls": {
+        "bash": 14,
+        "read": 8,
+        "edit": 3
+      },
+      "elapsedMs": 480042,
+      "independentChecks": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 7,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        }
+      },
+      "traceSummary": {
+        "toolCalls": 25,
+        "callsWithDependencyPathInArguments": 11,
+        "checkpoints": [
+          {
+            "paths": [
+              "src/extension.ts"
+            ],
+            "selected": [
+              "test/cancellation.test.ts",
+              "test/decision-regression.test.ts"
+            ],
+            "status": "failed",
+            "elapsedMs": 1111
+          },
+          {
+            "paths": [
+              "src/telemetry.ts"
+            ],
+            "selected": [
+              "test/decision-regression.test.ts",
+              "test/integration.test.ts"
+            ],
+            "status": "failed",
+            "elapsedMs": 957
+          },
+          {
+            "paths": [
+              "src/extension.ts"
+            ],
+            "selected": [
+              "test/cancellation.test.ts",
+              "test/decision-regression.test.ts"
+            ],
+            "status": "passed",
+            "elapsedMs": 1150
+          }
+        ]
+      }
+    },
+    {
+      "runId": "2026-09-17T21-15-25.413Z-checkpoint-jev",
+      "checkpoint": {
+        "mode": "jev",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0
+      },
+      "thinking": "medium",
+      "mode": "off",
+      "briefing": false,
+      "model": "anthropic/claude-sonnet-4.6",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "eaeec35f27ba82e3ed3681e6b539fbdd5a60a9c3",
+        "dirty": false,
+        "sourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "trackedSourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 123,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "eaeec35f27ba82e3ed3681e6b539fbdd5a60a9c3",
+        "dirty": false,
+        "sourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "trackedSourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 123,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 48,
+        "seconds": 480,
+        "tokens": 1600000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "timeout",
+      "requests": 31,
+      "assistantMessages": 30,
+      "providerResponses": 30,
+      "tokens": 1225640,
+      "usage": {
+        "input": 32,
+        "output": 21471,
+        "cacheRead": 1140261,
+        "cacheWrite": 63876,
+        "estimatedUsd": 0.9037742999999998
+      },
+      "calls": {
+        "bash": 43,
+        "read": 1
+      },
+      "elapsedMs": 480076,
+      "independentChecks": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "failures": [
+            "consumed steering binds the next cached decision to its actual user entry"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 5,
+          "fail": 2,
+          "cancelled": 0,
+          "failures": [
+            "holdout: a queued follow-up owns all of its later decisions, including cache hits",
+            "holdout: cancellation after consumed steering retains that message, not a queued follow-up"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        }
+      },
+      "traceSummary": {
+        "toolCalls": 44,
+        "callsWithDependencyPathInArguments": 35,
+        "checkpoints": []
+      }
+    },
+    {
+      "runId": "2026-09-17T21-15-25.437Z-checkpoint-manual",
+      "checkpoint": {
+        "mode": "manual",
+        "ready": true,
+        "startupError": false,
+        "records": 2,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0
+      },
+      "thinking": "medium",
+      "mode": "off",
+      "briefing": false,
+      "model": "anthropic/claude-sonnet-4.6",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "eaeec35f27ba82e3ed3681e6b539fbdd5a60a9c3",
+        "dirty": false,
+        "sourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "trackedSourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 123,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "eaeec35f27ba82e3ed3681e6b539fbdd5a60a9c3",
+        "dirty": false,
+        "sourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "trackedSourceDigest": "2e9720e41e527e6c80363a373b06365ba35e3260014ed497231e9d9655880323",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 123,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 48,
+        "seconds": 480,
+        "tokens": 1600000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "timeout",
+      "requests": 34,
+      "assistantMessages": 33,
+      "providerResponses": 33,
+      "tokens": 1007792,
+      "usage": {
+        "input": 35,
+        "output": 23417,
+        "cacheRead": 936341,
+        "cacheWrite": 47999,
+        "estimatedUsd": 0.8122585500000001
+      },
+      "calls": {
+        "bash": 30,
+        "read": 5,
+        "edit": 1,
+        "write": 1
+      },
+      "elapsedMs": 480069,
+      "independentChecks": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 41,
+          "pass": 41,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "failures": [
+            "consumed steering binds the next cached decision to its actual user entry"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 5,
+          "fail": 2,
+          "cancelled": 0,
+          "failures": [
+            "holdout: a queued follow-up owns all of its later decisions, including cache hits",
+            "holdout: cancellation after consumed steering retains that message, not a queued follow-up"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        }
+      },
+      "traceSummary": {
+        "toolCalls": 37,
+        "callsWithDependencyPathInArguments": 24,
+        "checkpoints": [
+          {
+            "paths": [
+              "src/extension.ts"
+            ],
+            "selected": [],
+            "status": null,
+            "elapsedMs": null
+          },
+          {
+            "paths": [
+              "test/debug-attribution.test.ts"
+            ],
+            "selected": [],
+            "status": null,
+            "elapsedMs": null
+          }
+        ]
+      }
+    }
+  ],
+  "postHocDiagnostic": {
+    "condition": "dependencies",
+    "timing": "Added after inspecting candidate, separate from original seven holdouts",
+    "tests": 2,
+    "pass": 0,
+    "fail": 2,
+    "findings": [
+      "Both journal userMessageId values differ from the actual consumed user entry IDs; second points to a toolResult entry.",
+      "formatDecisions ignores userMessageId and displays t:--------."
+    ],
+    "evidence": "eval/checkpoint-fixture/evidence/post-hoc-dependencies.txt"
+  }
+}
