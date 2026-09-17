@@ -89,3 +89,30 @@ Independent review identified that its generated turn UUID changes only in `befo
 ### Next experiment boundary
 
 Keep automatic briefing opt-in. Before claiming substitution, identify a concrete investigation step that disappears when Jev is enabled and measure the decision's actual adoption. Repeat complete-task comparisons, distinguish ranking from failure advice, and add a larger real-repository task where source selection is a meaningful bottleneck. The current two small repair projects and one unfinished real repository change cannot establish a product advantage.
+
+## Test-evidence feasibility: classification is not acceptance
+
+The [frozen source-only probe](evidence-probe.md) tests a second possible use: flagging requirements without direct test evidence. Fourteen independently authored cases received two fresh Jev requests each. Agreement with the original labels was 21/28 responses; two cases expose ambiguity in the transmitted unknown-evidence rubric and are documented separately. Clear errors include counting partial compound coverage as complete and counting a fabricated mocked client as exercising the real behavior. The protocol, cases, original labels, responses, hashes and an offline replay command are published. This is not a completion gate or a new product feature.
+
+### Actual CLI recovery pair with and without Jev's gap hints
+
+Both runs used the actual `bin/pij.mjs`, clean development revision `28018e7`, and separate clones of public baseline `4e1cdef` with the exact same partial Sonnet-generated patch from the earlier real CLI task. The seed patch's SHA-256 was `64e7c4936d42dcbb67df4d1050bbbb4ed6d2852fd59c542d500bf4e70ed03772`. Neither clone received the evaluator's failing steering test during generation. Source/build digests remained unchanged throughout both runs.
+
+This is a fresh-session recovery pilot, **not an end-to-end implementation of an automatic evidence checker**. The normal PiJ mode and source briefing were off in both conditions, isolating the additional prompt advisory from skill selection, ranking and failure triage. The common task was to complete the existing partial observability feature, documentation and meaningful runtime tests. Both prompts warned that existing tests did not establish acceptance.
+
+The hint condition additionally received three source-only missing-test judgments from the first repetition of the diagnostic probe on the actual seed. Selection used `not_exercised`, without threshold tuning or resampling: shared per-user-turn identity, a different identity after a later user message, and a fresh identity for another session. The fourth judgment, incorrectly reporting existing multi-user-prompt test coverage, was not sent as a gap. The advisory explicitly described the check as fallible and required validating the whole task. Jev had already been called in the diagnostic; its request cost/wait is excluded from the recovery figures below.
+
+Both used `anthropic/claude-sonnet-4.6`, thinking off, with limits of 48 admitted requests, 1,200,000 reported tokens including cache, 16,384 output tokens per response and 420 seconds. A response can overshoot the admission token budget.
+
+| Condition | Requests / read / bash | Reported tokens | Elapsed | Estimated main cost | Independent generated-suite check | Independent steering regression |
+| --- | --- | ---: | ---: | ---: | --- | --- |
+| No hint | 38 / 21 / 24 | 1,231,601 | 267.0 s | $0.7053 | Failed: new runtime test records no decisions | Failed: later consumed user message reuses turn ID |
+| Jev gap hint | 32 / 17 / 28 | 1,265,702 | 301.7 s | $1.0200 | 43/43 passed | Failed: later consumed user message reuses turn ID |
+
+Both stopped at the token budget. Independent type checks and builds passed for both; neither completed the requested documentation or corrected the source implementation beyond the seed. The no-hint run edited existing integration/telemetry tests. The hint run wrote three new tests for the prompted behaviors, but its session-switch test constructs two separate sessions with separate extension instances rather than exercising a switch in a retained runtime. Its sequential `session.prompt()` test does not cover queued steering. The evaluator then added the same real-Pi steering regression to each disposable workspace and reproduced the original reused-turn-ID defect in both. These evaluator files are excluded from the generated patch.
+
+Trace inspection matters: the no-hint model independently enumerated the same missing tests; the hint model treated the existing implementation as correct and followed the three high-level test categories. This suggests the advisory organized test writing but did not identify the missing lifecycle distinction. One pair, different generated tests, shared provider load and budget termination do not establish a general efficiency difference. No repair was accepted or merged. More passing self-authored tests is not feature acceptance.
+
+### Revised decision boundary
+
+Neither whole-task relevance ranking nor this missing-test advisory has demonstrated a dependable substitution benefit. Keep them experimental. Before another integration, specify the bounded judgment, the concrete action it controls, the main-model work it removes, and the independent behavioral oracle. If defining the right lifecycle cases still requires substantive reasoning, a high Jev score cannot substitute for that reasoning. Failure to demonstrate a gain here does not establish that Jev cannot help elsewhere; it narrows the claims this repository can support.
