@@ -80,3 +80,75 @@ five checkpoint acceptance checks and `runEntryOracle(workspace)`. The oracle
 is evaluator-only and never available during candidate generation. Commit
 sanitized outcomes and limitations here after both runs; normal product
 defaults remain unchanged pending task-level evidence.
+
+## Observed pair at `f0c4d47`
+
+Both runs used unchanged source/build digests and the same inventory of 276
+files / 2,823,944 bytes. Both reached the 1.6-million-token admission budget;
+neither completed the task. A response can overshoot the admission threshold.
+The Jev condition made two successful, uncached preprocessing calls: 22,645
+input / 852 output tokens, 2,292 ms recorded service wait, 2,535 ms including
+local retrieval. Lexical preprocessing took 227 ms. Ordinary PiJ decisions and
+automatic test execution remained off in both conditions.
+
+| Observation | Lexical | Jev |
+| --- | ---: | ---: |
+| Admitted main-model requests | 44 | 31 |
+| Reported main tokens, including cache | 1,616,367 | 1,602,618 |
+| Main catalog cost estimate, excluding Jev | $1.03085 | $1.04542 |
+| Agent / evidence-plus-agent time | 474.5 / 474.8 s | 418.5 / 421.1 s |
+| Tools mentioning `node_modules/` | 40 | 24 |
+| First successful edit: tool number / elapsed | 53 / 473.7 s | 31 / 337.7 s |
+| Ordinary tests | 40/40 | 40/40 |
+| Visible steering reproduction | 0/1 | 1/1 |
+| Original frozen holdouts | 2/7 | 7/7 |
+| Additional exact ownership + display checks | 0/2 | 1/2 |
+| Type check / build | fail / fail | pass / pass |
+| Requested new regression tests / documentation | absent / absent | absent / absent |
+| Accepted completed task | no | no |
+
+The navigation count is a trace proxy based on tool arguments, not the number
+of distinct facts inspected. First-edit timing uses the first successful edit
+result relative to the initial user message; it excludes preprocessing and CLI
+startup. Ending earlier at a token budget is not completing a task faster.
+These are one-sample outcomes, with provider/model variance and task-informed
+development, not causal or general efficiency estimates.
+
+### What the traces and independent checks establish
+
+Both initial user messages actually contained their selected evidence. Jev
+selected queue-handling windows in `agent-session.js` plus prompt-queueing docs;
+lexical selected mostly tool/error/auth/RPC docs. The Jev run went first to
+runtime implementation; lexical first investigated event/message types. Both
+continued substantial SDK investigation. The supplied excerpts did not contain
+the exact user-message persistence boundary, and their presence does not prove
+that the agent used a particular Jev judgment.
+
+The lexical run's only edit renamed the journal field without updating its
+callers. It lost identity metadata and failed type check/build. The Jev run
+captured the actual last consumed user entry before asynchronous work and
+passed independent exact-ID, steering, follow-up, cancellation and replacement
+checks. However, it wrote `userMessageId` while the seeded UI still read only
+`turnId`, so new decisions displayed `t:--------`. Both the additional oracle
+and independent review detected this mismatch. Neither run added the requested
+regression tests or documentation. No generated patch was merged.
+
+This is a partial-progress signal for dependency evidence at task entry. It
+does not establish complete-task gains, eliminate serial investigation, or
+justify enabling this preprocessor in the normal product. In particular, fewer
+requests did not yield lower reported main-model cost in this pair. The next
+useful test must measure evidence adoption and accepted completion, including
+repeats and an unseen task, rather than optimize this known example until it
+passes.
+
+### Inspectable artifacts
+
+[`eval/dependency-evidence-results/results.json`](../eval/dependency-evidence-results/results.json)
+records hashes, both stage answers/statuses, budgets, provenance, selections,
+usage and every acceptance result. The adjacent candidate patches and oracle
+logs preserve the failures. Each patch is the **entire candidate source change
+relative to `4e1cdef`**, including seeded changes; apply it to that base, not on
+top of `seed.patch`. The unchanged visible reproduction is supplied separately
+by `eval/checkpoint-fixture/visible`. Frozen seven-test and additional two-test
+scores remain separate. The candidate patches are evidence, not proposed
+product fixes. Raw model traces remain private and ignored.

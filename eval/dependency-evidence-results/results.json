@@ -1,0 +1,678 @@
+{
+  "schemaVersion": 1,
+  "interpretation": "One task-informed development pair; both stopped at token budget and neither completed the requested task. Jev partial repair passed core attribution checks but failed display acceptance.",
+  "cost": "Main model catalog estimates including cache, excluding Jev fees. Not billing receipts.",
+  "navigationMetric": "Tool execution arguments containing node_modules/; a navigation proxy, not unique facts read or proof of causal substitution.",
+  "firstEditMetric": "Elapsed from initial user message timestamp to first successful edit tool result; excludes dependency preprocessing and CLI startup.",
+  "jeVPlacement": "Two parent-side preprocessing calls in the jev condition; ordinary PiJ decisions and automatic checkpoint execution disabled.",
+  "provenance": "Frozen protocol at f0c4d47; initial live preflight used for development, additional oracle derived from a prior failure; not blind benchmark.",
+  "records": [
+    {
+      "mode": "lexical",
+      "runId": "2026-09-17T21-38-49.204Z-dependency-lexical",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "f0c4d47c6ac08ee9c6a389a912ab250e587f2769",
+        "dirty": false,
+        "sourceDigest": "75d3e822666ed390903dd5d7d919e8e323cb56bbea19e1b0a77d1d0b0f492545",
+        "trackedSourceDigest": "75d3e822666ed390903dd5d7d919e8e323cb56bbea19e1b0a77d1d0b0f492545",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 134,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "f0c4d47c6ac08ee9c6a389a912ab250e587f2769",
+        "dirty": false,
+        "sourceDigest": "75d3e822666ed390903dd5d7d919e8e323cb56bbea19e1b0a77d1d0b0f492545",
+        "trackedSourceDigest": "75d3e822666ed390903dd5d7d919e8e323cb56bbea19e1b0a77d1d0b0f492545",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 134,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 48,
+        "seconds": 480,
+        "tokens": 1600000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "budget",
+      "budgetReason": "tokens",
+      "accepted": false,
+      "requests": 44,
+      "tokens": 1616367,
+      "usage": {
+        "input": 46,
+        "output": 22331,
+        "cacheRead": 1530932,
+        "cacheWrite": 63058,
+        "estimatedUsd": 1.0308500999999999
+      },
+      "elapsedMs": 474544,
+      "evidenceAndAgentElapsedMs": 474771,
+      "calls": {
+        "bash": 52,
+        "edit": 1
+      },
+      "dependencyPathCalls": 40,
+      "firstEdit": {
+        "toolIndex": 53,
+        "secondsToToolResult": 473.688
+      },
+      "dependencyEvidence": {
+        "packages": [
+          "@earendil-works/pi-coding-agent@0.85.1",
+          "@earendil-works/pi-tui@0.85.1"
+        ],
+        "filesScanned": 276,
+        "bytesRead": 2823944,
+        "inventoryDigest": "88d5751394721649e9607c203039e27064fda1a2fa55ee0093c0e7fbd12cd79a",
+        "inventoryTruncated": true,
+        "filePool": [
+          "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/rpc.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/tui.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/settings.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/usage.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/custom-provider.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/models.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/compaction.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/package-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/security.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/export-html/template.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/main.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/package-manager-cli.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/loader.js",
+          "node_modules/@earendil-works/pi-tui/dist/components/editor.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/packages.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/settings-selector.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/runner.js"
+        ],
+        "selectedFiles": [
+          "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/rpc.md"
+        ],
+        "candidates": [
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 1921,
+            "bytes": 2381,
+            "sha256": "96f063633b69b7ee7b9c9157bdc4d95143a1519de0b4365eabd8692c755e730b"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 2017,
+            "bytes": 2223,
+            "sha256": "be0d6314900f359dee2fbdea5f97e21d2e4b2ac303d282700af18738a54ae2a6"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+            "startLine": 1897,
+            "bytes": 2367,
+            "sha256": "42cd207e6d5828866f2ce5b6270b33412849910da9bfbf6b0326351363b14c3f"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+            "startLine": 481,
+            "bytes": 1887,
+            "sha256": "7b68249b56a7ac85abbe87327d11ff86bfde8e8e7e0602e3464f97d48b473dd5"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/rpc.md",
+            "startLine": 841,
+            "bytes": 2288,
+            "sha256": "99f243b1c999df05268868cee3192c29327edada101af1a784f5a393b2b03026"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+            "startLine": 217,
+            "bytes": 1855,
+            "sha256": "ea3cd04fa045cd24149c867c5d137c0c2459d4a384a5a8ecc288cab105feb213"
+          }
+        ],
+        "elapsedMs": 227,
+        "decisions": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "failures": [
+            "consumed steering binds the next cached decision to its actual user entry"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 2,
+          "fail": 5,
+          "cancelled": 0,
+          "failures": [
+            "holdout: a queued follow-up owns all of its later decisions, including cache hits",
+            "holdout: cancellation after consumed steering retains that message, not a queued follow-up",
+            "holdout: runtime replacement settles an old pending decision under its original session",
+            "holdout: assist preserves decision mode and metadata privacy",
+            "holdout: observe preserves decision mode and metadata privacy"
+          ]
+        },
+        "check": {
+          "exitCode": 2,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 2,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "entryOwnership": {
+          "code": 1,
+          "signal": null,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 2,
+          "pass": 0,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "entry oracle: journal IDs exactly identify consumed SDK user entries, including a cache hit",
+            "entry oracle: newly generated journal rows display their emitted user identity"
+          ],
+          "passed": false
+        }
+      },
+      "candidate": {
+        "patch": "lexical.patch",
+        "patchSha256": "6517ebb1be732a65ed0e8cf6f93bdcdc9a3e418e601bafd7161290a553eb403c",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesSeedChanges": true,
+        "regressionTestsAdded": false,
+        "documentationAdded": false,
+        "replayVerifiedFiles": {
+          "src/extension.ts": "8107e8ead7f96a14bff9222d15bebb8972461795d418c012eeea7c556a52286a",
+          "src/telemetry.ts": "88216c8286c73f9c3dd12d48a5661d3cb64f1620e2df1197ef2aed158e4eb65e",
+          "src/ui.ts": "b54515bf3f9f86f6d853e76e99beb0d5e4dc4ac6961adcc80cdbcb637fb20533"
+        }
+      },
+      "oracleLog": "lexical-entry-ownership.txt"
+    },
+    {
+      "mode": "jev",
+      "runId": "2026-09-17T21-38-49.204Z-dependency-jev",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "f0c4d47c6ac08ee9c6a389a912ab250e587f2769",
+        "dirty": false,
+        "sourceDigest": "75d3e822666ed390903dd5d7d919e8e323cb56bbea19e1b0a77d1d0b0f492545",
+        "trackedSourceDigest": "75d3e822666ed390903dd5d7d919e8e323cb56bbea19e1b0a77d1d0b0f492545",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 134,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "f0c4d47c6ac08ee9c6a389a912ab250e587f2769",
+        "dirty": false,
+        "sourceDigest": "75d3e822666ed390903dd5d7d919e8e323cb56bbea19e1b0a77d1d0b0f492545",
+        "trackedSourceDigest": "75d3e822666ed390903dd5d7d919e8e323cb56bbea19e1b0a77d1d0b0f492545",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 134,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 48,
+        "seconds": 480,
+        "tokens": 1600000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "budget",
+      "budgetReason": "tokens",
+      "accepted": false,
+      "requests": 31,
+      "tokens": 1602618,
+      "usage": {
+        "input": 33,
+        "output": 19351,
+        "cacheRead": 1502049,
+        "cacheWrite": 81185,
+        "estimatedUsd": 1.04542245
+      },
+      "elapsedMs": 418533,
+      "evidenceAndAgentElapsedMs": 421068,
+      "calls": {
+        "bash": 28,
+        "read": 9,
+        "edit": 4
+      },
+      "dependencyPathCalls": 24,
+      "firstEdit": {
+        "toolIndex": 31,
+        "secondsToToolResult": 337.66
+      },
+      "dependencyEvidence": {
+        "packages": [
+          "@earendil-works/pi-coding-agent@0.85.1",
+          "@earendil-works/pi-tui@0.85.1"
+        ],
+        "filesScanned": 276,
+        "bytesRead": 2823944,
+        "inventoryDigest": "88d5751394721649e9607c203039e27064fda1a2fa55ee0093c0e7fbd12cd79a",
+        "inventoryTruncated": true,
+        "filePool": [
+          "node_modules/@earendil-works/pi-coding-agent/docs/extensions.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/rpc.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/tui.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/settings.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/usage.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/custom-provider.md",
+          "node_modules/@earendil-works/pi-coding-agent/docs/models.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/compaction.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/package-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/security.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/export-html/template.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/main.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/package-manager-cli.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/loader.js",
+          "node_modules/@earendil-works/pi-tui/dist/components/editor.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/packages.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/settings-selector.js",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/runner.js"
+        ],
+        "selectedFiles": [
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+          "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+          "node_modules/@earendil-works/pi-coding-agent/docs/session-format.md"
+        ],
+        "candidates": [
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+            "startLine": 1057,
+            "bytes": 1597,
+            "sha256": "0fadb46a400a819c5949fd0aaed4a1203e315a9ec030b5664689941b1bd3a8a3"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+            "startLine": 217,
+            "bytes": 1855,
+            "sha256": "ea3cd04fa045cd24149c867c5d137c0c2459d4a384a5a8ecc288cab105feb213"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+            "startLine": 1009,
+            "bytes": 1892,
+            "sha256": "0b96bd99f16558cd63afd326c931c4565805866ef134c1c86a32ec9beeea2329"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+            "startLine": 1081,
+            "bytes": 1787,
+            "sha256": "1d2a4d73a93f392ccb14354c239958f6f08bb3991c80409131e00bd9472abeac"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/docs/sdk.md",
+            "startLine": 193,
+            "bytes": 1925,
+            "sha256": "1d02ece72eaadaab482701645d15857ef60ef2530a7e6830cb00e15b8e62ab91"
+          },
+          {
+            "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+            "startLine": 865,
+            "bytes": 2015,
+            "sha256": "a245c4fb22570e438d5e8f80ffd88ba29d3a55a968c100bc305b9af68918de09"
+          }
+        ],
+        "elapsedMs": 2535,
+        "decisions": [
+          {
+            "status": "ok",
+            "answers": {
+              "f0": {
+                "type": "noul",
+                "noul": 0.08
+              },
+              "f1": {
+                "type": "noul",
+                "noul": 0.48
+              },
+              "f2": {
+                "type": "noul",
+                "noul": 0.56
+              },
+              "f3": {
+                "type": "noul",
+                "noul": 0.08
+              },
+              "f4": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f5": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "f6": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "f7": {
+                "type": "noul",
+                "noul": 0.16
+              },
+              "f8": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "f9": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f10": {
+                "type": "noul",
+                "noul": 0.36
+              },
+              "f11": {
+                "type": "noul",
+                "noul": 0.15
+              },
+              "f12": {
+                "type": "noul",
+                "noul": 0.06
+              },
+              "f13": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "f14": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f15": {
+                "type": "noul",
+                "noul": 0.25
+              },
+              "f16": {
+                "type": "noul",
+                "noul": 0.11
+              },
+              "f17": {
+                "type": "noul",
+                "noul": 0.14
+              },
+              "f18": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f19": {
+                "type": "noul",
+                "noul": 0.24
+              },
+              "f20": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f21": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "f22": {
+                "type": "noul",
+                "noul": 0.06
+              },
+              "f23": {
+                "type": "noul",
+                "noul": 0.2
+              }
+            },
+            "model": "typesafe-ai/jev",
+            "inputTokens": 9076,
+            "outputTokens": 426,
+            "latencyMs": 1285,
+            "cached": false
+          },
+          {
+            "status": "ok",
+            "answers": {
+              "w0": {
+                "type": "noul",
+                "noul": 0.23
+              },
+              "w1": {
+                "type": "noul",
+                "noul": 0.73
+              },
+              "w2": {
+                "type": "noul",
+                "noul": 0.64
+              },
+              "w3": {
+                "type": "noul",
+                "noul": 0.39
+              },
+              "w4": {
+                "type": "noul",
+                "noul": 0.73
+              },
+              "w5": {
+                "type": "noul",
+                "noul": 0.7
+              },
+              "w6": {
+                "type": "noul",
+                "noul": 0.18
+              },
+              "w7": {
+                "type": "noul",
+                "noul": 0.31
+              },
+              "w8": {
+                "type": "noul",
+                "noul": 0.7
+              },
+              "w9": {
+                "type": "noul",
+                "noul": 0.68
+              },
+              "w10": {
+                "type": "noul",
+                "noul": 0.7
+              },
+              "w11": {
+                "type": "noul",
+                "noul": 0.4
+              },
+              "w12": {
+                "type": "noul",
+                "noul": 0.69
+              },
+              "w13": {
+                "type": "noul",
+                "noul": 0.14
+              },
+              "w14": {
+                "type": "noul",
+                "noul": 0.73
+              },
+              "w15": {
+                "type": "noul",
+                "noul": 0.18
+              },
+              "w16": {
+                "type": "noul",
+                "noul": 0.3
+              },
+              "w17": {
+                "type": "noul",
+                "noul": 0.75
+              },
+              "w18": {
+                "type": "noul",
+                "noul": 0.62
+              },
+              "w19": {
+                "type": "noul",
+                "noul": 0.68
+              },
+              "w20": {
+                "type": "noul",
+                "noul": 0.28
+              },
+              "w21": {
+                "type": "noul",
+                "noul": 0.19
+              },
+              "w22": {
+                "type": "noul",
+                "noul": 0.34
+              },
+              "w23": {
+                "type": "noul",
+                "noul": 0.14
+              }
+            },
+            "model": "typesafe-ai/jev",
+            "inputTokens": 13569,
+            "outputTokens": 426,
+            "latencyMs": 1007,
+            "cached": false
+          }
+        ]
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 7,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "failures": []
+        },
+        "entryOwnership": {
+          "code": 1,
+          "signal": null,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 2,
+          "pass": 1,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "entry oracle: newly generated journal rows display their emitted user identity"
+          ],
+          "passed": false
+        }
+      },
+      "candidate": {
+        "patch": "jev.patch",
+        "patchSha256": "b19cea74bdaf01bbb114df12733282de14e0f8e4e7e569b06a72a51f1da50973",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesSeedChanges": true,
+        "regressionTestsAdded": false,
+        "documentationAdded": false,
+        "replayVerifiedFiles": {
+          "src/extension.ts": "01ab66e4b004b33bfc6c829ca5c4ce7cabf4c53e8db45eeaec1c847468f61eb1",
+          "src/telemetry.ts": "75e0e0beb4f838c09276fb5943ded02e9bdf1df796ed3d989b54a9f81138475d",
+          "src/ui.ts": "b54515bf3f9f86f6d853e76e99beb0d5e4dc4ac6961adcc80cdbcb637fb20533"
+        }
+      },
+      "oracleLog": "jev-entry-ownership.txt"
+    }
+  ]
+}

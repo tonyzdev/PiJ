@@ -1,0 +1,35 @@
+TAP version 13
+# ENTRY_OWNERSHIP [{"index":0,"matchesActualUser":true,"referencedRole":"user","cached":false},{"index":1,"matchesActualUser":true,"referencedRole":"user","cached":true}]
+# Subtest: entry oracle: journal IDs exactly identify consumed SDK user entries, including a cache hit
+ok 1 - entry oracle: journal IDs exactly identify consumed SDK user entries, including a cache hit
+  ---
+  duration_ms: 91.680333
+  type: 'test'
+  ...
+# Subtest: entry oracle: newly generated journal rows display their emitted user identity
+not ok 2 - entry oracle: newly generated journal rows display their emitted user identity
+  ---
+  duration_ms: 23.97275
+  type: 'test'
+  location: '<candidate>/.entry-oracle-tUtQqx/entry-ownership.test.ts:3:3828'
+  failureType: 'testCodeFailure'
+  error: "the actual generated row's user identity must be visible"
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (<candidate>/.entry-oracle-tUtQqx/entry-ownership.test.ts:129:12)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 778.092833

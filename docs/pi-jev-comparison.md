@@ -27,4 +27,11 @@ useful intermediate feedback, but the candidate still failed post-run review.
 An automatic hook alone therefore does not establish either useful Jev
 substitution or an advantage over the competitor's integration.
 
+Moving dependency evidence before the first request produced a partial-progress
+signal in [one lexical/Jev pair](dependency-evidence-experiment.md): the Jev
+candidate passed core attribution checks but failed UI display, while lexical
+left a type-invalid rename. Both exhausted their token budgets and omitted
+requested tests/docs. This strengthens the case for testing the earlier
+placement; it still provides no completed-task or head-to-head advantage.
+
 Primary implementation references: [tool gate](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/gate.ts), [output judge](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/output.ts), [extension](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/index.ts), [client](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/client.ts). See our [experiment results](experiment-results.md) for the boundary between working integration and demonstrated benefit.

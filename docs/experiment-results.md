@@ -2,7 +2,15 @@
 
 These are development observations, not performance claims. Initial runs use `alibaba/qwen3-coder-next`; the later comparison names its alternate model explicitly. Both use Vercel AI Gateway. Reported dollar values use the pinned Pi catalog, including its cache rates, not billing receipts; Jev fees are not included. Raw traces and disposable workspaces stay local.
 
-Latest follow-up: the [post-edit test checkpoint experiment](checkpoint-experiment.md)
+Latest follow-up: [dependency evidence before investigation](dependency-evidence-experiment.md)
+ran a lexical/Jev pair at `f0c4d47`. Both exhausted the token budget. The Jev
+partial repair passed the original seven holdouts and exact user-entry
+ownership, but failed generated-row display and omitted requested tests/docs.
+Lexical left a type-invalid field rename. Jev reached edits earlier and made
+fewer dependency navigation calls in this sample; main-model cost was slightly
+higher. Neither completed the task, and no general benefit is established.
+
+The earlier [post-edit test checkpoint experiment](checkpoint-experiment.md)
 ran three actual CLI conditions at `eaeec35`. All timed out; the Jev condition
 never edited and therefore never called Jev. The dependency selector exposed
 useful intermediate failures, but its generated patch passed the original seven

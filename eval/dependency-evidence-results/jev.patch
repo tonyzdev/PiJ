@@ -1,0 +1,155 @@
+diff --git a/src/extension.ts b/src/extension.ts
+index 8f06520..1709e0e 100644
+--- a/src/extension.ts
++++ b/src/extension.ts
+@@ -1,5 +1,5 @@
+ import { readFile, stat } from "node:fs/promises";
+-import type { ExtensionContext, ExtensionFactory } from "@earendil-works/pi-coding-agent";
++import type { ExtensionContext, ExtensionFactory, SessionMessageEntry } from "@earendil-works/pi-coding-agent";
+ import { Text } from "@earendil-works/pi-tui";
+ import { Type } from "typebox";
+ import type { DecisionMode, PijConfig } from "./config.js";
+@@ -20,16 +20,30 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+     let run = new AbortController();
+     let context: ExtensionContext | undefined;
+     let unsubscribeInput: (() => void) | undefined;
++    // Session identifier for decision metadata. Never contains prompts, content, or credentials.
++    let sessionId: string | undefined;
++    /**
++     * Capture the opaque session-entry ID of the most recent user message.
++     * Called synchronously before any async work so async continuations cannot
++     * inherit a later message's identity. Returns undefined when there is no
++     * user message yet (e.g. before the first LLM call persists the entry).
++     */
++    const captureUserMessageId = (sm: ExtensionContext["sessionManager"]): string | undefined =>
++      sm.getBranch().findLast((e): e is SessionMessageEntry => e.type === "message" && e.message.role === "user")?.id;
+     const journal = new DecisionJournal(config.home);
+     const client = new JevClient(config);
+     const update = () => context?.ui.setStatus("pij", cleanText(statusText(config, mode, journal, journal.recent().at(-1))));
+-    const engineFor = (decisionMode: DecisionMode) => new DecisionEngine(client, async (observation) => { await journal.record(decisionMode, observation); update(); });
++    const engineFor = (decisionMode: DecisionMode, userMessageId?: string) => new DecisionEngine(client, async (observation) => { await journal.record(decisionMode, observation, { sessionId, userMessageId }); update(); });
+     const signalFor = (signal?: AbortSignal) => signal ? AbortSignal.any([signal, run.signal]) : run.signal;
+
+     pi.on("session_start", (_event, ctx) => {
+       run.abort(); run = new AbortController(); request = ""; failuresThisRun = 0;
+       skillPending = false; skillAdvice = undefined; skills = [];
+       context = ctx;
++      // Capture the session identity from the Pi runtime. The session manager
++      // assigns a stable UUID per session file; switching sessions produces a
++      // new ID. We never read or store session content here.
++      sessionId = ctx.sessionManager.getSessionId();
+       unsubscribeInput?.();
+       if (ctx.mode === "tui") {
+         ctx.ui.setTitle("PiJ");
+@@ -76,11 +90,14 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+     // Pi does not create its run signal until after before_agent_start. Await
+     // decisions only in context, where TUI, SDK and RPC abort all reach fetch.
+     pi.on("context", async (event, ctx) => {
++      // Capture identity synchronously before any await so the evaluation belongs
++      // to the user message that actually triggered this context call.
++      const userMessageId = captureUserMessageId(ctx.sessionManager);
+       const signal = signalFor(ctx.signal);
+       if (skillPending && ctx.signal && !signal.aborted) {
+         skillPending = false;
+         const currentMode = mode;
+-        const suggestions = await engineFor(currentMode).recommendSkills(request, skills, async (path) => {
++        const suggestions = await engineFor(currentMode, userMessageId).recommendSkills(request, skills, async (path) => {
+           if ((await stat(path)).size > 200_000) throw new Error("Skill too large for advisory inspection.");
+           return readFile(path, "utf8");
+         }, signal);
+@@ -94,11 +111,13 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+
+     pi.on("tool_result", async (event, ctx) => {
+       if (!event.isError || mode === "off" || failuresThisRun >= 2 || event.toolName === "pij_search") return;
++      // Capture identity synchronously before any await.
++      const userMessageId = captureUserMessageId(ctx.sessionManager);
+       context = ctx; failuresThisRun++;
+       const signal = signalFor(ctx.signal);
+       const currentMode = mode;
+       const output = event.content.filter((part) => part.type === "text").map((part) => part.text).join("\n");
+-      const suggestion = await engineFor(currentMode).triage(event.toolName, output, request, signal);
++      const suggestion = await engineFor(currentMode, userMessageId).triage(event.toolName, output, request, signal);
+       if (currentMode !== "assist" || mode !== currentMode || signal.aborted || !suggestion) return;
+       return { content: [...event.content, { type: "text" as const, text: `\n${suggestion}` }] };
+     });
+@@ -116,6 +135,9 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+         limit: Type.Optional(Type.Integer({ minimum: 1, maximum: 20, description: "Excerpts returned; default 8" })),
+       }),
+       async execute(_id, params, signal, onUpdate, ctx) {
++        // Capture identity synchronously before any await so the evaluation belongs
++        // to the user message that triggered this tool call, not a later one.
++        const userMessageId = captureUserMessageId(ctx.sessionManager);
+         context = ctx;
+         onUpdate?.({ content: [{ type: "text", text: "Searching source files…" }], details: {} });
+         const found = await retrieveCode({ cwd: ctx.cwd, patterns: params.patterns, path: params.path, glob: params.glob, signal });
+@@ -123,7 +145,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+         let ranked: CodeCandidate[] = found.candidates;
+         if (mode !== "off") {
+           const decisionSignal = signalFor(signal);
+-          const evaluated = await engineFor(currentMode).rankCode(params.query, found.candidates, decisionSignal);
++          const evaluated = await engineFor(currentMode, userMessageId).rankCode(params.query, found.candidates, decisionSignal);
+           if (currentMode === "assist" && mode === currentMode && !decisionSignal.aborted) ranked = evaluated;
+         }
+         signal?.throwIfAborted();
+diff --git a/src/telemetry.ts b/src/telemetry.ts
+index 7b7ea12..b552616 100644
+--- a/src/telemetry.ts
++++ b/src/telemetry.ts
+@@ -16,6 +16,20 @@ export interface DecisionRecord {
+   cached?: boolean;
+   inputTokens?: number;
+   outputTokens?: number;
++  /** Opaque identifier for the Pi session. Stable across all turns in one session; changes on session switch. */
++  sessionId?: string;
++  /**
++   * Opaque identifier for the consumed user message that owns this evaluation.
++   * Taken directly from the session manager entry ID of the last user message at
++   * evaluation time, so it matches the actual Pi session entry rather than a
++   * synthetic UUID.  A new user message (initial prompt or consumed steering)
++   * receives a different ID; all Jev calls within one user message share the same
++   * value.  Absent on records written before this field was introduced.
++   * Legacy records may carry the old `turnId` field instead.
++   */
++  userMessageId?: string;
++  /** @deprecated Superseded by userMessageId. Present on records written before attribution was fixed. */
++  turnId?: string;
+ }
+
+ export class DecisionJournal {
+@@ -28,7 +42,7 @@ export class DecisionJournal {
+
+   constructor(home: string) { this.file = join(home, "decisions", `${Date.now()}-${randomUUID()}.jsonl`); }
+
+-  async record(mode: DecisionMode, observation: DecisionObservation): Promise<void> {
++  async record(mode: DecisionMode, observation: DecisionObservation, context?: { sessionId?: string; userMessageId?: string }): Promise<void> {
+     const { result, kind, questionCount } = observation;
+     // Deliberate allowlist: never serialize answers, source, prompts or raw errors.
+     const entry: DecisionRecord = {
+@@ -36,6 +50,9 @@ export class DecisionJournal {
+       ...(result.status === "fallback" ? { reason: result.reason } : {
+         model: result.model.slice(0, 100), cached: result.cached, inputTokens: result.cached ? 0 : result.inputTokens, outputTokens: result.cached ? 0 : result.outputTokens,
+       }),
++      // Deliberate allowlist: only opaque identifiers, never session content or credentials.
++      ...(context?.sessionId ? { sessionId: context.sessionId } : {}),
++      ...(context?.userMessageId ? { userMessageId: context.userMessageId } : {}),
+     };
+     this.records.push(entry);
+     if (this.records.length > 50) this.records.shift();
+diff --git a/src/ui.ts b/src/ui.ts
+index 9a7930d..c8bd280 100644
+--- a/src/ui.ts
++++ b/src/ui.ts
+@@ -33,5 +33,12 @@ export function statusText(config: PijConfig, mode: DecisionMode, journal: Decis
+
+ export function formatDecisions(records: DecisionRecord[]): string {
+   if (!records.length) return "No Jev decisions recorded yet.";
+-  return records.map((record) => cleanText(`${record.at.slice(11, 19)}  ${record.mode.padEnd(7)} ${record.kind.padEnd(15)} ${record.status === "fallback" ? `fallback:${record.reason}` : record.cached ? "cached" : "ok"}  ${record.latencyMs}ms`)).join("\n");
++  return records.map((record) => {
++    // Show the last 8 hex chars of each UUID so the user can visually group
++    // decisions by session and turn without exposing session content.
++    const sid = record.sessionId ? record.sessionId.replace(/-/g, "").slice(-8) : "--------";
++    const tid = record.turnId ? record.turnId.replace(/-/g, "").slice(-8) : "--------";
++    const outcome = record.status === "fallback" ? `fallback:${record.reason}` : record.cached ? "cached" : "ok";
++    return cleanText(`${record.at.slice(11, 19)}  s:${sid} t:${tid}  ${record.mode.padEnd(7)} ${record.kind.padEnd(15)} ${outcome}  ${record.latencyMs}ms`);
++  }).join("\n");
+ }
