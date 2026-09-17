@@ -5,6 +5,28 @@ import type { JevResult, Questions } from "../src/jev.js";
 
 const ok = (answers: Extract<JevResult, { status: "ok" }>["answers"]): JevResult => ({ status: "ok", answers, model: "fixture", inputTokens: 10, outputTokens: 0, cached: false, latencyMs: 1 });
 
+test("skill gate can see the eligible roster without sibling questions", async () => {
+  let bodyReads = 0;
+  const engine = new DecisionEngine({ evaluate: async (state: unknown, questions: Questions) => {
+    // Jev evaluates each question using only the shared state and that question.
+    const gateInput = JSON.stringify({ state, question: questions.needed });
+    assert.ok(gateInput.includes("deck-builder"), "gate must know which skills are available");
+    assert.ok(gateInput.includes("Create editable PowerPoint presentations"));
+    assert.ok(gateInput.includes("motion-review"));
+    assert.ok(gateInput.includes("Inspect animation code and timing"));
+    assert.ok(!gateInput.includes("manual-only"));
+    assert.ok(!gateInput.includes("/private/skills/"), "shortlist needs descriptions, not local paths");
+    return ok({ needed: { type: "noul", noul: 0.1 }, selection: { type: "choice", choice: "s0", probabilities: { s0: 0.8, s1: 0.2 }, confidence: 0.6 } });
+  } });
+  const result = await engine.recommendSkills("Make an editable pitch deck", [
+    { name: "deck-builder", description: "Create editable PowerPoint presentations", filePath: "/private/skills/deck.md" },
+    { name: "motion-review", description: "Inspect animation code and timing", filePath: "/private/skills/motion.md" },
+    { name: "manual-only", description: "Hidden unless explicitly requested", filePath: "/private/skills/manual.md", disableModelInvocation: true },
+  ], async () => { bodyReads++; return "Skill instructions"; });
+  assert.deepEqual(result, []);
+  assert.equal(bodyReads, 0, "a rejected gate must not load skill bodies");
+});
+
 test("skill advice is drawn from eligible candidates and only after body verification", async () => {
   let phase = 0;
   const engine = new DecisionEngine({ evaluate: async (_state: unknown, questions: Questions) => {
