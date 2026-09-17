@@ -10,6 +10,9 @@ import { validateBudgets, type EvalBudgetSnapshot, type EvalUsage } from "./budg
 import { captureSourceProvenance } from "./provenance.js";
 import { prepareWorkspace } from "./checkpoint-fixture/verify.js";
 import { readRecentDecisions } from "../src/telemetry.js";
+import { loadConfig } from "../src/config.js";
+import { JevClient } from "../src/jev.js";
+import { dependencyEvidence, formatDependencyEvidence } from "./dependency-evidence.js";
 
 const { values } = parseArgs({ options: {
   mode: { type: "string", default: "off" }, model: { type: "string", default: "anthropic/claude-sonnet-4.6" },
@@ -17,17 +20,20 @@ const { values } = parseArgs({ options: {
   seconds: { type: "string", default: "480" }, turns: { type: "string", default: "48" },
   tokens: { type: "string", default: "1600000" }, "max-output-tokens": { type: "string", default: "16384" },
   briefing: { type: "boolean", default: false },
+  "dependency-evidence": { type: "string", default: "none" },
 } });
 const budgets = validateBudgets({ turns: Number(values.turns), seconds: Number(values.seconds), tokens: Number(values.tokens), maxOutputTokens: Number(values["max-output-tokens"]) });
 if (process.platform !== "darwin") throw new Error("Real CLI evaluation currently requires macOS sandbox-exec.");
 if (values.mode !== "assist" && values.mode !== "observe" && values.mode !== "off") throw new Error("Use --mode assist, observe, or off.");
 if (values.mode !== "off" || values.briefing || !["manual", "dependencies", "jev"].includes(values.checkpoint!)) throw new Error("Checkpoint comparison requires --mode off, no briefing, and a valid --checkpoint mode.");
+const evidenceMode = values["dependency-evidence"]!;
+if (!["none", "lexical", "jev"].includes(evidenceMode) || (evidenceMode !== "none" && values.checkpoint !== "manual")) throw new Error("Dependency evidence requires none, lexical or jev and manual checkpoints.");
 const key = process.env.AI_GATEWAY_API_KEY;
 if (!key) throw new Error("Load AI_GATEWAY_API_KEY in the harness environment.");
 const project = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 // Capture this in the parent before shellEnvironment rewrites the child's HOME.
 const protectedHome = await realpath(homedir());
-const runId = `${new Date().toISOString().replaceAll(":", "-")}-checkpoint-${values.checkpoint}`;
+const runId = `${new Date().toISOString().replaceAll(":", "-")}-${evidenceMode === "none" ? `checkpoint-${values.checkpoint}` : `dependency-${evidenceMode}`}`;
 const source = await captureSourceProvenance(project);
 const output = join(project, ".pij", "evals", runId);
 const root = await realpath(await mkdtemp(join(process.platform === "darwin" ? "/private/tmp" : tmpdir(), "pij-df-")));
@@ -39,7 +45,14 @@ await prepareWorkspace(cwd);
 const baseline = (await exec("git", ["rev-parse", "HEAD"], { cwd })).stdout.trim();
 if ((await lstat(join(cwd, "node_modules"))).isSymbolicLink()) await rm(join(cwd, "node_modules"));
 await exec("npm", ["ci", "--ignore-scripts", "--no-audit", "--no-fund"], { cwd, timeout: 120000, maxBuffer: 1024 * 1024 });
-const prompt = (await readFile(join(project, "eval/checkpoint-fixture/task.md"), "utf8")) + "\nWork autonomously. Inspect and fix the implementation, run type checks, the full test suite and build, and document the change. Do not publish or commit.";
+const task = await readFile(join(project, "eval/checkpoint-fixture/task.md"), "utf8");
+const evidence = evidenceMode === "none" ? undefined : await dependencyEvidence({
+  cwd, query: task, mode: evidenceMode as "lexical" | "jev",
+  provider: evidenceMode === "jev" ? new JevClient(loadConfig({ ...process.env, PIJ_JEV_PROVIDER: "vercel" })) : undefined,
+  signal: AbortSignal.timeout(15000),
+});
+if (evidence) await writeFile(join(output, "dependency-evidence.json"), JSON.stringify(evidence, null, 2), { mode: 0o600 });
+const prompt = task + "\nWork autonomously. Inspect and fix the implementation, run type checks, the full test suite and build, and document the change. Do not publish or commit." + (evidence ? `\n\n${formatDependencyEvidence(evidence)}` : "");
 await writeFile(join(output, "task.txt"), prompt, { mode: 0o600 });
 const trace = createWriteStream(join(output, "cli-trace.jsonl"), { mode: 0o600 });
 const errors = createWriteStream(join(output, "stderr.txt"), { mode: 0o600 });
@@ -102,7 +115,7 @@ child.on("message", (message) => {
 });
 const clean = (text: string) => text.replaceAll(key, "[redacted]");
 const start = performance.now();
-console.log(JSON.stringify({ event: "start", runId, mode: values.mode, briefing: values.briefing, model: values.model, budgets, baseline, source, workspace: cwd, output, pid: child.pid }));
+console.log(JSON.stringify({ event: "start", runId, mode: values.mode, evidenceMode, briefing: values.briefing, model: values.model, budgets, baseline, source, workspace: cwd, output, pid: child.pid }));
 child.stdout!.setEncoding("utf8");
 child.stdout!.on("data", (data: string) => {
   pending += data;
@@ -163,6 +176,7 @@ const checkpoint = { mode: values.checkpoint, ready: checkpointReady, startupErr
 const sourceAtEnd = await captureSourceProvenance(project);
 const termination = checkpointStartupError ? "error" : timedOut ? "timeout" : interrupted || exitSignal === "SIGTERM" ? "interrupted" : backupBudgetStop || control?.termination === "budget" ? "budget" : spawnFailed || modelError || !checkpointReady || !control?.requests || control?.isolationError || exitCode !== 0 ? "error" : "completed";
 const result = { runId, checkpoint, thinking: values.thinking, mode: values.mode, briefing: values.briefing, model: values.model, baseline, source, sourceAtEnd, sourceChangedDuringRun: source.sourceDigest !== sourceAtEnd.sourceDigest || source.builtRuntimeDigest !== sourceAtEnd.builtRuntimeDigest || source.head !== sourceAtEnd.head, budgets, termination, budgetReason: control?.budgetReason ?? (backupBudgetStop ? "parent_request_guard" : undefined), requests: control?.requests ?? null, assistantMessages, providerResponses, tokens: control?.tokens ?? reportedTokens, usage: control?.usage ?? observedUsage, calls, jev, workspace: cwd, output, exitCode, exitSignal, timedOut, backupBudgetStop, isolationError: Boolean(control?.isolationError), controlStatsAvailable: !!control, elapsedMs: Math.round(performance.now() - start) };
-await writeFile(join(output, "result.json"), JSON.stringify(result, null, 2), { mode: 0o600 });
-console.log(JSON.stringify({ event: "result", ...result }));
+const summary = { ...result, dependencyEvidence: evidence ? { mode: evidenceMode, ...evidence, candidates: evidence.candidates.map(({path,startLine,excerpt})=>({path,startLine,bytes:Buffer.byteLength(excerpt)})), windowPool: undefined } : { mode: "none" }, evidenceAndAgentElapsedMs: result.elapsedMs + (evidence?.elapsedMs ?? 0) };
+await writeFile(join(output, "result.json"), JSON.stringify(summary, null, 2), { mode: 0o600 });
+console.log(JSON.stringify({ event: "result", ...summary }));
 process.off("SIGTERM", interrupt);

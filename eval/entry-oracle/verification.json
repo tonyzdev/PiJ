@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "verifiedAt": "2026-09-17T21:33:28.479Z",
+  "provenance": "Diagnostic-derived additional acceptance for future experiments; does not revise prior frozen seven-test scores.",
+  "baseRevision": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+  "sdk": "0.85.1",
+  "node": "v25.9.0",
+  "platform": "darwin",
+  "sandbox": "macOS Seatbelt; loopback only; candidate-confined writes; protected home/repository; trusted dependency read exception",
+  "credentialEnvironment": "eval/sandbox.ts shellEnvironment allowlist",
+  "externalModelOrJevCalls": 0,
+  "artifacts": {
+    "entry-ownership.test.ts.txt": "de3a8fac14fe1d52e475626ce669a46d994236be917ad7c6c93a22c40986c589",
+    "../entry-oracle.ts": "35656611cc303fb6ed04499208f7eb696362cba1138eb4d559fe8285b7a857cf"
+  },
+  "frozenArtifacts": {
+    "seed.patch": "64e7c4936d42dcbb67df4d1050bbbb4ed6d2852fd59c542d500bf4e70ed03772",
+    "reference.patch": "83d801d61f364ac113a55408772552bd13a665991c0a51e3e80f57c285728377",
+    "task.md": "728a546fb89bb0aec59e4c54caed13eb79f9e15208707f92c3a2313d318576c7",
+    "visible/decision-regression.test.ts.txt": "837a367b5cf68d055640001745274b9e0d9557d5418c8083678b330b89395f50",
+    "holdout/decision-lifecycle.test.ts.txt": "2991223479140b2a88d581f0381644951d9b13ddac0c11321a73f48be84728c1"
+  },
+  "matched": true,
+  "checks": {
+    "seed": {
+      "code": 1,
+      "signal": null,
+      "timedOut": false,
+      "outputExceeded": false,
+      "tests": 2,
+      "pass": 1,
+      "fail": 1,
+      "cancelled": 0,
+      "skipped": 0,
+      "failures": [
+        "entry oracle: journal IDs exactly identify consumed SDK user entries, including a cache hit"
+      ],
+      "passed": false,
+      "expectedPasses": 1,
+      "expectationMatched": true,
+      "log": "evidence/seed.tap"
+    },
+    "reference": {
+      "code": 0,
+      "signal": null,
+      "timedOut": false,
+      "outputExceeded": false,
+      "tests": 2,
+      "pass": 2,
+      "fail": 0,
+      "cancelled": 0,
+      "skipped": 0,
+      "failures": [],
+      "passed": true,
+      "expectedPasses": 2,
+      "expectationMatched": true,
+      "log": "evidence/reference.tap"
+    },
+    "prior-candidate": {
+      "code": 1,
+      "signal": null,
+      "timedOut": false,
+      "outputExceeded": false,
+      "tests": 2,
+      "pass": 0,
+      "fail": 2,
+      "cancelled": 0,
+      "skipped": 0,
+      "failures": [
+        "entry oracle: journal IDs exactly identify consumed SDK user entries, including a cache hit",
+        "entry oracle: newly generated journal rows display their emitted user identity"
+      ],
+      "passed": false,
+      "expectedPasses": 0,
+      "expectationMatched": true,
+      "log": "evidence/prior-candidate.tap"
+    }
+  }
+}
