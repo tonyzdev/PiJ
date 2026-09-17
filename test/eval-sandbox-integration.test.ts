@@ -1,0 +1,100 @@
+import assert from "node:assert/strict";
+import { once } from "node:events";
+import { execFile } from "node:child_process";
+import { createServer } from "node:http";
+import { access, mkdir, mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { join, resolve } from "node:path";
+import test from "node:test";
+import { promisify } from "node:util";
+import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager } from "@earendil-works/pi-coding-agent";
+import { shellEnvironment, shellQuote } from "../eval/sandbox.js";
+
+async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" | "missing" | "workspace", launchCli = false) {
+  const root = await realpath(await mkdtemp("/private/tmp/pij-iso-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const cwd = join(root, "clone");
+  const protectedRoot = join(root, "actual-home");
+  await Promise.all([mkdir(cwd), mkdir(protectedRoot)]);
+  await Promise.all([mkdir(join(cwd, ".home")), mkdir(join(cwd, ".tmp"))]);
+  await writeFile(join(protectedRoot, "marker.txt"), "NON_SECRET_ISOLATION_MARKER\n");
+  const env: NodeJS.ProcessEnv = { HOME: join(cwd, ".home"), PIJ_EVAL_WORKSPACE: cwd, PIJ_EVAL_STATS: join(root, "stats.json"), PIJ_EVAL_TURNS: "12", PIJ_EVAL_TOKENS: "100000", PIJ_ISOLATION_SENTINEL: "synthetic-inherited-marker", PIJ_EVAL_PROTECTED_HOME: protectedHome === "valid" ? protectedRoot : protectedHome === "workspace" ? join(cwd, ".home") : undefined };
+  const previous = Object.fromEntries(Object.keys(env).map((key) => [key, process.env[key]]));
+  for (const [key, value] of Object.entries(env)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; }
+  t.after(() => { for (const [key, value] of Object.entries(previous)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; } });
+  const commands = [
+    `cat ${shellQuote(join(protectedRoot, "marker.txt"))}`,
+    `printf forbidden > ${shellQuote(join(root, "outside.txt"))}`,
+    'printf "%s" "${PIJ_ISOLATION_SENTINEL-unset}" > environment.txt',
+    `cat ${shellQuote(resolve("package.json"))} > /dev/null`,
+    "printf permitted > proof.txt",
+  ];
+  let requests = 0;
+  const http = createServer(async (req, res) => {
+    for await (const _ of req) { /* Local deterministic provider only. */ }
+    const command = commands[requests++];
+    const delta = command ? { role: "assistant", tool_calls: [{ index: 0, id: `call_${requests}`, type: "function", function: { name: "bash", arguments: JSON.stringify({ command }) } }] } : { role: "assistant", content: "Fixture complete." };
+    res.writeHead(200, { "Content-Type": "text/event-stream" });
+    res.write(`data: ${JSON.stringify({ id: `r${requests}`, object: "chat.completion.chunk", model: "fixture", choices: [{ index: 0, delta, finish_reason: null }] })}\n\n`);
+    res.write(`data: ${JSON.stringify({ id: `r${requests}`, object: "chat.completion.chunk", model: "fixture", choices: [{ index: 0, delta: {}, finish_reason: command ? "tool_calls" : "stop" }] })}\n\n`);
+    res.end("data: [DONE]\n\n");
+  });
+  http.listen(0, "127.0.0.1");
+  await once(http, "listening");
+  t.after(() => { http.closeAllConnections(); http.close(); });
+  const address = http.address();
+  assert.ok(address && typeof address === "object");
+  const home = join(root, "agent");
+  if (launchCli) {
+    await mkdir(home);
+    await writeFile(join(home, "models.json"), JSON.stringify({ providers: { fixture: { baseUrl: `http://127.0.0.1:${address.port}/v1`, api: "openai-completions", apiKey: "fixture-only", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 128000, maxTokens: 16384 }] } } }));
+    const pending = promisify(execFile)(process.execPath, [resolve("bin/pij.mjs"), "--jev-mode", "off", "--mode", "json", "--print", "--provider", "fixture", "--model", "fixture", "--thinking", "off", "--no-context-files", "--no-skills", "--no-prompt-templates", "--no-extensions", "--offline", "--extension", resolve("eval/cli-control.ts"), "Run the isolation fixture commands."], {
+      cwd, env: { ...shellEnvironment(cwd), ...env, PIJ_HOME: home, PI_OFFLINE: "1", PI_TELEMETRY: "0", PI_SKIP_VERSION_CHECK: "1" }, timeout: 10000, maxBuffer: 2 * 1024 * 1024,
+    });
+    pending.child.stdin?.end();
+    const result = await pending;
+    const events = result.stdout.split("\n").flatMap((line) => { try { return [JSON.parse(line) as { type?: string; message?: { role?: string; isError?: boolean } }]; } catch { return []; } });
+    return { root, cwd, requests, results: events.filter((event) => event.type === "message_end" && event.message?.role === "toolResult").map((event) => event.message!) };
+  }
+  const runtime = await ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
+  runtime.registerProvider("fixture", { baseUrl: `http://127.0.0.1:${address.port}/v1`, api: "openai-completions", apiKey: "fixture-only", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 128000, maxTokens: 16384 }] });
+  const settings = SettingsManager.inMemory({ retry: { enabled: false }, compaction: { enabled: false } });
+  const resources = new DefaultResourceLoader({ cwd, agentDir: home, settingsManager: settings, noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true, noContextFiles: true, additionalExtensionPaths: [resolve("eval/cli-control.ts")] });
+  await resources.reload();
+  assert.deepEqual(resources.getExtensions().errors, [], "the control must stay loaded even when denying a bad configuration");
+  const { session } = await createAgentSession({ cwd, agentDir: home, modelRuntime: runtime, model: runtime.getModel("fixture", "fixture"), settingsManager: settings, resourceLoader: resources, sessionManager: SessionManager.inMemory() });
+  t.after(() => session.dispose());
+  await session.bindExtensions({});
+  await session.prompt("Run the isolation fixture commands.");
+  return { root, cwd, requests, results: session.messages.filter((message) => message.role === "toolResult") };
+}
+
+test("loaded CLI control protects the real home and development repository despite rewritten HOME", { skip: process.platform !== "darwin", timeout: 10000 }, async (t) => {
+  const result = await loadedControlFixture(t, "valid");
+  assert.equal(result.requests, 6);
+  assert.equal(result.results[0]?.isError, true, "protected marker read must fail");
+  assert.equal(result.results[1]?.isError, true, "outside write must fail");
+  await assert.rejects(access(join(result.root, "outside.txt")));
+  assert.equal(await readFile(join(result.cwd, "environment.txt"), "utf8"), "unset");
+  assert.equal(result.results[3]?.isError, true, "development repository read must fail");
+  assert.equal(await readFile(join(result.cwd, "proof.txt"), "utf8"), "permitted");
+  assert.ok(!JSON.stringify(result.results).includes("NON_SECRET_ISOLATION_MARKER"));
+});
+
+test("actual CLI startup retains protected roots when launched in a separate task checkout", { skip: process.platform !== "darwin", timeout: 15000 }, async (t) => {
+  const result = await loadedControlFixture(t, "valid", true);
+  assert.equal(result.requests, 6);
+  assert.equal(result.results[0]?.isError, true);
+  assert.equal(result.results[1]?.isError, true);
+  assert.equal(result.results[3]?.isError, true);
+  await assert.rejects(access(join(result.root, "outside.txt")));
+  assert.equal(await readFile(join(result.cwd, "environment.txt"), "utf8"), "unset");
+  assert.equal(await readFile(join(result.cwd, "proof.txt"), "utf8"), "permitted");
+});
+
+for (const invalid of ["missing", "workspace"] as const) {
+  test(`loaded CLI control fails closed for ${invalid} protected-home configuration`, { skip: process.platform !== "darwin", timeout: 10000 }, async (t) => {
+    const result = await loadedControlFixture(t, invalid);
+    assert.equal(result.requests, 0, "misconfigured isolation must stop before any provider or tool execution");
+    assert.equal(result.results.length, 0);
+  });
+}

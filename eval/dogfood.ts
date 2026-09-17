@@ -1,7 +1,7 @@
 import { execFile, spawn } from "node:child_process";
 import { createWriteStream } from "node:fs";
 import { mkdir, mkdtemp, readFile, realpath, writeFile } from "node:fs/promises";
-import { tmpdir } from "node:os";
+import { homedir, tmpdir } from "node:os";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseArgs, promisify } from "node:util";
@@ -22,6 +22,8 @@ if (values.mode !== "assist" && values.mode !== "observe" && values.mode !== "of
 const key = process.env.AI_GATEWAY_API_KEY;
 if (!key) throw new Error("Load AI_GATEWAY_API_KEY in the harness environment.");
 const project = resolve(dirname(fileURLToPath(import.meta.url)), "..");
+// Capture this in the parent before shellEnvironment rewrites the child's HOME.
+const protectedHome = await realpath(homedir());
 const runId = `${new Date().toISOString().replaceAll(":", "-")}-decision-lineage-${values.mode}-briefing-${values.briefing ? "on" : "off"}`;
 const source = await captureSourceProvenance(project);
 const output = join(project, ".pij", "evals", runId);
@@ -51,6 +53,7 @@ const child = spawn(process.execPath, [
   env: {
     ...shellEnvironment(cwd), AI_GATEWAY_API_KEY: key, PIJ_JEV_PROVIDER: "vercel", PIJ_HOME: join(output, "home"),
     PIJ_EVAL_WORKSPACE: cwd, PIJ_EVAL_STATS: join(output, "control.json"), PIJ_EVAL_TURNS: values.turns,
+    PIJ_EVAL_PROTECTED_HOME: protectedHome,
     PIJ_EVAL_TOKENS: String(budgets.tokens), PIJ_EVAL_SECONDS: String(budgets.seconds), PIJ_EVAL_MAX_OUTPUT_TOKENS: String(budgets.maxOutputTokens),
     PIJ_SOURCE_BRIEFING: values.briefing ? "1" : "0",
     PI_OFFLINE: "1", PI_TELEMETRY: "0", PI_SKIP_VERSION_CHECK: "1",
@@ -65,6 +68,7 @@ let reportedTokens = 0;
 const observedUsage: EvalUsage = { input: 0, output: 0, cacheRead: 0, cacheWrite: 0, estimatedUsd: 0 };
 const calls: Record<string, number> = {};
 let timedOut = false;
+let interrupted = false;
 let backupBudgetStop = false;
 let modelError = false;
 let forcedKill: ReturnType<typeof setTimeout> | undefined;
@@ -73,6 +77,8 @@ const stopChild = () => {
   try { process.kill(-child.pid, "SIGTERM"); } catch { return; }
   forcedKill ??= setTimeout(() => { if (child.pid) try { process.kill(-child.pid, "SIGKILL"); } catch {} }, 1000);
 };
+const interrupt = () => { interrupted = true; stopChild(); };
+process.on("SIGTERM", interrupt);
 const clean = (text: string) => text.replaceAll(key, "[redacted]");
 const start = performance.now();
 console.log(JSON.stringify({ event: "start", runId, mode: values.mode, briefing: values.briefing, model: values.model, budgets, baseline, source, workspace: cwd, output, pid: child.pid }));
@@ -116,17 +122,19 @@ child.stderr.on("data", (data: string) => {
 });
 const timer = setTimeout(() => { timedOut = true; stopChild(); }, budgets.seconds * 1000);
 let spawnFailed = false;
-const exitCode = await new Promise<number | null>((resolveExit) => { child.once("error", () => { spawnFailed = true; resolveExit(null); }); child.once("close", resolveExit); });
+let exitSignal: NodeJS.Signals | null = null;
+const exitCode = await new Promise<number | null>((resolveExit) => { child.once("error", () => { spawnFailed = true; resolveExit(null); }); child.once("close", (code, signal) => { exitSignal = signal; resolveExit(code); }); });
 clearTimeout(timer);
 if (forcedKill) clearTimeout(forcedKill);
 if (pending) trace.write(clean(pending));
 if (pendingError) errors.write(clean(pendingError));
 await Promise.all([new Promise<void>((done) => trace.end(done)), new Promise<void>((done) => errors.end(done))]);
-const control = await readFile(join(output, "control.json"), "utf8").then((text) => JSON.parse(text) as EvalBudgetSnapshot).catch(() => undefined);
+const control = await readFile(join(output, "control.json"), "utf8").then((text) => JSON.parse(text) as EvalBudgetSnapshot & { isolationError?: boolean }).catch(() => undefined);
 const decisions = await readRecentDecisions(join(output, "home"), 500);
 const jev = decisions.reduce((sum, row) => ({ calls: sum.calls + 1, successfulNetworkCalls: sum.successfulNetworkCalls + Number(row.status === "ok" && !row.cached), cacheHits: sum.cacheHits + Number(row.cached), fallbacks: sum.fallbacks + Number(row.status === "fallback"), input: sum.input + (row.inputTokens ?? 0), output: sum.output + (row.outputTokens ?? 0), latencyMs: sum.latencyMs + row.latencyMs }), { calls: 0, successfulNetworkCalls: 0, cacheHits: 0, fallbacks: 0, input: 0, output: 0, latencyMs: 0 });
 const sourceAtEnd = await captureSourceProvenance(project);
-const termination = timedOut ? "timeout" : backupBudgetStop || control?.termination === "budget" ? "budget" : spawnFailed || modelError || exitCode !== 0 ? "error" : "completed";
-const result = { runId, mode: values.mode, briefing: values.briefing, model: values.model, baseline, source, sourceAtEnd, sourceChangedDuringRun: source.sourceDigest !== sourceAtEnd.sourceDigest || source.builtRuntimeDigest !== sourceAtEnd.builtRuntimeDigest || source.head !== sourceAtEnd.head, budgets, termination, budgetReason: control?.budgetReason ?? (backupBudgetStop ? "parent_request_guard" : undefined), requests: control?.requests ?? null, assistantMessages, providerResponses, tokens: control?.tokens ?? reportedTokens, usage: control?.usage ?? observedUsage, calls, jev, workspace: cwd, output, exitCode, timedOut, backupBudgetStop, controlStatsAvailable: !!control, elapsedMs: Math.round(performance.now() - start) };
+const termination = timedOut ? "timeout" : interrupted || exitSignal === "SIGTERM" ? "interrupted" : backupBudgetStop || control?.termination === "budget" ? "budget" : spawnFailed || modelError || control?.isolationError || exitCode !== 0 ? "error" : "completed";
+const result = { runId, mode: values.mode, briefing: values.briefing, model: values.model, baseline, source, sourceAtEnd, sourceChangedDuringRun: source.sourceDigest !== sourceAtEnd.sourceDigest || source.builtRuntimeDigest !== sourceAtEnd.builtRuntimeDigest || source.head !== sourceAtEnd.head, budgets, termination, budgetReason: control?.budgetReason ?? (backupBudgetStop ? "parent_request_guard" : undefined), requests: control?.requests ?? null, assistantMessages, providerResponses, tokens: control?.tokens ?? reportedTokens, usage: control?.usage ?? observedUsage, calls, jev, workspace: cwd, output, exitCode, exitSignal, timedOut, backupBudgetStop, isolationError: Boolean(control?.isolationError), controlStatsAvailable: !!control, elapsedMs: Math.round(performance.now() - start) };
 await writeFile(join(output, "result.json"), JSON.stringify(result, null, 2), { mode: 0o600 });
 console.log(JSON.stringify({ event: "result", ...result }));
+process.off("SIGTERM", interrupt);

@@ -1,4 +1,5 @@
-import type { ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
+import { open } from "node:fs/promises";
+import type { AgentSession, ExtensionAPI, ExtensionContext } from "@earendil-works/pi-coding-agent";
 
 export interface EvalBudgets { turns: number; seconds: number; tokens: number; maxOutputTokens: number }
 export type BudgetReason = "requests" | "tokens";
@@ -67,6 +68,35 @@ export function installEvalBudget(pi: ExtensionAPI, options: EvalBudgets) {
   return {
     snapshot(): EvalBudgetSnapshot {
       return { budgets: { ...budgets }, requests, tokens, termination: budgetReason ? "budget" : "completed", ...(budgetReason ? { budgetReason } : {}), calls: { ...calls }, usage: { ...usage } };
+    },
+  };
+}
+
+/** Retain completed messages/events during a run and allow SIGTERM to finish cleanup. */
+export async function recordEvalRun(session: AgentSession, path: string, sanitize: (text: string) => string, onInterrupt: () => void) {
+  const file = await open(path, "a", 0o600);
+  let pending = Promise.resolve();
+  let failed = false;
+  const append = (event: unknown) => {
+    const line = sanitize(`${JSON.stringify({ at: new Date().toISOString(), event })}\n`);
+    pending = pending.then(() => file.appendFile(line)).catch(() => { failed = true; });
+  };
+  append({ type: "recorder_start" });
+  const unsubscribe = session.subscribe((event) => {
+    // Avoid repeatedly serializing a growing streamed message; completed messages
+    // and tool events provide a durable, bounded-per-event progress record.
+    if (["agent_start", "agent_end", "turn_start", "turn_end", "message_end", "tool_execution_start", "tool_execution_end"].includes(event.type)) append(event);
+  });
+  const interrupt = () => { append({ type: "interrupted", signal: "SIGTERM" }); onInterrupt(); void session.abort(); };
+  process.on("SIGTERM", interrupt);
+  return {
+    get writeFailed() { return failed; },
+    async flush() { await pending; },
+    async close() {
+      process.off("SIGTERM", interrupt);
+      unsubscribe();
+      await pending;
+      await file.close();
     },
   };
 }

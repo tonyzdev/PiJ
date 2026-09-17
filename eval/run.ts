@@ -9,7 +9,7 @@ import { createPijExtension } from "../src/extension.js";
 import { readRecentDecisions } from "../src/telemetry.js";
 import { checkWorkspacePath, sandboxProfile, shellEnvironment, shellQuote } from "./sandbox.js";
 import { TASKS } from "./tasks.js";
-import { installEvalBudget, validateBudgets } from "./budget.js";
+import { installEvalBudget, recordEvalRun, validateBudgets } from "./budget.js";
 import { captureSourceProvenance } from "./provenance.js";
 
 const { values } = parseArgs({ options: {
@@ -86,18 +86,20 @@ const { session } = await createAgentSession({
   tools: ["read", "bash", "edit", "write", ...(mode === "plain" ? [] : ["pij_search"])],
 });
 await session.bindExtensions({});
+const recording = await recordEvalRun(session, join(output, "events.jsonl"), clean, () => { termination = "interrupted"; });
 session.subscribe((event) => {
   if (event.type === "tool_execution_start") {
     console.log(JSON.stringify({ event: "tool", turn: budget.snapshot().requests, tool: event.toolName }));
   }
   if (event.type === "message_end" && event.message.role === "assistant") {
     const message = event.message;
-    if (message.stopReason === "error" && budget.snapshot().termination !== "budget") termination = "error";
+    if (message.stopReason === "error" && termination === "completed" && budget.snapshot().termination !== "budget") termination = "error";
   }
 });
+try {
 console.log(JSON.stringify({ event: "start", task: task.id, mode, briefing: values.briefing, model: model.id, budgets, source, output, workspace: cwd }));
 const start = performance.now();
-const timer = setTimeout(() => { termination = "timeout"; void session.abort(); }, budgets.seconds * 1000);
+const timer = setTimeout(() => { if (termination !== "interrupted") termination = "timeout"; void session.abort(); }, budgets.seconds * 1000);
 let error: string | undefined;
 try {
   await session.prompt(`${task.prompt}\n\nWork autonomously in this repository. Inspect the implementation, make the repair, and run its tests. Do not ask for clarification. Keep changes focused and preserve the public API.`);
@@ -107,7 +109,7 @@ try {
 } finally { clearTimeout(timer); }
 const elapsedMs = Math.round(performance.now() - start);
 const budgetState = budget.snapshot();
-if (budgetState.termination === "budget" && termination !== "timeout") termination = "budget";
+if (budgetState.termination === "budget" && termination !== "timeout" && termination !== "interrupted") termination = "budget";
 const trace = session.messages;
 await writeFile(join(output, "trace.json"), clean(JSON.stringify(trace, null, 2)), { mode: 0o600 });
 session.dispose();
@@ -120,6 +122,8 @@ const jev = decisions.reduce((sum, row) => ({
   latencyMs: sum.latencyMs + row.latencyMs,
 }), { calls: 0, network: 0, fallbacks: 0, input: 0, output: 0, latencyMs: 0 });
 const sourceAtEnd = await captureSourceProvenance(project);
-const result = { runId, version: sourceRef, source, sourceAtEnd, sourceChangedDuringRun: source.sourceDigest !== sourceAtEnd.sourceDigest || source.builtRuntimeDigest !== sourceAtEnd.builtRuntimeDigest || source.head !== sourceAtEnd.head, task: task.id, mode, briefing: values.briefing, model: model.id, budgets, termination, ...(budgetState.budgetReason ? { budgetReason: budgetState.budgetReason } : {}), acceptance, turns: budgetState.requests, requests: budgetState.requests, tokens: budgetState.tokens, calls: budgetState.calls, usage: budgetState.usage, jev, elapsedMs, ...(error ? { error } : {}), workspace: cwd };
+await recording.flush();
+const result = { runId, version: sourceRef, source, sourceAtEnd, sourceChangedDuringRun: source.sourceDigest !== sourceAtEnd.sourceDigest || source.builtRuntimeDigest !== sourceAtEnd.builtRuntimeDigest || source.head !== sourceAtEnd.head, task: task.id, mode, briefing: values.briefing, model: model.id, budgets, termination, ...(budgetState.budgetReason ? { budgetReason: budgetState.budgetReason } : {}), acceptance, turns: budgetState.requests, requests: budgetState.requests, tokens: budgetState.tokens, calls: budgetState.calls, usage: budgetState.usage, jev, elapsedMs, traceWriteFailed: recording.writeFailed, ...(error ? { error } : {}), workspace: cwd };
 await writeFile(join(output, "result.json"), clean(JSON.stringify(result, null, 2)), { mode: 0o600 });
 console.log(clean(JSON.stringify({ event: "result", ...result })));
+} finally { await recording.close(); }

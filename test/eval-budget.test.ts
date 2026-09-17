@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
-import { execFile } from "node:child_process";
+import { execFile, spawn } from "node:child_process";
 import { once } from "node:events";
 import { createServer } from "node:http";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join, resolve } from "node:path";
 import { promisify } from "node:util";
+import { pathToFileURL } from "node:url";
 import test from "node:test";
 import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager, type ExtensionFactory } from "@earendil-works/pi-coding-agent";
 import cliControl from "../eval/cli-control.js";
@@ -49,7 +50,9 @@ async function fixture(t: test.TestContext, limits: Partial<EvalBudgets> = {}, o
   let budget!: ReturnType<typeof installEvalBudget>;
   let control: ExtensionFactory = (pi) => { budget = installEvalBudget(pi, { ...defaults, ...limits }); };
   if (options.cli) {
-    const env = { PIJ_EVAL_WORKSPACE: cwd, PIJ_EVAL_STATS: join(cwd, "stats.json"), PIJ_EVAL_TURNS: "2", PIJ_EVAL_TOKENS: "100000", PIJ_EVAL_MAX_OUTPUT_TOKENS: "16384" };
+    const protectedHome = await mkdtemp(join(tmpdir(), "pij-budget-protected-"));
+    t.after(() => rm(protectedHome, { recursive: true, force: true }));
+    const env = { PIJ_EVAL_WORKSPACE: cwd, PIJ_EVAL_PROTECTED_HOME: protectedHome, PIJ_EVAL_STATS: join(cwd, "stats.json"), PIJ_EVAL_TURNS: "2", PIJ_EVAL_TOKENS: "100000", PIJ_EVAL_MAX_OUTPUT_TOKENS: "16384" };
     const previous = Object.fromEntries(Object.keys(env).map((key) => [key, process.env[key]]));
     Object.assign(process.env, env);
     t.after(() => { for (const [key, value] of Object.entries(previous)) { if (value === undefined) delete process.env[key]; else process.env[key] = value; } });
@@ -140,4 +143,57 @@ test("provenance distinguishes tracked, untracked, and built code without scanni
   await writeFile(join(cwd, ".env"), "SYNTHETIC_PRIVATE_MARKER=not-a-key\n");
   assert.deepEqual(await captureSourceProvenance(cwd), built);
   assert.ok(!JSON.stringify(built).includes("SYNTHETIC_PRIVATE_MARKER"));
+});
+
+test("SIGTERM preserves an incremental redacted trace and lets actual Pi run cleanup", { timeout: 10000 }, async (t) => {
+  const cwd = await mkdtemp(join(tmpdir(), "pij-interrupt-"));
+  t.after(() => rm(cwd, { recursive: true, force: true }));
+  let entered!: () => void;
+  const waiting = new Promise<void>((resolve) => { entered = resolve; });
+  let requests = 0;
+  const http = createServer(async (req, _res) => { for await (const _ of req) {} requests++; entered(); });
+  http.listen(0, "127.0.0.1");
+  await once(http, "listening");
+  t.after(() => { http.closeAllConnections(); http.close(); });
+  const address = http.address();
+  assert.ok(address && typeof address === "object");
+  const script = `
+    import { join } from 'node:path';
+    import { writeFile } from 'node:fs/promises';
+    import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager } from '@earendil-works/pi-coding-agent';
+    import { recordEvalRun } from ${JSON.stringify(pathToFileURL(resolve("eval/budget.ts")).href)};
+    const cwd = ${JSON.stringify(cwd)}, home = join(cwd, 'home');
+    const runtime = await ModelRuntime.create({authPath:join(home,'auth.json'),modelsPath:null,refreshOnCreate:false});
+    runtime.registerProvider('fixture',{baseUrl:${JSON.stringify(`http://127.0.0.1:${address.port}/v1`)},api:'openai-completions',apiKey:'fixture-only',models:[{id:'fixture',name:'fixture',reasoning:false,input:['text'],cost:{input:0,output:0,cacheRead:0,cacheWrite:0},contextWindow:32000,maxTokens:512}]});
+    const settings = SettingsManager.inMemory({retry:{enabled:false},compaction:{enabled:false}});
+    const resources = new DefaultResourceLoader({cwd,agentDir:home,settingsManager:settings,noExtensions:true,noSkills:true,noPromptTemplates:true,noThemes:true,noContextFiles:true});
+    await resources.reload();
+    const {session} = await createAgentSession({cwd,agentDir:home,modelRuntime:runtime,model:runtime.getModel('fixture','fixture'),settingsManager:settings,resourceLoader:resources,sessionManager:SessionManager.inMemory()});
+    await session.bindExtensions({});
+    let termination = 'completed';
+    const recorder = await recordEvalRun(session,join(cwd,'events.jsonl'),text=>text.replaceAll('synthetic-recording-marker','[redacted]'),()=>{termination='interrupted';});
+    await session.prompt('Fixture request synthetic-recording-marker');
+    await recorder.close();
+    await writeFile(join(cwd,'result.json'),JSON.stringify({termination,idle:session.isIdle,cleanup:true}));
+    session.dispose();
+  `;
+  const child = spawn(process.execPath, ["--import", "tsx", "--input-type=module", "-e", script], { cwd: resolve("."), env: { PATH: process.env.PATH, HOME: cwd, PI_OFFLINE: "1", PI_TELEMETRY: "0" }, stdio: ["ignore", "ignore", "pipe"] });
+  t.after(() => { child.kill("SIGKILL"); });
+  const finished = new Promise<{ code: number | null; signal: NodeJS.Signals | null }>((resolveExit, reject) => { child.once("error", reject); child.once("close", (code, signal) => resolveExit({ code, signal })); });
+  await Promise.race([waiting, finished.then(() => { throw new Error("Fixture process exited before its provider request."); })]);
+  let progress = "";
+  for (let attempt = 0; attempt < 50; attempt++) {
+    progress = await readFile(join(cwd, "events.jsonl"), "utf8");
+    if (progress.includes('"message_end"')) break;
+    await new Promise((resolveDelay) => setTimeout(resolveDelay, 10));
+  }
+  assert.ok(progress.includes('"message_end"'), "completed user message must already be on disk while the provider is pending");
+  assert.ok(!progress.includes("synthetic-recording-marker"));
+  child.kill("SIGTERM");
+  assert.deepEqual(await finished, { code: 0, signal: null });
+  assert.deepEqual(JSON.parse(await readFile(join(cwd, "result.json"), "utf8")), { termination: "interrupted", idle: true, cleanup: true });
+  const trace = await readFile(join(cwd, "events.jsonl"), "utf8");
+  assert.ok(trace.includes('"interrupted"'));
+  assert.ok(!trace.includes("synthetic-recording-marker"));
+  assert.equal(requests, 1);
 });

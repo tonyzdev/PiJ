@@ -43,3 +43,11 @@ One direct live Jev ranking per task, over 19 and 18 source windows respectively
 | Queue pagination | 1/5 reference files | 3/5 | 530 ms | 4,578 / 318 |
 
 The queue shortlist still omits the cursor scope and boundary implementations. Better overlap is a useful intermediate observation, not proof of a better repair. Whole-task comparisons are required, including the extra context and request costs.
+
+### Follow-up batch stopped: invalid real-CLI isolation
+
+The first fixed-budget briefing batch was stopped after its actual CLI trace showed bash reading the development checkout outside the task clone. The CLI child intentionally receives a temporary `HOME`; deriving the protected home from that child's environment consequently protected the wrong directory. Direct sandbox-unit checks had missed the integration error. No credential read was observed, but the affected runs are excluded from performance comparisons. The simultaneous SDK pair was also stopped conservatively; its trace was not yet persisted and it is not scored.
+
+The correction passes the parent's actual protected home explicitly, separately protects the development repository, and keeps a blocking control active if configuration is invalid. Runtime integration tests must load the extension with rewritten `HOME` and attempt real bash reads/writes. The SDK runner also needs incremental trace persistence and graceful interruption so a stopped run remains inspectable.
+
+Trace inspection also found repeated identical searches. The initial evidence had been appended as a new user-like message after every tool response. It now remains beside the request that generated it, before newer observations, with a runtime ordering regression test. Whether this placement caused the observed repetition is unproven; the next controlled run must assess behavior.
