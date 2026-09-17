@@ -125,6 +125,7 @@ Switch with `/pij assist`, `/pij observe`, or `/pij off`. Session switches are t
 | `AI_GATEWAY_API_KEY` | Vercel route credential |
 | `PIJ_JEV_MODEL` | `jev-latest` for TypeSafe; `typesafe-ai/jev` for Vercel |
 | `PIJ_JEV_TIMEOUT_MS` | Per-call deadline: `1800`; allowed range 50–30000 |
+| `PIJ_SOURCE_BRIEFING` | Experimental initial source evidence: `0` (default) or `1` |
 | `PIJ_JEV_ENDPOINT` | TypeSafe API URL, or Vercel SDK base URL; normally leave unset |
 
 Pi project resources in `.pi/` and `AGENTS.md` remain supported. PiJ retains Pi's project-extension trust flow. It uses Pi's public SDK, pinned to 0.85.1.
@@ -136,6 +137,8 @@ In `assist` and `observe`, task text, candidate skill instructions, retrieved so
 - Jev requests have a total deadline, cancellation, strict response validation, size limits, and no client retries. Successful answers are cached in memory for five minutes; repeated service failures trigger a short cooldown.
 - Local decision logs contain metadata such as mode, stage, latency, token use, and fallback reason. They exclude prompts, answers, source, and tool output. **Pi session transcripts separately retain normal conversation and tool content.**
 - `pij_search` respects ignore files and excludes hidden files, common credential files, dependencies, and build output. It retrieves a bounded shortlist and reports truncation. These filters do not detect secrets embedded in source code.
+- Omit `patterns` in `pij_search` to discover source windows from a natural-language question. Discovery reads at most 1,000 eligible files, 256 KiB per file and 4 MiB total, then offers at most 32 excerpts for ranking. Files beyond the enumeration budget are not searched.
+- `PIJ_SOURCE_BRIEFING=1` optionally provides up to six files' exact excerpts before the coding model starts. Assist uses Jev ranking; off and observe use deterministic selection. Each new prompt refreshes the snapshot; edits can make it stale. This may add latency and source disclosure to the configured Jev provider. It is disabled by default and has no demonstrated task-performance advantage. See the [experiment design](docs/experiments.md) and [results](docs/experiment-results.md).
 - Jev is advisory. Model confidence and relevance scores are not probabilities that a code change is correct.
 
 ## Development and evidence
