@@ -1,0 +1,26 @@
+diff --git a/tests/queries/test_repro.py b/tests/queries/test_repro.py
+new file mode 100644
+index 0000000..60a350d
+--- /dev/null
++++ b/tests/queries/test_repro.py
+@@ -0,0 +1,20 @@
++from django.test import TestCase, skipUnlessDBFeature
++from .models import Number
++
++
++@skipUnlessDBFeature('supports_select_union')
++class ReproTest(TestCase):
++    @classmethod
++    def setUpTestData(cls):
++        Number.objects.bulk_create(Number(num=i) for i in range(10))
++
++    def test_repro(self):
++        from django.db import connection
++        connection.features.supports_slicing_ordering_in_compound = True
++        qs1 = Number.objects.filter(num__in=[1, 2])
++        qs2 = Number.objects.filter(num__in=[8, 9]).order_by('num')
++        qs = qs1.union(qs2)
++        print("union SQL:", str(qs.query))
++        derived = qs.order_by().values_list('num', flat=True)
++        print("derived SQL:", str(derived.query))
++        print("union again SQL:", str(qs.query))

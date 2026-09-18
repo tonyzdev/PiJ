@@ -157,8 +157,10 @@ async function runAgent(inst: Instance, arm: Arm, dir: string, workspace: string
     { calls: 0, ok: 0, cached: 0, fallbacks: 0, inputTokens: 0, outputTokens: 0, latencyMs: 0, kinds: {} as Record<string, number> });
   const byKind: Record<string, { calls: number; resultBytes: number }> = {};
   for (const c of calls) { const k = byKind[c.kind] ??= { calls: 0, resultBytes: 0 }; k.calls++; k.resultBytes += c.resultBytes; }
-  const termination = timedOut ? "timeout" : control?.termination === "budget" ? "budget" : modelError || control?.isolationError || exitCode !== 0 ? "error" : "completed";
-  return { termination, budgetReason: control?.budgetReason, exitCode, turns, usage, requests: control?.requests ?? usage.responses, calls, byKind, jev, finalText: finalText.slice(0, 2000), elapsedMs: Math.round(performance.now() - started) };
+  // A transient provider error that Pi retried still ends in a completed run; it is
+  // recorded, not allowed to relabel the outcome.
+  const termination = timedOut ? "timeout" : control?.termination === "budget" ? "budget" : control?.isolationError || exitCode !== 0 || (modelError && !control) ? "error" : "completed";
+  return { termination, modelErrors: modelError, budgetReason: control?.budgetReason, exitCode, turns, usage, requests: control?.requests ?? usage.responses, calls, byKind, jev, finalText: finalText.slice(0, 2000), elapsedMs: Math.round(performance.now() - started) };
 }
 
 /** The benchmark's own oracle: apply the reference test patch on top of the agent's change
