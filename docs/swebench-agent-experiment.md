@@ -33,8 +33,8 @@ and achieves on a real task?
   and bash `cat|head|sed -n…` are *read*; `runtests.py|pytest` is *test*.
 
 Harness: `eval/swebench-agent.ts`. Raw per-run records, patches and summary:
-`eval/swebench-agent-results/` (first pass), `v2/` (corrected prompt) and `v3/` (calibrated
-trust). 120 runs, 0 harness errors, $0.38 of main-model spend in total.
+`eval/swebench-agent-results/` (first pass), `v2/` (corrected prompt), `v3/` (calibrated
+trust) and `v4/` (whole top file). 140 runs, 0 harness errors, about $0.45 of main-model spend in total.
 
 ## A confound, caught and corrected
 
@@ -182,6 +182,35 @@ the model did not start "trusting" the tool. What changed is the verify phase: f
 post-edit iterations (edits after the first 1.5 → 0.7), i.e. the first fix was right more
 often. With one run per configuration, +1 resolved is within noise; the token and tool-call
 reductions are consistent across the phase table.
+
+## Whole top file in the briefing (v4)
+
+The re-read finding above suggested a mechanical fix: when the top-ranked file scores at
+least 0.8 and fits Pi's own 50 KB read bound, the briefing carries it whole instead of a
+window. Rerun of the PiJ + Jev arm only (`eval/swebench-agent-results/v4/`).
+
+| | Pi | v2 | v3 | **v4** |
+|---|---:|---:|---:|---:|
+| resolved | 15/20 | 14/20 | 16/20 | 14/20 |
+| search calls | 4.6 | 4.3 | 4.0 | **3.5** |
+| tool calls | 17.1 | 16.1 | 14.8 | **14.3** |
+| `read` calls | 6.2 | 6.7 | 6.0 | **5.5** |
+| reads of a gold file, all runs | 48 | 56 | 55 | **47** |
+| prompt tokens per task | 192k | 202k | 169k | 178k |
+| wall time | 42 s | 58 s | 73 s | 55 s |
+| first request, prompt tokens | — | — | 3.6k | 4.4k |
+
+The mechanism did what it was meant to: gold-file reads fall back to plain Pi's level (55
+→ 47 across 20 runs), and in six runs the model edited straight from the briefing with no
+`read` at all; searches, reads and tool calls are the lowest of any arm. The injected file
+costs about 850 prompt tokens on the first request (the cap keeps the large files out) and
+~500 per request thereafter. Outcome: 14/20, two fewer than v3 — but `11087` has alternated
+resolved / budget across four PiJ + Jev runs under near-identical configurations, and
+`11141` has flipped once. **At one run per configuration on twenty instances, resolve rate
+cannot rank v3 against v4 against Pi; the effort metrics can, and they move consistently
+with each design change (tools 16.1 → 14.8 → 14.3).** Ranking configurations on outcome
+needs several seeds per instance, which this task set does not justify: on 13 of 20 the
+model already opens the right file with at most one search.
 
 ## Limitations
 
