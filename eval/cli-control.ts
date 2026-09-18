@@ -27,7 +27,9 @@ const control: ExtensionFactory = async (pi) => {
     const developmentRepository = await realpath(resolve(dirname(fileURLToPath(import.meta.url)), ".."));
     if (!(await stat(actualHome)).isDirectory() || inside(cwd, actualHome) || inside(cwd, developmentRepository)) throw new Error("Invalid protection roots.");
     // The repository's HTTP fixtures need loopback. External network remains denied.
-    profile = sandboxProfile(cwd, [actualHome, developmentRepository], { allowLoopback: true });
+    const allowRead = await Promise.all((process.env.PIJ_EVAL_ALLOW_READ ?? "").split(":").filter(Boolean).map((root) => realpath(root)));
+    if (allowRead.some((root) => inside(root, actualHome) || inside(root, developmentRepository) || inside(actualHome, root) || inside(developmentRepository, root))) throw new Error("Allowed read roots must not overlap protected roots.");
+    profile = sandboxProfile(cwd, [actualHome, developmentRepository], { allowLoopback: true, allowRead });
     budgets = validateBudgets({
       turns: Number(process.env.PIJ_EVAL_TURNS ?? 36), seconds: Number(process.env.PIJ_EVAL_SECONDS ?? 360),
       tokens: Number(process.env.PIJ_EVAL_TOKENS ?? 180000), maxOutputTokens: Number(process.env.PIJ_EVAL_MAX_OUTPUT_TOKENS ?? 16384),

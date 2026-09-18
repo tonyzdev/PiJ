@@ -33,7 +33,7 @@ export function shellEnvironment(cwd: string): NodeJS.ProcessEnv {
 }
 
 /** The live benchmark currently requires macOS Seatbelt. It never silently runs unsandboxed. */
-export function sandboxProfile(cwd: string, protectedRoots: string[], options: { allowLoopback?: boolean } = {}): string {
+export function sandboxProfile(cwd: string, protectedRoots: string[], options: { allowLoopback?: boolean; allowRead?: string[] } = {}): string {
   // Candidates and evaluator reference checkouts share the host temporary
   // roots. Protect their contents as well as the user's home. The explicit
   // workspace allowance below still permits this candidate's own dependencies
@@ -52,6 +52,9 @@ export function sandboxProfile(cwd: string, protectedRoots: string[], options: {
     // Metadata access does not permit their enumeration or sibling contents.
     ...(ancestors.length ? [`(allow file-read-metadata ${ancestors.map((path) => `(literal ${JSON.stringify(path)})`).join(" ")})`] : []),
     `(allow file-read* (subpath ${JSON.stringify(cwd)}))`,
+    // Toolchains the task legitimately needs (an interpreter outside the workspace) are
+    // allowed after the denies, so a later rule wins; they remain read-only.
+    ...(options.allowRead ?? []).map((root) => `(allow file-read* (subpath ${JSON.stringify(root)}))`),
     `(allow file-write* (subpath ${JSON.stringify(cwd)}) (literal \"/dev/null\"))`,
   ].join("\n");
 }
