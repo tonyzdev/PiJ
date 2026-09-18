@@ -7,6 +7,8 @@ and achieves on a real task?
 
 ![comparison](figures/swebench-agent-comparison.png)
 
+*Figure: plain Pi against the current PiJ arms (no Jev: corrected prompt; Jev: calibrated-trust briefing, v3).*
+
 ## Setup
 
 - **Instances**: 20 `django/django` instances from SWE-bench Verified. Candidates were
@@ -31,8 +33,8 @@ and achieves on a real task?
   and bash `cat|head|sed -n…` are *read*; `runtests.py|pytest` is *test*.
 
 Harness: `eval/swebench-agent.ts`. Raw per-run records, patches and summary:
-`eval/swebench-agent-results/` (first pass) and `eval/swebench-agent-results/v2/` (corrected
-prompt). 100 runs, 0 harness errors, $0.32 of main-model spend in total.
+`eval/swebench-agent-results/` (first pass), `v2/` (corrected prompt) and `v3/` (calibrated
+trust). 120 runs, 0 harness errors, $0.38 of main-model spend in total.
 
 ## A confound, caught and corrected
 
@@ -114,6 +116,72 @@ that path — intercept the `grep`/`rg` output the model already asked for and r
 rather than beside it. That is also where the latency has to earn its keep: a ranked grep
 result is worth 2 s only where it removes more than 2 s of subsequent searching, which on
 this task set is roughly half the instances.
+
+## Separating localization from comprehension
+
+"Search count" conflates two different kinds of work, so each run is split into phases at
+two events: **L** (localize) runs until every file the reference patch edits has been read;
+**C** (comprehend) runs from there to the first edit; **V** (verify) is everything after.
+Only L is the retrieval tool's job. (`eval/figures/swebench-agent-phases.py`; per-run data
+in `eval/swebench-agent-results/phases.json`.)
+
+| phase | metric | Pi | PiJ, no Jev | PiJ + Jev (v2) | PiJ + Jev (v3) |
+|---|---|---:|---:|---:|---:|
+| **L** | calls, mean / median | 4.7 / 2 | 3.2 / 2 | 2.3 / 1 | **2.2 / 1** |
+| | search calls | 1.8 / 1 | 1.3 / 1 | 0.7 / 0 | **0.6 / 0** |
+| | non-gold tool output ingested | 4.9 KB | 3.4 KB | 2.0 KB | **1.7 KB** |
+| **C** | calls | 3.8 / 2 | 3.2 / 1 | 6.2 / 2 | 6.2 / 3 |
+| | search calls | 1.1 | 1.0 | 2.3 | 2.1 |
+| **L + C** | calls before the first edit | 8.5 | 6.4 | 8.5 | 8.4 |
+| **V** | calls | 8.9 | 8.9 | 7.4 | **6.6** |
+| | edits after the first | 1.5 | 1.4 | 1.1 | **0.7** |
+| | share of all calls (Pi) | 54% | | | |
+| | resolved | 15/20 | 14/20 | 14/20 | **16/20** |
+
+The retrieval effect is real and confined to L: the Jev-ranked briefing halves localization
+calls (4.7 → 2.2), cuts localization searches by two thirds and cuts the irrelevant tool
+output ingested during localization from 4.9 KB to 1.7 KB. It then gives all of it back in
+C: comprehension calls rise from 3.8 to 6.2, so **calls before the first edit are identical
+(8.5 vs 8.4)**. PiJ moves the work from before the model has the file to after; it does not
+remove it. Half of all tool calls happen after the first edit, in a phase retrieval cannot
+touch.
+
+Two things account for the C inflation. The PiJ arms **re-read the gold file 2.5–3× as
+often** during C (15–19 re-reads across 18 runs vs 6 for Pi): the briefing delivers an
+excerpt, so the model fetches the whole file afterwards and then re-reads parts of it,
+where Pi's first contact is already a full `read`. And the model greps for callers and
+usages regardless of how it was pointed at the file (17 → 29 grep calls in C); that
+searching is understanding the change, not finding the file.
+
+## Calibrated trust (v3)
+
+The briefing was then rewritten around what the ranker actually returns: at most three files
+instead of six, each carrying Jev's relevance score, with the score explained as a
+probability and how to act on it (high: work there; low: the shortlist missed, search), and
+without the earlier "other files and lines may matter … expand when evidence is missing"
+wording. `pij_search`'s guideline says what it is — a judgement model ranking real excerpts
+for a natural-language question, not grep — and how to use its scores.
+
+| | Pi | PiJ + Jev (v2) | **PiJ + Jev (v3)** |
+|---|---:|---:|---:|
+| resolved | 15/20 | 14/20 | **16/20** |
+| first tool call reads a gold file | 5/20 | 11/20 | **14/20** |
+| `pij_search` calls / runs | — | 7 / 5 | 7 / 5 |
+| search calls, mean / median | 4.6 / 3.0 | 4.3 / 1.5 | 4.0 / 2.0 |
+| tool calls | 17.1 | 16.1 | **14.8** |
+| prompt tokens per task | 192k | 202k | **169k** |
+| wall time per task | **42 s** | 58 s | 73 s |
+
+This is the first configuration on the frontier ahead of plain Pi: one more task resolved,
+12% fewer prompt tokens, 13% fewer tool calls — at 31 s more wall time, almost all of it
+Jev latency (6.1 s of requests per task) plus the discovery pass. Two instances that had
+failed under PiJ + Jev in both earlier passes (`11087`, `11239`) resolved; one (`11138`)
+regressed. The improvement did not come where the hypothesis predicted: the comprehension
+phase is unchanged (6.2 calls), and `pij_search` usage is unchanged (7 calls in 5 runs) —
+the model did not start "trusting" the tool. What changed is the verify phase: fewer
+post-edit iterations (edits after the first 1.5 → 0.7), i.e. the first fix was right more
+often. With one run per configuration, +1 resolved is within noise; the token and tool-call
+reductions are consistent across the phase table.
 
 ## Limitations
 

@@ -1,0 +1,42 @@
+diff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py
+index d69c244..405f547 100644
+--- a/django/db/models/sql/query.py
++++ b/django/db/models/sql/query.py
+@@ -1666,6 +1666,7 @@ class Query(BaseExpression):
+             filter_expr = (filter_lhs, OuterRef(filter_rhs.name))
+         # Generate the inner query.
+         query = Query(self.model)
++        query._filtered_relations = self._filtered_relations
+         query.add_filter(filter_expr)
+         query.clear_ordering(True)
+         # Try to have as simple as possible subquery -> trim leading joins from
+diff --git a/tests/filtered_relation/test_repro.py b/tests/filtered_relation/test_repro.py
+new file mode 100644
+index 0000000..3183e45
+--- /dev/null
++++ b/tests/filtered_relation/test_repro.py
+@@ -0,0 +1,24 @@
++from django.db.models import Q, FilteredRelation
++from django.test import TestCase
++
++from .models import Author, Book, Editor
++
++
++class ReproTest(TestCase):
++    @classmethod
++    def setUpTestData(cls):
++        cls.author1 = Author.objects.create(name='Alice')
++        cls.author2 = Author.objects.create(name='Jane')
++        cls.editor_a = Editor.objects.create(name='a')
++        cls.editor_b = Editor.objects.create(name='b')
++        cls.book1 = Book.objects.create(title='Poem by Alice', editor=cls.editor_a, author=cls.author1)
++        cls.book2 = Book.objects.create(title='The book by Jane A', editor=cls.editor_b, author=cls.author2)
++        cls.book3 = Book.objects.create(title='The book by Jane B', editor=cls.editor_b, author=cls.author2)
++        cls.book4 = Book.objects.create(title='The book by Alice', editor=cls.editor_a, author=cls.author1)
++
++    def test_exclude(self):
++        qs = Author.objects.annotate(
++            book_alice=FilteredRelation('book', condition=Q(book__title__iexact='poem by alice')),
++        ).exclude(book_alice__isnull=False)
++        print(qs.query)
++        self.assertSequenceEqual(qs, [self.author2])

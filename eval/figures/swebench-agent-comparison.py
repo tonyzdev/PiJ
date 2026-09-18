@@ -2,7 +2,7 @@ import json, math
 SC="/private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad"
 D=json.load(open(f"{SC}/agent-chart-data.json"))
 ARMS=[("pi","Pi（bash grep）","#9a9a9a","c"),("pij-off","PiJ · 无 Jev（BM25 briefing）","#3987e5","c"),("pij-jev","PiJ · Jev 重排 briefing","#d55181","d")]
-FIRST_GOLD={"pi":5,"pij-off":7,"pij-jev":11}
+FIRST_GOLD={"pi":5,"pij-off":7,"pij-jev":14}
 W,H=1672,1060
 PANEL,BORDER,GRID="#1e1e1e","#3a3a3a","#2e2e2e"; INK,INK2,INK3="#ededed","#b4b4b4","#8c8c8c"; FRONT="#9a9a9a"
 SANS="'Helvetica Neue',Helvetica,Arial,'PingFang SC',sans-serif"
@@ -76,7 +76,7 @@ for i,(title,sub,fmean,fmed,fmt,ymax) in enumerate(metrics):
         short={"pi":"Pi","pij-off":"PiJ 无 Jev","pij-jev":"PiJ + Jev"}[k]
         t(cx,base+20,short,col,12.5,"500","middle")
         if m is not None: t(cx,base+38,f"中位 {fmt(m)}",INK3,11.5,"400","middle")
-t(18,H-12,"柱 = 均值 · 白线 = 中位数 · 完成 = 参考测试补丁下 FAIL_TO_PASS 全过且无回归 · 预算：600k token / 40 轮 / 9 分钟 · 主模型总花费 $0.32 / 100 run · PiJ 两条 arm 为修正 prompt 后的重跑 · Jev 82 次调用，平均每任务 +3.9s",INK3,12.5)
+t(18,H-12,"柱 = 均值 · 白线 = 中位数 · 完成 = 参考测试补丁下 FAIL_TO_PASS 全过且无回归 · 预算：600k token / 40 轮 / 9 分钟 · 主模型总花费 $0.38 / 120 run · PiJ+Jev 为校准信任版 briefing（v3） · Jev 平均每任务 +6.1s",INK3,12.5)
 o.append("</svg>")
 open(f"{SC}/fig/agent.html","w").write('<style>*{margin:0;padding:0}html,body{background:#abbab9}body{padding:36px}</style>\n'+"\n".join(o))
 print("agent.html written; frontier:", [p[0] for p in front])
