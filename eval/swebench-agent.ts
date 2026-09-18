@@ -15,7 +15,11 @@ import { goldFiles } from "./swebench-retrieval.js";
  * Outcome is the benchmark's own oracle: FAIL_TO_PASS tests after the test patch.
  */
 type Arm = "pi" | "pij-off" | "pij-jev";
-interface Instance { repo: string; instance_id: string; base_commit: string; problem_statement: string; patch: string; test_patch: string; FAIL_TO_PASS: string; PASS_TO_PASS: string; difficulty: string }
+interface Instance {
+  repo: string; instance_id: string; base_commit: string; problem_statement: string; patch: string; test_patch: string; FAIL_TO_PASS: string; PASS_TO_PASS: string; difficulty: string;
+  /** Repositories other than SWE-bench's: where to clone from, how to install, and which test files the oracle runs with pytest. */
+  runner?: "django" | "pytest"; clone_url?: string; install?: string; test_files?: string[]; repo_dir?: string;
+}
 
 const exec = promisify(execFile);
 const { values } = parseArgs({ options: {
@@ -55,7 +59,7 @@ export function classify(tool: string, args: Record<string, unknown>): "search" 
 async function prepareWorkspace(inst: Instance, dir: string) {
   await rm(dir, { recursive: true, force: true });
   await mkdir(dir, { recursive: true });
-  const repo = resolve(values.repos!, inst.repo.split("/")[1]!);
+  const repo = resolve(values.repos!, inst.repo_dir ?? inst.repo.split("/")[1]!);
   // A self-contained checkout: the sandbox denies reads outside the workspace,
   // so a worktree or shared clone would break every git command the agent runs.
   await new Promise<void>((done, fail) => {
@@ -70,8 +74,11 @@ async function prepareWorkspace(inst: Instance, dir: string) {
   await git("commit", "-qm", "base");
   await Promise.all([mkdir(join(dir, ".home")), mkdir(join(dir, ".tmp"))]);
   await exec("uv", ["venv", "-q", "--python", values.python!, ".venv"], { cwd: dir });
-  const extra = inst.repo === "sympy/sympy" ? ["mpmath"] : [];
-  await exec("uv", ["pip", "install", "-q", "-p", ".venv", "-e", ".", ...extra], { cwd: dir, timeout: 300_000 });
+  if (inst.install) await exec("/bin/bash", ["-lc", inst.install], { cwd: dir, timeout: 600_000 });
+  else {
+    const extra = inst.repo === "sympy/sympy" ? ["mpmath"] : [];
+    await exec("uv", ["pip", "install", "-q", "-p", ".venv", "-e", ".", ...extra], { cwd: dir, timeout: 300_000 });
+  }
 }
 
 function prompt(inst: Instance) {
@@ -81,7 +88,7 @@ function prompt(inst: Instance) {
 ${inst.problem_statement.trim()}
 </issue>
 
-Resolve the issue by changing the library source code. Make the minimal correct change; do not modify or add tests. A Python virtual environment at .venv has this checkout installed in editable mode, so you may run targeted tests, for example \`.venv/bin/python tests/runtests.py <app_label>\` for Django — never the full suite. Do not commit. Work autonomously and do not ask questions. When finished, describe the change in one paragraph.`;
+Resolve the issue by changing the library source code. Make the minimal correct change; do not modify or add tests. A Python virtual environment at .venv has this checkout installed in editable mode, so you may run targeted tests, for example ${inst.runner === "pytest" ? "\`.venv/bin/python -m pytest <test file>\`" : "\`.venv/bin/python tests/runtests.py <app_label>\` for Django"} — never the full suite. Do not commit. Work autonomously and do not ask questions. When finished, describe the change in one paragraph.`;
 }
 
 async function runAgent(inst: Instance, arm: Arm, dir: string, workspace: string) {
@@ -182,6 +189,13 @@ export function parseDjangoResults(output: string): Map<string, string> {
   return status;
 }
 
+/** pytest -rA summary lines: `PASSED path::test`, `FAILED path::test - reason`. */
+export function parsePytestResults(output: string): Map<string, string> {
+  const status = new Map<string, string>();
+  for (const m of output.matchAll(/^(PASSED|FAILED|ERROR|XFAIL|XPASS|SKIPPED) (\S+)/gm)) status.set(m[2]!, m[1] === "PASSED" || m[1] === "XFAIL" ? "ok" : m[1] === "SKIPPED" ? "skipped" : m[1]!);
+  return status;
+}
+
 export function testModules(ids: string[]): string[] {
   return [...new Set(ids.flatMap((id) => { const m = /\(([\w.]+)\)$/.exec(id); return m ? [m[1]!.split(".").slice(0, -1).join(".")] : []; }))].sort();
 }
@@ -198,18 +212,21 @@ async function evaluate(inst: Instance, workspace: string, dir: string) {
   try { await git("apply", join(dir, "test.patch")); } catch { testPatchApplied = false; }
   const f2p = JSON.parse(inst.FAIL_TO_PASS) as string[];
   const p2p = JSON.parse(inst.PASS_TO_PASS) as string[];
-  const labels = testModules([...f2p, ...p2p]);
+  const pytest = inst.runner === "pytest";
+  const labels = pytest ? (inst.test_files ?? []) : testModules([...f2p, ...p2p]);
   let output = "";
   let testError: string | undefined;
   const t0 = performance.now();
   if (testPatchApplied && labels.length) {
+    const python = join(workspace, ".venv", "bin", "python");
+    const args = pytest ? ["-m", "pytest", ...labels, "-rA", "-q", "--no-header", "-p", "no:cacheprovider", "-o", "addopts="] : ["tests/runtests.py", ...labels, "--parallel", "1", "-v", "2"];
     try {
-      const r = await exec(join(workspace, ".venv", "bin", "python"), ["tests/runtests.py", ...labels, "--parallel", "1", "-v", "2"], { cwd: workspace, timeout: 1_200_000, maxBuffer: 256_000_000, env: { PATH: process.env.PATH, HOME: join(workspace, ".home"), LANG: "en_US.UTF-8" } });
+      const r = await exec(python, args, { cwd: workspace, timeout: 1_200_000, maxBuffer: 256_000_000, env: { PATH: process.env.PATH, HOME: join(workspace, ".home"), LANG: "en_US.UTF-8", PYTHONDONTWRITEBYTECODE: "1" } });
       output = r.stdout + r.stderr;
     } catch (e: any) { output = `${e.stdout ?? ""}${e.stderr ?? ""}`; testError = e.killed ? "timeout" : e.code === "ENOENT" ? "no-python" : undefined; }
   }
   await writeFile(join(dir, "tests.txt"), output, { mode: 0o600 });
-  const status = parseDjangoResults(output);
+  const status = pytest ? parsePytestResults(output) : parseDjangoResults(output);
   const f2pStatus = f2p.map(id => ({ id, status: status.get(id) ?? "missing" }));
   const p2pSeen = p2p.map(id => ({ id, status: status.get(id) })).filter(x => x.status);
   const passing = (st: string) => st === "ok" || st.startsWith("skipped") || st === "expected failure";
