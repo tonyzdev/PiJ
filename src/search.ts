@@ -3,7 +3,9 @@ import { readFile, realpath, stat } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 import { minimatch } from "minimatch";
 
-export interface CodeCandidate { id: string; path: string; line: number; startLine: number; excerpt: string; relevance?: number }
+/** `outline` is whole-file evidence used only for ranking; `excerpt` is the real
+ * source the model receives. Literal pattern search supplies no outline. */
+export interface CodeCandidate { id: string; path: string; line: number; startLine: number; excerpt: string; outline?: string; relevance?: number }
 export interface SearchOptions { cwd: string; patterns: string[]; path?: string; glob?: string; maxCandidates?: number; signal?: AbortSignal }
 export interface SearchResult { candidates: CodeCandidate[]; truncated: boolean }
 const excluded = ["node_modules", "vendor", "dist", "build", "coverage", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "*.pem", "*.key", "credentials*", "*.env", ".env*"];

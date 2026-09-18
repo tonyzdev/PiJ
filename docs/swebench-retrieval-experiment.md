@@ -87,3 +87,74 @@ is now worth spending, because stage 1 says there is something to convert.
   `sympy__sympy-13091` (21 gold files, 7 in the shortlist) dominates the residual loss.
 - The outline representation is one design among several; whole-file, chunk-level and
   hybrid inputs are untested.
+
+---
+
+# Applying the result to PiJ's own pipeline
+
+## What was wrong
+
+Running PiJ's shipped `discoverCode` against django at four of these instances showed the
+gold file reaching the candidate pool **1 time out of 5**. Jev was being asked to rank 32
+windows that usually did not contain the answer, so its ranking quality was irrelevant.
+
+Four defects, in the order they bind:
+
+1. **Ranking unit was a window, not a file.** Up to four windows per file competed with each
+   other, and `select()`'s cross-file diversification then suppressed the file they came
+   from. A file is what gets read and edited; splitting it scatters the evidence for that
+   decision.
+2. **The shortlist was 32 windows.** A wide shortlist is the entire point of reranking.
+3. **The prefilter was not BM25.** `lineTerms.size * 4 + terms.size * 2 + pathTerms.size`
+   counts how many distinct query words appear, with no idf and no length normalization, so
+   a file repeating common words beats the one file carrying the decisive rare identifier.
+4. **Read budgets bound early.** `MAX_FILES = 1000` and `MAX_READ_BYTES = 4 MB` covered
+   ~430 of django's 2,464 Python files.
+
+## What changed
+
+- `discoverCode` scores **whole files with Okapi BM25** and returns one candidate per file,
+  shortlist 100. Each candidate carries a real excerpt (unchanged output contract) plus a
+  ≤1,200-byte `outline` used only for ranking.
+- `DecisionEngine.rankCode` **batches** the shortlist under a 70 KB transport bound, scores
+  outlines rather than excerpts, and discards the whole ranking if any batch fails or omits
+  a candidate — never a partial order.
+- Budgets raised to 20,000 files / 48 MB with an 8 s read deadline, and made overridable so
+  tests exercise the bounds cheaply.
+
+Two defects surfaced only by measuring against the benchmark:
+
+- **Term frequencies were being discarded.** `tokens()` returns a `Set`, so every frequency
+  was 1 and length normalization used the distinct-term count — BM25 degraded to
+  idf-weighted binary overlap. `tokenCounts()` now supplies real frequencies.
+- **Documentation monopolised the shortlist.** For `django__django-10097`, **92 of the top
+  100** files were `docs/*.txt`: prose repeats natural-language query words far more densely
+  than code does. The shortlist is now stratified, reserving 80% of slots for source, so
+  both kinds reach the ranker instead of either being excluded.
+
+## Rerun, same four instances
+
+| instance | gold in pool | BM25 rank | gold in top-8 | Jev rank |
+|---|:--:|:--:|:--:|:--:|
+| django__django-10097 | 1/1 | 44 | 1/1 | **1** |
+| django__django-10554 | 2/2 | 2, 5 | 2/2 | **1, 3** |
+| django__django-10880 | 1/1 | 11 | 1/1 | **1** |
+| django__django-10914 | 1/1 | 2 | 1/1 | **2** |
+
+**Gold in candidate pool: 1/5 → 5/5. Gold in the top-8 shown to the model: 1/5 → 5/5.**
+
+`django__django-10097` is the pattern in miniature: BM25 puts the gold file at 44, Jev moves
+it to 1. Neither stage alone would have delivered it.
+
+Cost: 12 Jev requests, 171k input tokens, 0 fallbacks. Discovery ~3.9 s and ranking ~2.7 s
+per query over 5,900 files — slower than before, and worth measuring against a narrower
+`pij_search` question than a pasted issue body.
+
+## Caveats
+
+- Four instances, one repository. This shows the pipeline defects are fixed, not that the
+  ranking quality generalises; the 20-instance Stage 1 numbers above remain the evidence for
+  that.
+- The prose stratification was motivated by a single observed failure. The 80/20 split is a
+  guess and needs validation across the wider sample.
+- Still untested end to end: whether any of this raises the task resolve rate.

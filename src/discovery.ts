@@ -6,14 +6,20 @@ import { setImmediate } from "node:timers/promises";
 import { minimatch } from "minimatch";
 import type { CodeCandidate } from "./search.js";
 
-interface DiscoveryOptions { cwd: string; query: string; path?: string; glob?: string; signal?: AbortSignal }
+interface DiscoveryOptions {
+  cwd: string; query: string; path?: string; glob?: string; signal?: AbortSignal;
+  /** Read budgets, overridable so tests can exercise the bounds cheaply. */
+  maxFiles?: number; maxReadBytes?: number; shortlist?: number;
+}
 interface Window { path: string; line: number; startLine: number; excerpt: string; terms: Set<string>; score: number; tie: number }
-const MAX_FILES = 1000;
+const MAX_FILES = 20_000;
 const MAX_FILE_BYTES = 256 * 1024;
-const MAX_READ_BYTES = 4 * 1024 * 1024;
-const MAX_WINDOWS = 32;
+const MAX_READ_BYTES = 48 * 1024 * 1024;
+// Ranking is per file, so the shortlist is the recall ceiling Jev inherits.
+const SHORTLIST = 100;
 const MAX_EXCERPT_BYTES = 1800;
-const MAX_CANDIDATE_BYTES = 58 * 1024;
+const MAX_OUTLINE_BYTES = 1200;
+const READ_DEADLINE_MS = 8000;
 // Keep these aligned with literal search. Positive caller globs never reach rg.
 const excluded = ["node_modules", "vendor", "dist", "build", "coverage", "package-lock.json", "pnpm-lock.yaml", "yarn.lock", "*.pem", "*.key", "credentials*", "*.env", ".env*"];
 const stopWords = new Set("a an and are as at be by can code do does for from happen how i in is it of on or should that the their then these this to using was what when where which who why will with would".split(" "));
@@ -48,6 +54,24 @@ function tokens(text: string): Set<string> {
   return result;
 }
 
+/** Term frequencies for BM25. `tokens` deliberately returns a set for overlap
+ * checks; saturation and length normalization need the counts it discards. */
+function tokenCounts(text: string): { counts: Map<string, number>; length: number } {
+  const counts = new Map<string, number>();
+  let length = 0;
+  const add = (term: string) => { counts.set(term, (counts.get(term) ?? 0) + 1); length++; };
+  const split = text.replace(/([a-z\d])([A-Z])/g, "$1 $2").replace(/([A-Z])([A-Z][a-z])/g, "$1 $2").toLowerCase();
+  for (const word of split.match(/[a-z][a-z\d]*|\p{Script=Han}+/gu) ?? []) {
+    if (/\p{Script=Han}/u.test(word)) {
+      if (word.length === 1) add(word);
+      for (let i = 0; i < word.length - 1; i++) add(word.slice(i, i + 2));
+    } else if (word.length > 1 && !stopWords.has(word)) {
+      add(word);
+    }
+  }
+  return { counts, length };
+}
+
 function overlap(text: string, query: Set<string>): Set<string> {
   return new Set([...tokens(text)].filter((term) => query.has(term)));
 }
@@ -80,7 +104,7 @@ async function enumerate(root: string, target: string, options: DiscoveryOptions
         pending = pending.slice(end + 1);
         if (!inside(target, resolve(root, path)) || excludedPath(path)) continue;
         if (options.glob && !minimatch(path.split(sep).join("/"), options.glob, { matchBase: true })) continue;
-        if (paths.length === MAX_FILES) { truncated = true; cancel(); break; }
+        if (paths.length === (options.maxFiles ?? MAX_FILES)) { truncated = true; cancel(); break; }
         paths.push(path);
       }
     });
@@ -159,35 +183,54 @@ function windows(path: string, source: string, query: Set<string>, queryText: st
   return { items, truncated: clipped || lines.some((line, i) => line.trim() && !covered.has(i)) };
 }
 
-async function select(pool: Window[], signal?: AbortSignal): Promise<CodeCandidate[]> {
-  const selected: CodeCandidate[] = [];
-  let bytes = 2; // JSON array brackets; include escaped source and path overhead.
-  const files = new Set<string>();
-  const terms = new Set<string>();
-  while (pool.length && selected.length < MAX_WINDOWS) {
-    await setImmediate(undefined, { signal });
-    const fresh = pool.filter((item) => !files.has(item.path));
-    const choices = fresh.length ? fresh : pool;
-    const value = (item: Window) => item.score + [...item.terms].filter((term) => !terms.has(term)).length * 3;
-    let best = choices[0]!;
-    let bestValue = value(best);
-    for (const item of choices.slice(1)) {
-      const score = value(item);
-      if (score > bestValue || (score === bestValue && (item.tie < best.tie || (item.tie === best.tie && item.path.localeCompare(best.path) < 0)))) {
-        best = item;
-        bestValue = score;
-      }
-    }
-    const candidate = { id: `c${selected.length}`, path: best.path, line: best.line, startLine: best.startLine, excerpt: best.excerpt };
-    const addedBytes = Buffer.byteLength(JSON.stringify(candidate)) + (selected.length ? 1 : 0);
-    if (bytes + addedBytes > MAX_CANDIDATE_BYTES) break;
-    bytes += addedBytes;
-    selected.push(candidate);
-    files.add(best.path);
-    for (const term of best.terms) terms.add(term);
-    pool.splice(pool.indexOf(best), 1);
+/** Prose repeats natural-language query words far more densely than code does,
+ * so unstratified BM25 hands the whole shortlist to documentation. Reserving
+ * most slots for source keeps both kinds in front of the ranker instead of
+ * excluding either one. */
+const PROSE_SHARE = 0.2;
+function prose(path: string): boolean {
+  return /\.(?:txt|md|rst|adoc|po|pot|html?|tex)$/i.test(path) || path.split(sep).includes("docs");
+}
+
+/** Okapi BM25 over whole files: idf weighting and length normalization are what
+ * keep one decisive rare identifier ahead of a file that merely repeats common
+ * query words. Raw term-overlap counts invert exactly that ordering. */
+function bm25(query: Set<string>, documents: { path: string; terms: Map<string, number>; length: number }[], k1 = 1.2, b = 0.75): number[] {
+  const total = documents.length;
+  const average = documents.reduce((sum, document) => sum + document.length, 0) / Math.max(1, total);
+  const idf = new Map<string, number>();
+  for (const term of query) {
+    const frequency = documents.reduce((count, document) => count + (document.terms.has(term) ? 1 : 0), 0);
+    idf.set(term, Math.log(1 + (total - frequency + 0.5) / (frequency + 0.5)));
   }
-  return selected;
+  return documents.map((document) => {
+    let score = 0;
+    for (const term of query) {
+      const frequency = document.terms.get(term);
+      if (frequency) score += idf.get(term)! * (frequency * (k1 + 1)) / (frequency + k1 * (1 - b + b * document.length / average));
+    }
+    // A path hit is evidence about the file as a whole, not about one line.
+    return score + overlap(document.path, query).size * 1.5;
+  });
+}
+
+/** Compact whole-file evidence for ranking. Real excerpts remain what the model
+ * receives; this is only what the decision service scores. */
+function outline(path: string, source: string, query: Set<string>): string {
+  const lines = source.split("\n");
+  const head: string[] = [];
+  for (const line of lines.slice(0, 60)) {
+    if (line.trim() && /^\s*(?:import|from|package|using|#include|\/\/|#)/.test(line)) head.push(line.trim());
+    if (head.length === 6) break;
+  }
+  const definitions: string[] = [];
+  for (let i = 0; i < lines.length; i++) {
+    if (/^\s{0,4}(?:export\s+)?(?:async\s+)?(?:function|class|def|fn|func|interface|type|const|struct|impl)\s+[\w<>$]/.test(lines[i]!)) definitions.push(`${i + 1}: ${lines[i]!.trim().slice(0, 140)}`);
+    if (definitions.length === 48) break;
+  }
+  const hits: string[] = [];
+  for (let i = 0; i < lines.length && hits.length < 8; i++) if (overlap(lines[i]!, query).size) hits.push(`${i + 1}: ${lines[i]!.trim().slice(0, 140)}`);
+  return prefixBytes([`# ${path} (${lines.length} lines)`, ...head, "## definitions", ...definitions, "## query matches", ...hits].join("\n"), MAX_OUTLINE_BYTES);
 }
 
 /** Bounded lexical discovery only. Scores select real excerpts, never generated summaries. */
@@ -206,13 +249,16 @@ export async function discoverCode(options: DiscoveryOptions): Promise<{ candida
   const query = tokens(options.query);
   // Hash ties spread the read budget across names, even without lexical overlap.
   enumeration.paths.sort((a, b) => overlap(b, query).size - overlap(a, query).size || hash(`${options.query}\0${a}`) - hash(`${options.query}\0${b}`) || a.localeCompare(b));
+  const maxReadBytes = options.maxReadBytes ?? MAX_READ_BYTES;
+  const shortlistSize = options.shortlist ?? SHORTLIST;
   let truncated = enumeration.truncated;
   let bytesRead = 0;
   let filesScanned = 0;
-  const pool: Window[] = [];
+  const deadline = Date.now() + READ_DEADLINE_MS;
+  const sources: { path: string; source: string }[] = [];
   for (const path of enumeration.paths) {
     options.signal?.throwIfAborted();
-    if (bytesRead === MAX_READ_BYTES) { truncated = true; break; }
+    if (bytesRead === maxReadBytes || Date.now() > deadline) { truncated = true; break; }
     const absolute = resolve(root, path);
     try {
       if (!(await noSymlinks(root, path))) { truncated = true; continue; }
@@ -224,7 +270,7 @@ export async function discoverCode(options: DiscoveryOptions): Promise<{ candida
         const current = await lstat(absolute);
         if (!info.isFile() || current.isSymbolicLink() || info.ino !== current.ino || info.dev !== current.dev || !(await noSymlinks(root, path))) { truncated = true; continue; }
         if (info.size > MAX_FILE_BYTES) { truncated = true; continue; }
-        const size = Math.min(info.size, MAX_READ_BYTES - bytesRead);
+        const size = Math.min(info.size, maxReadBytes - bytesRead);
         if (size < info.size) truncated = true;
         const buffer = Buffer.alloc(size);
         let offset = 0;
@@ -243,9 +289,7 @@ export async function discoverCode(options: DiscoveryOptions): Promise<{ candida
         let source: string;
         try { source = new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(data); } catch { truncated = true; continue; }
         if (!source.trim()) continue;
-        const result = windows(path, source, query, options.query);
-        pool.push(...result.items);
-        truncated ||= result.truncated;
+        sources.push({ path, source });
       } finally { await handle.close(); }
     } catch {
       options.signal?.throwIfAborted();
@@ -254,7 +298,33 @@ export async function discoverCode(options: DiscoveryOptions): Promise<{ candida
     }
   }
   options.signal?.throwIfAborted();
-  const candidates = await select(pool, options.signal);
-  truncated ||= pool.length > 0;
+  if (!sources.length) return { candidates: [], truncated, filesScanned };
+  // Score whole files first: a file is the unit that gets read and edited, and
+  // splitting it into competing windows scatters the evidence for that decision.
+  const documents = sources.map(({ path, source }) => {
+    const { counts, length } = tokenCounts(source);
+    return { path, terms: counts, length: Math.max(1, length) };
+  });
+  const scores = bm25(query, documents);
+  const order = sources.map((_, index) => index)
+    .sort((a, b) => scores[b]! - scores[a]! || hash(`${options.query}\0${sources[a]!.path}`) - hash(`${options.query}\0${sources[b]!.path}`) || sources[a]!.path.localeCompare(sources[b]!.path));
+  const proseBudget = Math.round(shortlistSize * PROSE_SHARE);
+  const source = order.filter((index) => !prose(sources[index]!.path));
+  const written = order.filter((index) => prose(sources[index]!.path));
+  const keptProse = written.slice(0, Math.max(proseBudget, shortlistSize - source.length));
+  const kept = new Set([...source.slice(0, shortlistSize - keptProse.length), ...keptProse]);
+  // Restore the single BM25 order so the unranked fallback stays meaningful.
+  const shortlist = order.filter((index) => kept.has(index));
+  if (shortlist.length < order.length) truncated = true;
+  const candidates: CodeCandidate[] = [];
+  for (const index of shortlist) {
+    await setImmediate(undefined, { signal: options.signal });
+    const { path, source } = sources[index]!;
+    const result = windows(path, source, query, options.query);
+    const best = result.items[0];
+    if (!best) continue;
+    truncated ||= result.truncated;
+    candidates.push({ id: `c${candidates.length}`, path, line: best.line, startLine: best.startLine, excerpt: best.excerpt, outline: outline(path, source, query) });
+  }
   return { candidates, truncated, filesScanned };
 }

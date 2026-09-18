@@ -76,11 +76,12 @@ test("discovery preserves exclusions, ignores, glob narrowing and realpath bound
 
 test("candidates cover diverse files deterministically instead of the alphabetical prefix", async (t) => {
   const cwd = await fixture(t);
-  for (let i = 0; i < 60; i++) await writeFile(join(cwd, "src", `file${String(i).padStart(2, "0")}.ts`), `export function processRequest${i}() {\n  return ${i};\n}\n`);
+  for (let i = 0; i < 140; i++) await writeFile(join(cwd, "src", `file${String(i).padStart(3, "0")}.ts`), `export function processRequest${i}() {\n  return ${i};\n}\n`);
   const result = await discoverCode({ cwd, query: "request processing" });
-  assert.equal(result.candidates.length, 32);
-  assert.equal(new Set(result.candidates.map((item) => item.path)).size, 32);
-  assert.ok(result.candidates.some((item) => Number(item.path.match(/file(\d+)/)![1]) >= 40));
+  // One candidate per file: ranking decides which file to read, not which window.
+  assert.equal(result.candidates.length, 100);
+  assert.equal(new Set(result.candidates.map((item) => item.path)).size, 100);
+  assert.ok(result.candidates.some((item) => Number(item.path.match(/file(\d+)/)![1]) >= 100));
   assert.deepEqual(await discoverCode({ cwd, query: "request processing" }), result);
   assert.equal(result.truncated, true);
 });
@@ -116,12 +117,16 @@ test("a clipped long line never joins later lines into fabricated evidence", asy
   for (const item of result.candidates) assert.ok(source.split("\n").slice(item.startLine - 1).join("\n").startsWith(item.excerpt));
 });
 
-test("serialized candidate payload stays bounded even when source escaping expands it", async (t) => {
+test("every candidate stays individually bounded even when source escaping expands it", async (t) => {
   const cwd = await fixture(t);
   for (let i = 0; i < 40; i++) await writeFile(join(cwd, "src", `f${i}.ts`), `// request ${"\\".repeat(2000)}`);
   const result = await discoverCode({ cwd, query: "request" });
   assert.ok(result.candidates.length > 0);
-  assert.ok(Buffer.byteLength(JSON.stringify(result.candidates)) <= 58 * 1024);
+  // The shortlist no longer fits one request, so the per-candidate bounds are
+  // what keep batching in DecisionEngine.rankCode predictable.
+  assert.ok(result.candidates.every((item) => Buffer.byteLength(item.excerpt) <= 1800));
+  assert.ok(result.candidates.every((item) => Buffer.byteLength(item.outline!) <= 1200));
+  assert.ok(result.candidates.every((item) => !item.outline!.includes("\uFFFD")));
   assert.equal(result.truncated, true);
 });
 
@@ -138,16 +143,21 @@ test("binary and oversized files are not offered as source evidence", async (t) 
 test("enumeration and aggregate reads stop at their bounds with explicit truncation", async (t) => {
   const cwd = await fixture(t);
   await Promise.all(Array.from({ length: 1002 }, (_, i) => writeFile(join(cwd, "src", `f${i}.ts`), "export const value = true;\n")));
-  const many = await discoverCode({ cwd, query: "value" });
+  const many = await discoverCode({ cwd, query: "value", maxFiles: 1000 });
   assert.ok(many.filesScanned <= 1000);
-  assert.ok(many.candidates.length <= 32);
+  assert.ok(many.candidates.length <= 100);
   assert.equal(many.truncated, true);
+  // Without a caller cap the same tree is fully enumerated, so the shortlist is
+  // the only thing discarding files.
+  const all = await discoverCode({ cwd, query: "value" });
+  assert.equal(all.filesScanned, 1002);
+  assert.equal(all.candidates.length, 100);
   await rm(join(cwd, "src"), { recursive: true });
   await mkdir(join(cwd, "src"));
   const content = "export const value = true;\n" + "// filler\n".repeat(26_211);
   assert.ok(Buffer.byteLength(content) <= 262_144);
   await Promise.all(Array.from({ length: 22 }, (_, i) => writeFile(join(cwd, "src", `f${i}.ts`), content)));
-  const large = await discoverCode({ cwd, query: "value" });
+  const large = await discoverCode({ cwd, query: "value", maxReadBytes: 4 * 1024 * 1024 });
   assert.ok(large.filesScanned <= 17);
   assert.equal(large.truncated, true);
 });
