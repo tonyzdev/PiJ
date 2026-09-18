@@ -8,7 +8,7 @@ import test from "node:test";
 import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager } from "@earendil-works/pi-coding-agent";
 import { createCheckpointExtension, type CheckpointRecord } from "../eval/checkpoint-extension.js";
 
-for (const condition of ["manual", "dependencies", "jev", "cancel"] as const) {
+for (const condition of ["manual", "dependencies", "jev", "cancel", "capped"] as const) {
 test(`actual Pi checkpoint: ${condition} after an edit batch`, { skip: process.platform !== "darwin", timeout: 10000 }, async (t) => {
   const cwd = await mkdtemp(join(tmpdir(), "pij-cpi-"));
   t.after(() => rm(cwd, { recursive: true, force: true }));
@@ -25,7 +25,7 @@ test(`actual Pi checkpoint: ${condition} after an edit batch`, { skip: process.p
   const server = createServer(async (req, res) => {
     let body = ""; for await (const chunk of req) body += String(chunk);
     payloads.push(body); calls++;
-    const toolCalls = calls === 1 ? ["a", "b"].map((name, index) => ({ index, id: `edit_${name}`, type: "function", function: { name: "write", arguments: JSON.stringify({ path: `src/${name}.mjs`, content: "export const value = 2;\n" }) } })) : calls === 2 ? [{ index: 0, id: "read", type: "function", function: { name: "read", arguments: JSON.stringify({ path: "src/a.mjs" }) } }] : undefined;
+    const toolCalls = calls === 1 ? ["a", "b"].map((name, index) => ({ index, id: `edit_${name}`, type: "function", function: { name: "write", arguments: JSON.stringify({ path: `src/${name}.mjs`, content: "export const value = 2;\n" }) } })) : calls === 2 ? [{ index: 0, id: "second", type: "function", function: condition === "capped" ? { name: "write", arguments: JSON.stringify({ path: "src/a.mjs", content: "export const value = 3;\n" }) } : { name: "read", arguments: JSON.stringify({ path: "src/a.mjs" }) } }] : undefined;
     const delta = toolCalls ? { role: "assistant", tool_calls: toolCalls } : { role: "assistant", content: "Complete." };
     res.writeHead(200, { "Content-Type": "text/event-stream" });
     for (const [part, finish] of [[delta, null], [{}, toolCalls ? "tool_calls" : "stop"]]) res.write(`data: ${JSON.stringify({ id: `m${calls}`, object: "chat.completion.chunk", model: "fixture", choices: [{ index: 0, delta: part, finish_reason: finish }] })}\n\n`);
@@ -38,7 +38,7 @@ test(`actual Pi checkpoint: ${condition} after an edit batch`, { skip: process.p
   const runtime = await ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
   runtime.registerProvider("fixture", { baseUrl: `http://127.0.0.1:${address.port}/v1`, api: "openai-completions", apiKey: "fixture", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], contextWindow: 32000, maxTokens: 2000, cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 } }] });
   const settings = SettingsManager.inMemory({ retry: { enabled: false }, compaction: { enabled: false } });
-  const extension = createCheckpointExtension({ mode: condition === "cancel" ? "jev" : condition, cwd, protectedRoots: [], limit: 1, onRecord: (record) => { records.push(record); }, provider: { evaluate: async (_state, _questions, signal) => {
+  const extension = createCheckpointExtension({ mode: condition === "cancel" || condition === "capped" ? "jev" : condition, maxCheckpoints: condition === "capped" ? 1 : undefined, cwd, protectedRoots: [], limit: 1, onRecord: (record) => { records.push(record); }, provider: { evaluate: async (_state, _questions, signal) => {
     decisions++;
     if (condition === "cancel") {
       entered();
@@ -62,8 +62,9 @@ test(`actual Pi checkpoint: ${condition} after an edit batch`, { skip: process.p
     return;
   }
   assert.equal(calls, 3, "Checkpoint must not introduce a separate model turn");
-  assert.equal(decisions, condition === "jev" ? 1 : 0, "Only Jev mode sends one selection for the entire batch");
-  assert.equal(records.length, 1);
+  assert.equal(decisions, condition === "jev" || condition === "capped" ? 1 : 0, "Only Jev mode sends one selection for the entire batch");
+  assert.equal(records.length, condition === "capped" ? 2 : 1);
+  if (condition === "capped") { assert.equal(records[1]?.skipped, "checkpoint_limit"); assert.equal(records[1]?.execution, undefined); }
   if (condition === "manual") {
     assert.deepEqual(records[0]!.selected, []);
     assert.equal(records[0]!.execution, undefined);

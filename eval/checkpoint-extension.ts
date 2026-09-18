@@ -7,13 +7,14 @@ import { loadConfig } from "../src/config.js";
 import { JevClient, type JevResult } from "../src/jev.js";
 import { checkpointSnapshot, changedSources, testCatalog, chooseCheckpointTests, runCheckpointTests, type SourceSnapshot, type CheckpointResult } from "./checkpoint.js";
 export interface CheckpointRecord { mode: string; paths: string[]; selected: string[]; decision?: JevResult; execution?: CheckpointResult; sessionId?: string; userMessageId?: string; skipped?: string }
-export function createCheckpointExtension(options: { mode: "manual" | "dependencies" | "jev"; cwd: string; protectedRoots: string[]; limit?: number; provider?: DecisionProvider; onRecord?: (record: CheckpointRecord) => void | Promise<void>; onProcess?: (event: "start" | "stop", pid: number) => void }): ExtensionFactory {
+export function createCheckpointExtension(options: { mode: "manual" | "dependencies" | "jev"; cwd: string; protectedRoots: string[]; limit?: number; maxCheckpoints?: number; provider?: DecisionProvider; onRecord?: (record: CheckpointRecord) => void | Promise<void>; onProcess?: (event: "start" | "stop", pid: number) => void }): ExtensionFactory {
   return (pi) => {
     let previous: SourceSnapshot | undefined;
     let generation = 0;
     let pending: Promise<void> = Promise.resolve();
     let feedback: { role: "custom"; customType: string; content: string; display: boolean; timestamp: number; details: { checkpointId: number; selected: string[]; status?: string } } | undefined;
     let sequence = 0;
+    let checkpoints = 0;
     pi.on("before_agent_start", async () => { generation++; feedback = undefined; previous = await checkpointSnapshot(options.cwd); });
     pi.on("session_shutdown", () => { generation++; previous = undefined; });
     const execute = async (event: TurnEndEvent, ctx: ExtensionContext) => {
@@ -30,6 +31,8 @@ export function createCheckpointExtension(options: { mode: "manual" | "dependenc
         if (!changes.length || signal?.aborted) return;
         record.paths = changes.map((change) => change.path);
         if (options.mode === "manual") { await options.onRecord?.(record); return; }
+        if (checkpoints >= (options.maxCheckpoints ?? Infinity)) { record.skipped = "checkpoint_limit"; await options.onRecord?.(record); return; }
+        checkpoints++;
         const catalog = testCatalog(fresh);
         const selection = await chooseCheckpointTests({ mode: options.mode, snapshot: fresh, changes, catalog, limit: options.limit ?? 2, provider: options.provider, signal });
         Object.assign(record, selection);
@@ -94,7 +97,7 @@ const checkpointExtension: ExtensionFactory = async (pi) => {
     });
     await createCheckpointExtension({
       cwd: await realpath(cwd), protectedRoots: [await realpath(home), await realpath(resolve(dirname(fileURLToPath(import.meta.url)), ".."))],
-      mode: mode as "manual" | "dependencies" | "jev", provider: new JevClient(loadConfig()),
+      mode: mode as "manual" | "dependencies" | "jev", maxCheckpoints: process.env.PIJ_PLACEMENT_POLICY?.startsWith("checkpoint-") ? 6 : undefined, provider: new JevClient(loadConfig()),
       onRecord: (record) => appendFile(output, `${JSON.stringify(record)}\n`, { mode: 0o600 }),
       onProcess: (phase, pid) => { process.send!({ type: "pij_checkpoint_process", phase, pid }); },
     })(pi);

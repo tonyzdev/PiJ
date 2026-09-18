@@ -1,0 +1,85 @@
+{
+  "schemaVersion": 1,
+  "maxConcurrent": 3,
+  "sample": 1,
+  "model": "anthropic/claude-sonnet-4.6",
+  "thinking": "medium",
+  "budgets": {
+    "seconds": 600,
+    "requests": 64,
+    "tokens": 3000000,
+    "maxOutputTokens": 16384
+  },
+  "cells": [
+    {
+      "order": 1,
+      "task": "session-mode",
+      "policy": "baseline"
+    },
+    {
+      "order": 2,
+      "task": "attribution",
+      "policy": "output-jev"
+    },
+    {
+      "order": 3,
+      "task": "session-mode",
+      "policy": "checkpoint-local"
+    },
+    {
+      "order": 4,
+      "task": "attribution",
+      "policy": "finish-local"
+    },
+    {
+      "order": 5,
+      "task": "session-mode",
+      "policy": "output-jev"
+    },
+    {
+      "order": 6,
+      "task": "attribution",
+      "policy": "checkpoint-jev"
+    },
+    {
+      "order": 7,
+      "task": "session-mode",
+      "policy": "finish-jev"
+    },
+    {
+      "order": 8,
+      "task": "attribution",
+      "policy": "baseline"
+    },
+    {
+      "order": 9,
+      "task": "session-mode",
+      "policy": "output-local"
+    },
+    {
+      "order": 10,
+      "task": "attribution",
+      "policy": "checkpoint-local"
+    },
+    {
+      "order": 11,
+      "task": "session-mode",
+      "policy": "finish-local"
+    },
+    {
+      "order": 12,
+      "task": "attribution",
+      "policy": "output-local"
+    },
+    {
+      "order": 13,
+      "task": "session-mode",
+      "policy": "checkpoint-jev"
+    },
+    {
+      "order": 14,
+      "task": "attribution",
+      "policy": "finish-jev"
+    }
+  ]
+}

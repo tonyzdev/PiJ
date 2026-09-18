@@ -8,7 +8,7 @@ import test from "node:test";
 import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager } from "@earendil-works/pi-coding-agent";
 import { shellEnvironment, shellQuote } from "../eval/sandbox.js";
 
-async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" | "missing" | "workspace", launchCli = false, checkpoint: boolean | "no-ack" = false) {
+async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" | "missing" | "workspace", launchCli = false, checkpoint: boolean | "no-ack" = false, placement: boolean | "no-ack" | "jev" = false) {
   const root = await realpath(await mkdtemp("/private/tmp/pij-iso-"));
   t.after(() => rm(root, { recursive: true, force: true }));
   const cwd = join(root, "clone");
@@ -38,10 +38,21 @@ async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" 
     await writeFile(join(cwd, "test/example.test.mjs"), "import assert from 'node:assert/strict'; import { value } from '../src/example.mjs'; assert.equal(value, 2);\n");
     commands.push("printf 'export const value = 2;\\n' > src/example.mjs");
   }
+  if (placement) {
+    await mkdir(join(cwd, "src"), { recursive: true });
+    await mkdir(join(cwd, "test"), { recursive: true });
+    await writeFile(join(cwd, "TASK.md"), "Persist the Jev mode with real production regression tests.");
+  }
   let requests = 0;
   const http = createServer(async (req, res) => {
     const chunks: Buffer[] = [];
     for await (const chunk of req) chunks.push(Buffer.from(chunk));
+    if (req.url === "/jev") {
+      const request = JSON.parse(Buffer.concat(chunks).toString());
+      res.writeHead(200, { "Content-Type": "application/json" });
+      res.end(JSON.stringify({ model: "jev-fixture", answers: Object.fromEntries(Object.keys(request.questions).map(id => [id, { type: "noul", noul: 0.1 }])), usage: { input_tokens: 1, output_tokens: 1 } }));
+      return;
+    }
     const body = JSON.parse(Buffer.concat(chunks).toString()) as { messages: { role: string; content: string }[] };
     const system = body.messages.filter((message) => message.role === "system").map((message) => message.content).join("\n");
     const docs = system.match(/^- Additional docs: (.+)$/m)?.[1];
@@ -63,23 +74,24 @@ async function loadedControlFixture(t: test.TestContext, protectedHome: "valid" 
   if (launchCli) {
     await mkdir(home);
     await writeFile(join(home, "models.json"), JSON.stringify({ providers: { fixture: { baseUrl: `http://127.0.0.1:${address.port}/v1`, api: "openai-completions", apiKey: "fixture-only", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 128000, maxTokens: 16384 }] } } }));
-    let checkpointReady = false;
+    let checkpointReady = false, placementReady = false;
     const checkpointProcesses: string[] = [];
-    const child = spawn(process.execPath, [resolve("bin/pij.mjs"), "--jev-mode", "off", "--mode", "json", "--print", "--provider", "fixture", "--model", "fixture", "--thinking", "off", "--no-context-files", "--no-skills", "--no-prompt-templates", "--no-extensions", "--offline", "--extension", resolve("eval/cli-control.ts"), ...(checkpoint ? ["--extension", resolve("eval/checkpoint-extension.ts")] : []), "Run the isolation fixture commands."], {
-      cwd, env: { ...shellEnvironment(cwd), ...env, PIJ_HOME: home, PI_OFFLINE: "1", PI_TELEMETRY: "0", PI_SKIP_VERSION_CHECK: "1", ...(checkpoint ? { PIJ_CHECKPOINT_MODE: "dependencies", PIJ_CHECKPOINT_LOG: join(root, "checkpoints.jsonl") } : {}) }, timeout: 10000, stdio: ["ignore", "pipe", "pipe", "ipc"],
+    const child = spawn(process.execPath, [resolve("bin/pij.mjs"), "--jev-mode", "off", "--mode", "json", "--print", "--provider", "fixture", "--model", "fixture", "--thinking", "off", "--no-context-files", "--no-skills", "--no-prompt-templates", "--no-extensions", "--offline", "--extension", resolve("eval/cli-control.ts"), ...(checkpoint ? ["--extension", resolve("eval/checkpoint-extension.ts")] : []), ...(placement ? ["--extension", resolve("eval/placement-extension.ts")] : []), "Run the isolation fixture commands."], {
+      cwd, env: { ...shellEnvironment(cwd), ...env, PIJ_HOME: home, PI_OFFLINE: "1", PI_TELEMETRY: "0", PI_SKIP_VERSION_CHECK: "1", ...(checkpoint ? { PIJ_CHECKPOINT_MODE: "dependencies", PIJ_CHECKPOINT_LOG: join(root, "checkpoints.jsonl") } : {}), ...(placement ? { PIJ_PLACEMENT_POLICY: placement === "jev" ? "finish-jev" : "finish-local", PIJ_JEV_PROVIDER: "typesafe", TYPESAFE_API_KEY: "local-fixture-only", PIJ_JEV_ENDPOINT: `http://127.0.0.1:${address.port}/jev`, PIJ_PLACEMENT_TASK: "session-mode", PIJ_PLACEMENT_LOG: join(root, "placements.jsonl") } : {}) }, timeout: 10000, stdio: ["ignore", "pipe", "pipe", "ipc"],
     });
     child.on("message", (message) => {
       const event = message as { type?: string; phase?: string };
       if (event.type === "pij_checkpoint_ready") { checkpointReady = true; if (checkpoint !== "no-ack") child.send({ type: "pij_checkpoint_ack" }); }
+      if (event.type === "pij_placement_ready") { placementReady = true; if (placement !== "no-ack") child.send({ type: "pij_placement_ack" }); }
       if (event.type === "pij_checkpoint_process") checkpointProcesses.push(event.phase!);
     });
     const result = { stdout: "", stderr: "" };
     child.stdout!.on("data", (data: Buffer) => { result.stdout += data.toString(); });
     child.stderr!.on("data", (data: Buffer) => { result.stderr += data.toString(); });
     const [exitCode] = await once(child, "close");
-    if (checkpoint !== "no-ack") assert.equal(exitCode, 0, result.stderr);
+    if (checkpoint !== "no-ack" && placement !== "no-ack") assert.equal(exitCode, 0, result.stderr);
     const events = result.stdout.split("\n").flatMap((line) => { try { return [JSON.parse(line) as { type?: string; message?: { role?: string; isError?: boolean } }]; } catch { return []; } });
-    return { root, cwd, requests, checkpointReady, checkpointProcesses, stderr: result.stderr, results: events.filter((event) => event.type === "message_end" && event.message?.role === "toolResult").map((event) => event.message!) };
+    return { root, cwd, requests, checkpointReady, placementReady, checkpointProcesses, stderr: result.stderr, results: events.filter((event) => event.type === "message_end" && event.message?.role === "toolResult").map((event) => event.message!) };
   }
   const runtime = await ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
   runtime.registerProvider("fixture", { baseUrl: `http://127.0.0.1:${address.port}/v1`, api: "openai-completions", apiKey: "fixture-only", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 128000, maxTokens: 16384 }] });
@@ -150,3 +162,18 @@ test("actual CLI sends no model request when checkpoint readiness is not acknowl
   assert.equal(result.requests, 0);
   assert.deepEqual(result.checkpointProcesses, []);
 });
+
+for (const placement of [true, "jev", "no-ack"] as const) {
+  test(`actual CLI placement ${placement !== "no-ack" ? `continues once before returning (${placement === "jev" ? "Jev transport" : "local checklist"})` : "blocks requests without readiness acknowledgement"}`, { skip: process.platform !== "darwin", timeout: 15000 }, async (t) => {
+    const result = await loadedControlFixture(t, "valid", true, false, placement);
+    assert.equal(result.placementReady, true, result.stderr);
+    assert.equal(result.requests, placement !== "no-ack" ? 9 : 0);
+    if (placement !== "no-ack") {
+      const records = (await readFile(join(result.root, "placements.jsonl"), "utf8")).trim().split("\n").map(line => JSON.parse(line));
+      assert.equal(records.length, 2);
+      assert.deepEqual(records.map(record => record.continued), [true, false]);
+      assert.ok(records.every(record => record.kind === "finish"));
+      if (placement === "jev") assert.ok(records.every(record => record.decision.status === "ok" && record.decision.model === "jev-fixture"));
+    }
+  });
+}

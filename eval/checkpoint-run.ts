@@ -14,6 +14,7 @@ import { JevClient } from "../src/jev.js";
 import { dependencyEvidence, formatDependencyEvidence } from "./dependency-evidence.js";
 import { dependencyApiEvidence, formatDependencyApiEvidence } from "./dependency-api-evidence.js";
 import { projectSourceEvidence, formatProjectSourceEvidence } from "./project-source-evidence.js";
+import { PLACEMENTS, type Placement } from "./placement.js";
 
 const { values } = parseArgs({ options: {
   mode: { type: "string", default: "off" }, model: { type: "string", default: "anthropic/claude-sonnet-4.6" },
@@ -24,11 +25,11 @@ const { values } = parseArgs({ options: {
   "dependency-evidence": { type: "string", default: "none" },
   "dependency-policy": { type: "string", default: "windows" },
   "project-evidence": { type: "string", default: "none" },
+  placement: { type: "string", default: "none" },
   task: { type: "string", default: "attribution" },
   sample: { type: "string", default: "1" },
 } });
 const budgets = validateBudgets({ turns: Number(values.turns), seconds: Number(values.seconds), tokens: Number(values.tokens), maxOutputTokens: Number(values["max-output-tokens"]) });
-if (process.platform !== "darwin") throw new Error("Real CLI evaluation currently requires macOS sandbox-exec.");
 if (values.mode !== "assist" && values.mode !== "observe" && values.mode !== "off") throw new Error("Use --mode assist, observe, or off.");
 if (values.mode !== "off" || values.briefing || !["manual", "dependencies", "jev"].includes(values.checkpoint!)) throw new Error("Checkpoint comparison requires --mode off, no briefing, and a valid --checkpoint mode.");
 const evidenceMode = values["dependency-evidence"]!;
@@ -37,8 +38,14 @@ if (!["windows", "api"].includes(values["dependency-policy"]!) || (values["depen
 const apiEvidence = values["dependency-policy"] === "api";
 const projectEvidenceMode = values["project-evidence"]!;
 if (!["none", "lexical", "jev"].includes(projectEvidenceMode) || (projectEvidenceMode !== "none" && (evidenceMode !== "none" || values.checkpoint !== "manual"))) throw new Error("Project evidence requires lexical/jev, manual checkpoints, and no dependency evidence.");
+const placementPolicy = values.placement!;
+if (placementPolicy !== "none" && !PLACEMENTS.includes(placementPolicy as Placement)) throw new Error("Invalid placement policy");
+if (placementPolicy !== "none" && (evidenceMode !== "none" || projectEvidenceMode !== "none" || values.checkpoint !== "manual")) throw new Error("Placement must be isolated from other evidence and checkpoint policies");
+if (placementPolicy === "checkpoint-local") values.checkpoint = "dependencies";
+if (placementPolicy === "checkpoint-jev") values.checkpoint = "jev";
 if (values.task !== "attribution" && values.task !== "session-mode") throw new Error("Use --task attribution or session-mode.");
 if (!/^[1-9]\d{0,2}$/.test(values.sample!)) throw new Error("Use a positive --sample label from 1 to 999.");
+if (process.platform !== "darwin") throw new Error("Real CLI evaluation currently requires macOS sandbox-exec.");
 const fixtureDirectory = values.task === "attribution" ? "checkpoint-fixture" : "session-mode-fixture";
 const { prepareWorkspace } = await import(`./${fixtureDirectory}/verify.js`) as typeof import("./checkpoint-fixture/verify.js");
 const key = process.env.AI_GATEWAY_API_KEY;
@@ -46,7 +53,7 @@ if (!key) throw new Error("Load AI_GATEWAY_API_KEY in the harness environment.")
 const project = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 // Capture this in the parent before shellEnvironment rewrites the child's HOME.
 const protectedHome = await realpath(homedir());
-const runId = `${new Date().toISOString().replaceAll(":", "-")}-${values.task === "attribution" ? "" : `${values.task}-${values.sample}-`}${projectEvidenceMode !== "none" ? `project-${projectEvidenceMode}` : evidenceMode === "none" ? `checkpoint-${values.checkpoint}` : `${apiEvidence ? "api" : "dependency"}-${evidenceMode}`}`;
+const runId = placementPolicy !== "none" ? `${new Date().toISOString().replaceAll(":", "-")}-${values.task}-${values.sample}-placement-${placementPolicy}` : `${new Date().toISOString().replaceAll(":", "-")}-${values.task === "attribution" ? "" : `${values.task}-${values.sample}-`}${projectEvidenceMode !== "none" ? `project-${projectEvidenceMode}` : evidenceMode === "none" ? `checkpoint-${values.checkpoint}` : `${apiEvidence ? "api" : "dependency"}-${evidenceMode}`}`;
 const source = await captureSourceProvenance(project);
 const output = join(project, ".pij", "evals", runId);
 const root = await realpath(await mkdtemp(join(process.platform === "darwin" ? "/private/tmp" : tmpdir(), "pij-df-")));
@@ -93,6 +100,7 @@ const child = spawn(process.execPath, [
   "--no-context-files", "--no-skills", "--no-prompt-templates", "--no-extensions", "--offline",
   "--extension", join(project, "eval", "cli-control.ts"),
   "--extension", join(project, "eval", "checkpoint-extension.ts"),
+  ...(placementPolicy !== "none" ? ["--extension", join(project, "eval", "placement-extension.ts")] : []),
   "--session-dir", join(output, "sessions"), prompt,
 ], {
   cwd, detached: true, stdio: ["ignore", "pipe", "pipe", "ipc"],
@@ -100,6 +108,7 @@ const child = spawn(process.execPath, [
     ...shellEnvironment(cwd), AI_GATEWAY_API_KEY: key, PIJ_JEV_PROVIDER: "vercel", PIJ_HOME: join(output, "home"),
     PIJ_EVAL_WORKSPACE: cwd, PIJ_EVAL_STATS: join(output, "control.json"), PIJ_EVAL_TURNS: values.turns,
     PIJ_EVAL_PROTECTED_HOME: protectedHome,
+    PIJ_PLACEMENT_POLICY: placementPolicy, PIJ_PLACEMENT_TASK: values.task, PIJ_PLACEMENT_LOG: join(output, "placements.jsonl"),
     PIJ_CHECKPOINT_MODE: values.checkpoint, PIJ_CHECKPOINT_LOG: join(output, "checkpoints.jsonl"),
     PIJ_EVAL_TOKENS: String(budgets.tokens), PIJ_EVAL_SECONDS: String(budgets.seconds), PIJ_EVAL_MAX_OUTPUT_TOKENS: String(budgets.maxOutputTokens),
     PIJ_SOURCE_BRIEFING: values.briefing ? "1" : "0",
@@ -119,6 +128,7 @@ let interrupted = false;
 let backupBudgetStop = false;
 let modelError = false;
 let checkpointReady = false;
+let placementReady = placementPolicy === "none";
 let checkpointStartupError = false;
 let stopping = false;
 const checkpointGroups = new Set<number>();
@@ -134,7 +144,8 @@ const stopChild = () => {
 const interrupt = () => { interrupted = true; stopChild(); };
 process.on("SIGTERM", interrupt);
 child.on("message", (message) => {
-  const event = message as { type?: string; mode?: string; phase?: string; pid?: number };
+  const event = message as { type?: string; mode?: string; policy?: string; phase?: string; pid?: number };
+  if (event.type === "pij_placement_ready" && event.policy === placementPolicy) { placementReady = true; child.send({ type: "pij_placement_ack" }); }
   if (event.type === "pij_checkpoint_ready" && event.mode === values.checkpoint) {
     checkpointReady = true;
     child.send({ type: "pij_checkpoint_ack" });
@@ -146,7 +157,7 @@ child.on("message", (message) => {
 });
 const clean = (text: string) => text.replaceAll(key, "[redacted]");
 const start = performance.now();
-console.log(JSON.stringify({ event: "start", runId, task: values.task, sample: Number(values.sample), mode: values.mode, evidenceMode, projectEvidenceMode, evidencePolicy: values["dependency-policy"], briefing: values.briefing, model: values.model, budgets, baseline, source, workspace: cwd, output, pid: child.pid }));
+console.log(JSON.stringify({ event: "start", runId, task: values.task, sample: Number(values.sample), mode: values.mode, evidenceMode, projectEvidenceMode, placementPolicy, evidencePolicy: values["dependency-policy"], briefing: values.briefing, model: values.model, budgets, baseline, source, workspace: cwd, output, pid: child.pid }));
 child.stdout!.setEncoding("utf8");
 child.stdout!.on("data", (data: string) => {
   pending += data;
@@ -158,7 +169,7 @@ child.stdout!.on("data", (data: string) => {
       const event = JSON.parse(line);
       if (event.type === "turn_start") {
         turns++;
-        if (!checkpointReady) { checkpointStartupError = true; stopChild(); }
+        if (!checkpointReady || !placementReady) { checkpointStartupError = true; stopChild(); }
       }
       if (event.type === "tool_execution_start") {
         calls[event.toolName] = (calls[event.toolName] ?? 0) + 1;
@@ -205,12 +216,13 @@ const jev = decisions.reduce((sum, row) => ({ calls: sum.calls + 1, successfulNe
 const checkpointRecords = await readFile(join(output, "checkpoints.jsonl"), "utf8").then((text) => text.trim().split("\n").filter(Boolean).map((line) => JSON.parse(line))).catch(() => []);
 const checkpoint = { mode: values.checkpoint, ready: checkpointReady, startupError: checkpointStartupError, records: checkpointRecords.length, executed: checkpointRecords.filter((row) => row.execution).length, scheduledFiles: checkpointRecords.flatMap((row) => row.selected).length, executionMs: checkpointRecords.reduce((sum, row) => sum + (row.execution?.elapsedMs ?? 0), 0), decisions: checkpointRecords.filter((row) => row.decision).length, decisionMs: checkpointRecords.reduce((sum, row) => sum + (row.decision?.latencyMs ?? 0), 0), inputTokens: checkpointRecords.reduce((sum, row) => sum + (row.decision?.inputTokens ?? 0), 0), outputTokens: checkpointRecords.reduce((sum, row) => sum + (row.decision?.outputTokens ?? 0), 0) };
 const sourceAtEnd = await captureSourceProvenance(project);
-const termination = checkpointStartupError ? "error" : timedOut ? "timeout" : interrupted || exitSignal === "SIGTERM" ? "interrupted" : backupBudgetStop || control?.termination === "budget" ? "budget" : spawnFailed || modelError || !checkpointReady || !control?.requests || control?.isolationError || exitCode !== 0 ? "error" : "completed";
+const termination = checkpointStartupError ? "error" : timedOut ? "timeout" : interrupted || exitSignal === "SIGTERM" ? "interrupted" : backupBudgetStop || control?.termination === "budget" ? "budget" : spawnFailed || modelError || !checkpointReady || !placementReady || !control?.requests || control?.isolationError || exitCode !== 0 ? "error" : "completed";
 const result = { runId, checkpoint, thinking: values.thinking, mode: values.mode, briefing: values.briefing, model: values.model, baseline, source, sourceAtEnd, sourceChangedDuringRun: source.sourceDigest !== sourceAtEnd.sourceDigest || source.builtRuntimeDigest !== sourceAtEnd.builtRuntimeDigest || source.head !== sourceAtEnd.head, budgets, termination, budgetReason: control?.budgetReason ?? (backupBudgetStop ? "parent_request_guard" : undefined), requests: control?.requests ?? null, assistantMessages, providerResponses, tokens: control?.tokens ?? reportedTokens, usage: control?.usage ?? observedUsage, calls, jev, workspace: cwd, output, exitCode, exitSignal, timedOut, backupBudgetStop, isolationError: Boolean(control?.isolationError), controlStatsAvailable: !!control, elapsedMs: Math.round(performance.now() - start) };
 const evidenceSummary = !evidence ? { mode: "none" } : "policy" in evidence
   ? { mode: evidenceMode, ...evidence, pool: undefined, candidates: evidence.candidates.map(({ excerpts, ...unit }) => ({ ...unit, excerpts: excerpts.map(({ excerpt, ...span }) => ({ ...span, bytes: Buffer.byteLength(excerpt) })) })) }
   : { mode: evidenceMode, policy: "windows", ...evidence, candidates: evidence.candidates.map(({path,startLine,excerpt})=>({path,startLine,bytes:Buffer.byteLength(excerpt)})), windowPool: undefined };
-const summary = { ...result, task: values.task, sample: Number(values.sample), dependencyEvidence: evidenceSummary, projectEvidence, evidenceAndAgentElapsedMs: result.elapsedMs + (evidence?.elapsedMs ?? 0) + (projectEvidence?.elapsedMs ?? 0) };
+const placementRecords = await readFile(join(output, "placements.jsonl"), "utf8").then(text => text.trim().split("\n").filter(Boolean).map(line => JSON.parse(line))).catch(() => []);
+const summary = { ...result, placement: { policy: placementPolicy, ready: placementReady, records: placementRecords }, task: values.task, sample: Number(values.sample), dependencyEvidence: evidenceSummary, projectEvidence, evidenceAndAgentElapsedMs: result.elapsedMs + (evidence?.elapsedMs ?? 0) + (projectEvidence?.elapsedMs ?? 0) };
 await writeFile(join(output, "result.json"), JSON.stringify(summary, null, 2), { mode: 0o600 });
 console.log(JSON.stringify({ event: "result", ...summary }));
 process.off("SIGTERM", interrupt);
