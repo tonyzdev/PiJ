@@ -1,0 +1,135 @@
+diff --git a/rollout_runtime/workers/batch_scheduler.py b/rollout_runtime/workers/batch_scheduler.py
+index bee77a7..87c8d11 100644
+--- a/rollout_runtime/workers/batch_scheduler.py
++++ b/rollout_runtime/workers/batch_scheduler.py
+@@ -184,7 +184,9 @@ class InferenceBatchScheduler:
+         bucket.append(pending)
+         self.enqueued_count += 1
+ 
+-    def next_batch(self, now: float) -> list[PendingRequest]:
++    def next_batch(
++        self, now: float, *, require_full: bool = False
++    ) -> list[PendingRequest]:
+         """Pull out one executable batch.
+ 
+         Trigger condition: the number of **selectable** requests in a bucket reaches
+@@ -196,6 +198,12 @@ class InferenceBatchScheduler:
+         Args:
+             now: Current time (a monotonic clock is fine, as long as it shares the
+                 same source as ``PendingRequest.enqueued_at``).
++            require_full: When True, the ``max_wait_ms`` trigger is suppressed and a
++                bucket only fires once it holds ``max_batch_size`` selectable
++                requests. The worker sets this while a batch is already executing on
++                the GPU, so that requests accumulate into a full batch instead of
++                being dispatched as a fragmented partial batch that would queue
++                behind the running one.
+ 
+         Returns:
+             A list of requests sharing the same ``compat_key``; empty if no batch is
+@@ -217,7 +225,9 @@ class InferenceBatchScheduler:
+             if not selectable:
+                 continue
+             oldest = min(item.enqueued_at for item in selectable)
+-            ready = len(selectable) >= limit or (now - oldest) >= wait_seconds
++            ready = len(selectable) >= limit or (
++                not require_full and (now - oldest) >= wait_seconds
++            )
+             if not ready:
+                 continue
+             rank = (selectable[0].sort_key[0], selectable[0].sort_key[1])
+@@ -240,7 +250,9 @@ class InferenceBatchScheduler:
+         self.batched_count += len(batch)
+         return batch
+ 
+-    def time_until_ready(self, now: float) -> float | None:
++    def time_until_ready(
++        self, now: float, *, require_full: bool = False
++    ) -> float | None:
+         """How long until the next batch can be issued.
+ 
+         Used by ``execute_batches`` to wait precisely, avoiding polling just to
+@@ -248,6 +260,10 @@ class InferenceBatchScheduler:
+ 
+         Args:
+             now: Current time.
++            require_full: When True, the ``max_wait_ms`` trigger is suppressed (see
++                ``next_batch``); a bucket that is not yet full reports no due time,
++                so the caller waits for a new request or for the in-flight batch to
++                complete rather than firing a partial batch.
+ 
+         Returns:
+             ``0.0`` means a batch can be issued now; a positive number is the seconds
+@@ -265,6 +281,8 @@ class InferenceBatchScheduler:
+                 continue
+             if len(selectable) >= limit:
+                 return 0.0
++            if require_full:
++                continue
+             oldest = min(item.enqueued_at for item in selectable)
+             remaining = max(0.0, wait_seconds - (now - oldest))
+             best = remaining if best is None else min(best, remaining)
+diff --git a/rollout_runtime/workers/rollout_worker.py b/rollout_runtime/workers/rollout_worker.py
+index 12efd7b..b7274c4 100644
+--- a/rollout_runtime/workers/rollout_worker.py
++++ b/rollout_runtime/workers/rollout_worker.py
+@@ -94,6 +94,7 @@ class RuntimeRolloutWorker:
+         self._idle_sleep = 0.001
+         self._routes: dict[RequestId, str] = {}
+         self._tasks: set[asyncio.Task[None]] = set()
++        self._inflight_batches = 0
+         self._response_channel: Any = None
+         self._serving = False
+         self.last_serve_error: Any = None
+@@ -220,17 +221,34 @@ class RuntimeRolloutWorker:
+         request), so ``max_wait_ms`` is a genuine batch-accumulation window rather
+         than a sampling period.
+ 
++        Batches are dispatched one at a time per rank: while a batch is executing,
++        the ``max_wait_ms`` trigger is suppressed so only a full bucket fires. A
++        spawned batch can no longer be merged, so dispatching a partial batch
++        concurrently would only queue fragmented small forwards behind the running
++        one; waiting for a full bucket lets the requests that arrive during a
++        forward accumulate into the next, larger batch.
++
+         Args:
+             response_channel: The ``rr_infer_resp`` channel.
+         """
+         loop = asyncio.get_running_loop()
+         while self._serving:
+-            batch = self.scheduler.next_batch(loop.time())
++            # While a batch is executing on this rank's GPU, suppress the
++            # ``max_wait_ms`` trigger: a spawned batch can no longer be merged, so
++            # firing a partial batch now would only queue a fragmented small
++            # forward behind the running one. Waiting for a bucket to fill lets the
++            # requests that arrive during a forward accumulate into the next,
++            # larger batch. A full bucket (including ``max_batch_size == 1``) still
++            # fires immediately, so independent requests can stay concurrent.
++            require_full = self._inflight_batches > 0
++            batch = self.scheduler.next_batch(loop.time(), require_full=require_full)
+             if batch:
+                 self._spawn(self._run_batch(batch, response_channel))
+                 continue
+             self._wake.clear()
+-            delay = self.scheduler.time_until_ready(loop.time())
++            delay = self.scheduler.time_until_ready(
++                loop.time(), require_full=require_full
++            )
+             if delay is None:
+                 await self._wake.wait()
+                 continue
+@@ -254,6 +272,7 @@ class RuntimeRolloutWorker:
+     def _spawn(self, coroutine: Any) -> None:
+         task = asyncio.get_running_loop().create_task(coroutine)
+         self._tasks.add(task)
++        self._inflight_batches += 1
+         task.add_done_callback(self._finish_task)
+ 
+     async def _run_batch(
+@@ -282,6 +301,7 @@ class RuntimeRolloutWorker:
+             for pending in batch:
+                 self.scheduler.complete(pending)
+                 self._slots.release()
++            self._inflight_batches = max(0, self._inflight_batches - 1)
+             self._wake.set()
+ 
+     async def infer_batch(

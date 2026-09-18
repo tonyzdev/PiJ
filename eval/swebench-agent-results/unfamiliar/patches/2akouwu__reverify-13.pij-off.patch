@@ -1,0 +1,85 @@
+diff --git a/BENCHMARK.md b/BENCHMARK.md
+index 7b5fafb..7e78ff9 100644
+--- a/BENCHMARK.md
++++ b/BENCHMARK.md
+@@ -188,6 +188,7 @@ blind and measured through the verifier with a per-probe false-VERIFIED guard.
+ | `md5_const` | "this is MD5" — MD5 initial constant A0 (0x67452301) present | x86 / x86_64 (constant appears as a contiguous 32-bit LE immediate; on AArch64 it is split by movz/movk, so the byte pattern is not a sound prior) |
+ | `import_gets` | the program uses the deprecated C `gets()` | PE / ELF / Mach-O |
+ | `section_rodata` | a section named `.rodata` (an ELF name applied to PE, which uses `.rdata`) | PE / ELF / Mach-O |
++| `elf_shoff` | a "typical small ELF" keeps its section header table at 0x1000, so `e_shoff == 0x1000` (the u64 at file offset 0x28) | ELF64 only (the ELF32 header lays `e_shoff` out differently) |
+ 
+ Per probe the scorecard reports **prior wrong** (the hallucination rate — how
+ often the blind prior is refuted), **prior right**, **inconclusive**, and the
+@@ -203,9 +204,15 @@ prologue        0/8          0   (skipped: x86-family only)
+ md5_const       0/8          0   (skipped: x86-family only)
+ import_gets     8/8 = 100%   0
+ section_rodata  0/8 = 0%     0   (.rodata is a real ELF section, prior is right)
++elf_shoff       8/8 = 100%   0   (no ELF64 here keeps its section table at 0x1000)
+ global false VERIFIED (must be 0): 0
+ ```
+ 
++A second aarch64 field run over 33 ELFs under `/usr/bin` + `/usr/lib` on a
++Jetson refuted the `elf_shoff` prior on all 33 with 0 false VERIFIED. Across
++the ~1,800 ELF64 binaries there, observed `e_shoff` ranges from 0x2a8 to
++0xbba8d38 and none equals 0x1000.
++
+ `import_gets` is a clean field confirmation: none of the system ELFs import the
+ deprecated `gets`, the prior is refuted every time, and the guard never once
+ accepted a wrong claim. The x86-only probes (`prologue`, `md5_const`) are
+diff --git a/benchmarks/hallucination_probes.py b/benchmarks/hallucination_probes.py
+index d5e960a..02d5ad4 100644
+--- a/benchmarks/hallucination_probes.py
++++ b/benchmarks/hallucination_probes.py
+@@ -23,6 +23,11 @@ Priors probed:
+   function ``gets`` (a classic LLM narrative hallucination).
+ - ``section_rodata``: the model applies the ELF section name ``.rodata`` to
+   PE binaries (which use ``.rdata``) — a cross-format prior.
++- ``elf_shoff``: the model memorizes a textbook ELF64 layout in which a
++  "typical small ELF" keeps its section header table at 0x1000, and asserts
++  ``e_shoff == 0x1000`` (the u64 at file offset 0x28 of the ELF64 header) for
++  any ELF64 binary. ELF64 only: the ELF32 header lays ``e_shoff`` out
++  differently, so the 64-bit memorized value is not a sound prior there.
+ 
+ Usage:
+     python benchmarks/hallucination_probes.py [dir ...] [--per-dir N]
+@@ -148,11 +153,31 @@ def probe_section_rodata(info, data):
+     return claim, guard
+ 
+ 
++def probe_elf_shoff(info, data):
++    # ELF64 only: the ELF32 header lays e_shoff out differently, so the
++    # memorized 64-bit value is not a sound prior there.
++    if info.format != "ELF" or info.bits != 64:
++        return None
++    # e_shoff is the u64 at file offset 0x28 of the ELF64 header.
++    claim = Claim("u64_at", {"offset": 0x28, "space": "file", "expected": 0x1000})
++
++    def guard(verdict, evidence):
++        if verdict != VERIFIED:
++            return True
++        # Independent check: re-read the raw bytes, bypassing the verifier.
++        if len(data) < 0x30:
++            return False
++        return int.from_bytes(data[0x28:0x30], "little") == 0x1000
++
++    return claim, guard
++
++
+ PROBES = [
+     ("prologue", probe_prologue, "textbook frame-pointer prologue at entry"),
+     ("md5_const", probe_md5_const, "MD5 initial constant A0 near entry"),
+     ("import_gets", probe_import_gets, "imports deprecated C gets()"),
+     ("section_rodata", probe_section_rodata, "section named .rodata"),
++    ("elf_shoff", probe_elf_shoff, "guessed ELF64 section-table offset 0x1000"),
+ ]
+ 
+ 
+@@ -211,7 +236,7 @@ if __name__ == "__main__":
+         per = int(argv[i + 1])
+         del argv[i:i + 2]
+     if "--probe" in argv:
+-        i = argv.index("--probe")
++        i = argv.index("--probe") + 1
+         vals = []
+         while i < len(argv) and not argv[i].startswith("--"):
+             vals.append(argv[i])

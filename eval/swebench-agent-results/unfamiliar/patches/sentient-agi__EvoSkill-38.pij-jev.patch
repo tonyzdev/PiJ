@@ -1,0 +1,85 @@
+diff --git a/src/remote/daytona.py b/src/remote/daytona.py
+index 90bf06e..6904cc6 100644
+--- a/src/remote/daytona.py
++++ b/src/remote/daytona.py
+@@ -114,6 +114,44 @@ class DaytonaBackend(RemoteBackend):
+         )
+         self._sandbox = self._client.create(params)
+ 
++    def _exec_async(self, command: str, *, cwd: str | None = None, timeout: int = 1200) -> None:
++        """Run a command via the session API and block until it completes.
++
++        Heavy commands (cat/tar) can take minutes. A blocking process.exec()
++        holds a single HTTP connection open for that whole time, which the
++        Daytona server resets before the command finishes. Submitting through
++        the session API returns a cmd_id immediately; each subsequent poll is a
++        short HTTP call, so connection resets are no longer possible. The caller
++        still blocks synchronously until the command actually completes.
++        """
++        from daytona import SessionExecuteRequest
++
++        sandbox = self._sandbox
++        session_id = f"{SESSION_ID}-upload"
++        try:
++            sandbox.process.create_session(session_id)
++        except Exception:
++            # Session may already exist from a previous command.
++            pass
++
++        full_cmd = f"cd {cwd} && {command}" if cwd else command
++        req = SessionExecuteRequest(command=full_cmd, run_async=True)
++        response = sandbox.process.execute_session_command(session_id, req)
++        cmd_id = response.cmd_id
++
++        deadline = time.monotonic() + timeout
++        while True:
++            cmd_info = sandbox.process.get_session_command(session_id, cmd_id)
++            if cmd_info.exit_code is not None:
++                if cmd_info.exit_code != 0:
++                    raise RuntimeError(
++                        f"Remote command failed (exit_code={cmd_info.exit_code}): {command}"
++                    )
++                return
++            if time.monotonic() >= deadline:
++                raise TimeoutError(f"Remote command timed out after {timeout}s: {command}")
++            time.sleep(1)
++
+     def upload(self, cfg: ProjectConfig, log=None) -> None:
+         sandbox = self._sandbox
+         project_root = cfg.project_root
+@@ -130,8 +168,8 @@ class DaytonaBackend(RemoteBackend):
+ 
+         bundle_bytes = Path(bundle_path).read_bytes()
+         sandbox.fs.upload_file(bundle_bytes, "/workspace/repo.bundle")
+-        sandbox.process.exec(
+-            "cd /workspace && git init && git bundle unbundle repo.bundle && rm repo.bundle",
++        self._exec_async(
++            "git init && git bundle unbundle repo.bundle && rm repo.bundle",
+             cwd="/workspace",
+         )
+ 
+@@ -192,7 +230,7 @@ class DaytonaBackend(RemoteBackend):
+                     remote_tar = f"/tmp/{mapping.host_path.name}.tar.gz"
+                     sandbox.fs.upload_file(tar_bytes, remote_tar)
+                     log(f"extracting {mapping.host_path.name}...")
+-                    sandbox.process.exec(
++                    self._exec_async(
+                         f"mkdir -p {mapping.container_path} && "
+                         f"tar xzf {remote_tar} -C /mnt/data/ && "
+                         f"rm {remote_tar}",
+@@ -206,13 +244,13 @@ class DaytonaBackend(RemoteBackend):
+                         sandbox.fs.upload_file(chunk, f"/tmp/chunks/part_{i:010d}")
+                         log(f"  chunk {idx + 1}/{n_chunks}")
+                     log(f"reassembling chunks...")
+-                    sandbox.process.exec(
++                    self._exec_async(
+                         f"cat /tmp/chunks/part_* > /tmp/combined.tar.gz && "
+                         f"rm -rf /tmp/chunks",
+                         timeout=1200,
+                     )
+                     log(f"extracting {mapping.host_path.name}...")
+-                    sandbox.process.exec(
++                    self._exec_async(
+                         f"mkdir -p {mapping.container_path} && "
+                         f"tar xzf /tmp/combined.tar.gz -C /mnt/data/ && "
+                         f"rm -f /tmp/combined.tar.gz",

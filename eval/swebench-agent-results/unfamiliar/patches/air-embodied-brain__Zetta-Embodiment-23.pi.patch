@@ -1,0 +1,186 @@
+diff --git a/.scratch/verify_coalesce.py b/.scratch/verify_coalesce.py
+new file mode 100644
+index 0000000..00bdd47
+--- /dev/null
++++ b/.scratch/verify_coalesce.py
+@@ -0,0 +1,49 @@
++import asyncio, contextlib
++from rollout_runtime.api.ids import new_request_id
++from rollout_runtime.api.internal import InferenceRequest, make_routing_token
++from rollout_runtime.api.messages import Observation
++from rollout_runtime.backends.fake.policy import FakePolicyConfig, FakePolicyCore
++from rollout_runtime.transport.inproc import InProcInferenceChannel
++from rollout_runtime.workers.batch_scheduler import SchedulerConfig
++from rollout_runtime.workers.rollout_worker import RuntimeRolloutWorker
++
++ROUTE = make_routing_token("env", 0)
++
++def make_req(i):
++    return InferenceRequest(
++        request_id=new_request_id(), session_id=f"s{i}", policy_id="fake",
++        observation=Observation(session_id=f"s{i}", episode_id=1, step_index=i),
++        routing_token=ROUTE, compat_key="k", application_id="app",
++    )
++
++async def main():
++    channel = InProcInferenceChannel(request_queue_size=256, response_queue_size=256)
++    policy = FakePolicyCore(FakePolicyConfig(delay_seconds=0.2))
++    worker = RuntimeRolloutWorker(
++        policy=policy,
++        scheduler_config=SchedulerConfig(max_batch_size=8, max_wait_ms=50.0,
++                                         max_inflight_per_session=64,
++                                         max_inflight_per_application=64),
++        max_concurrent_inferences=64,
++    )
++    channel.register_route(ROUTE)
++    worker.init_worker({"inference": channel})
++    task = asyncio.get_running_loop().create_task(worker.serve(channel, channel))
++    try:
++        for i in range(24):
++            await channel.put_request_nowait(make_req(i))
++            await asyncio.sleep(0.025)
++        for _ in range(400):
++            if worker.responded_count >= 24:
++                break
++            await asyncio.sleep(0.01)
++        print("responded", worker.responded_count)
++        print("batch_count", worker.scheduler.batch_count)
++        print("batched_count", worker.scheduler.batched_count)
++        print("avg batch", worker.scheduler.batched_count / max(1, worker.scheduler.batch_count))
++    finally:
++        await worker.stop(); channel.close(); task.cancel()
++        with contextlib.suppress(BaseException):
++            await task
++
++asyncio.run(main())
+diff --git a/rollout_runtime/workers/batch_scheduler.py b/rollout_runtime/workers/batch_scheduler.py
+index bee77a7..05f7bde 100644
+--- a/rollout_runtime/workers/batch_scheduler.py
++++ b/rollout_runtime/workers/batch_scheduler.py
+@@ -184,7 +184,9 @@ class InferenceBatchScheduler:
+         bucket.append(pending)
+         self.enqueued_count += 1
+ 
+-    def next_batch(self, now: float) -> list[PendingRequest]:
++    def next_batch(
++        self, now: float, *, allow_partial: bool = True
++    ) -> list[PendingRequest]:
+         """Pull out one executable batch.
+ 
+         Trigger condition: the number of **selectable** requests in a bucket reaches
+@@ -196,6 +198,12 @@ class InferenceBatchScheduler:
+         Args:
+             now: Current time (a monotonic clock is fine, as long as it shares the
+                 same source as ``PendingRequest.enqueued_at``).
++            allow_partial: Whether a batch may fire before it reaches
++                ``max_batch_size`` (i.e. on the ``max_wait_ms`` timer). The worker
++                passes ``False`` while a batch is already executing on the GPU so
++                that newly arrived requests keep accumulating into the next batch
++                instead of being dispatched as a fragmented partial batch that can
++                no longer be merged. A full batch is always allowed.
+ 
+         Returns:
+             A list of requests sharing the same ``compat_key``; empty if no batch is
+@@ -216,8 +224,13 @@ class InferenceBatchScheduler:
+             selectable = self._selectable(bucket, limit)
+             if not selectable:
+                 continue
++            full = len(selectable) >= limit
++            if not full and not allow_partial:
++                # A batch is already running: hold this partial batch back so it can
++                # grow until the running batch finishes (or until it becomes full).
++                continue
+             oldest = min(item.enqueued_at for item in selectable)
+-            ready = len(selectable) >= limit or (now - oldest) >= wait_seconds
++            ready = full or (now - oldest) >= wait_seconds
+             if not ready:
+                 continue
+             rank = (selectable[0].sort_key[0], selectable[0].sort_key[1])
+@@ -240,7 +253,9 @@ class InferenceBatchScheduler:
+         self.batched_count += len(batch)
+         return batch
+ 
+-    def time_until_ready(self, now: float) -> float | None:
++    def time_until_ready(
++        self, now: float, *, allow_partial: bool = True
++    ) -> float | None:
+         """How long until the next batch can be issued.
+ 
+         Used by ``execute_batches`` to wait precisely, avoiding polling just to
+@@ -248,11 +263,16 @@ class InferenceBatchScheduler:
+ 
+         Args:
+             now: Current time.
++            allow_partial: Whether a partial batch may fire on the ``max_wait_ms``
++                timer. When ``False`` (a batch is already executing), only a full
++                batch counts as ready, so partial batches report ``None`` and the
++                caller waits for the running batch to finish instead of polling.
+ 
+         Returns:
+             ``0.0`` means a batch can be issued now; a positive number is the seconds
+             still to wait; ``None`` means there are no selectable requests (including
+-            when blocked by fairness quotas or during a version fence).
++            when blocked by fairness quotas, during a version fence, or when only
++            partial batches are available but ``allow_partial`` is ``False``).
+         """
+         if self.fenced and self.inflight_total > 0:
+             return None
+@@ -265,6 +285,8 @@ class InferenceBatchScheduler:
+                 continue
+             if len(selectable) >= limit:
+                 return 0.0
++            if not allow_partial:
++                continue
+             oldest = min(item.enqueued_at for item in selectable)
+             remaining = max(0.0, wait_seconds - (now - oldest))
+             best = remaining if best is None else min(best, remaining)
+diff --git a/rollout_runtime/workers/rollout_worker.py b/rollout_runtime/workers/rollout_worker.py
+index 12efd7b..e915d1c 100644
+--- a/rollout_runtime/workers/rollout_worker.py
++++ b/rollout_runtime/workers/rollout_worker.py
+@@ -210,6 +210,11 @@ class RuntimeRolloutWorker:
+ 
+     def _finish_task(self, task: asyncio.Task[None]) -> None:
+         self._tasks.discard(task)
++        # Wake ``execute_batches`` once the batch is fully retired: while a batch is
++        # running it holds partial batches back, so the loop must re-evaluate as soon
++        # as the GPU is free (the in-coroutine ``_wake.set()`` may race with the
++        # loop's ``_wake.clear()`` before the done callback removes the task).
++        self._wake.set()
+ 
+     async def execute_batches(self, response_channel: Any) -> None:
+         """Continuously pull and execute batches according to ``max_batch_size`` /
+@@ -220,17 +225,31 @@ class RuntimeRolloutWorker:
+         request), so ``max_wait_ms`` is a genuine batch-accumulation window rather
+         than a sampling period.
+ 
++        While a batch is already executing on this rank's GPU, partial batches are
++        held back (``allow_partial=False``): only a batch that has already reached
++        ``max_batch_size`` is dispatched. This keeps requests accumulating into the
++        next batch so it can be merged into one larger forward once the running batch
++        finishes, instead of spawning a queue of fragmented small batches on the GPU.
++
+         Args:
+             response_channel: The ``rr_infer_resp`` channel.
+         """
+         loop = asyncio.get_running_loop()
+         while self._serving:
+-            batch = self.scheduler.next_batch(loop.time())
++            # While a batch is already executing on this rank's GPU, only dispatch a
++            # batch that is already full. A partial batch is held back so that newly
++            # arrived requests keep accumulating into it and it can be merged into a
++            # single larger forward once the running batch finishes, instead of
++            # spawning a fragmented small batch that can no longer be merged.
++            allow_partial = not self._tasks
++            batch = self.scheduler.next_batch(loop.time(), allow_partial=allow_partial)
+             if batch:
+                 self._spawn(self._run_batch(batch, response_channel))
+                 continue
+             self._wake.clear()
+-            delay = self.scheduler.time_until_ready(loop.time())
++            delay = self.scheduler.time_until_ready(
++                loop.time(), allow_partial=allow_partial
++            )
+             if delay is None:
+                 await self._wake.wait()
+                 continue

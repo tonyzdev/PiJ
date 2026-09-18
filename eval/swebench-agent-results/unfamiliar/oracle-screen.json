@@ -1,0 +1,1551 @@
+[
+ {
+  "tag": "openonion__connectonion-1588",
+  "repo": "openonion/connectonion",
+  "pr": 1588,
+  "title": "Fix registry cleanup thread shutdown",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 3,
+  "testSec": 9,
+  "f2p": [
+   "tests/unit/test_registry_cleanup_stop.py::test_stop_can_be_joined_repeatedly"
+  ],
+  "p2p": [],
+  "negCounts": {
+   "FAILED": 1
+  },
+  "posCounts": {
+   "PASSED": 1
+  },
+  "tests": [
+   "tests/unit/test_registry_cleanup_stop.py"
+  ]
+ },
+ {
+  "tag": "openonion__connectonion-1556",
+  "repo": "openonion/connectonion",
+  "pr": 1556,
+  "title": "[1.8.6] Record which consumer handled each message (#1503)",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 3,
+  "testSec": 10,
+  "f2p": [
+   "tests/unit/test_inbox_store.py::test_a_message_handed_out_twice_after_lease_expiry_shows_both_consumers",
+   "tests/unit/test_inbox_store.py::test_two_consumers_on_one_inbox_leave_distinguishable_records"
+  ],
+  "p2p": [
+   "tests/unit/test_inbox_store.py::test_a_delivered_message_is_one_log_line_and_one_queue_file",
+   "tests/unit/test_inbox_store.py::test_a_duplicate_id_is_dropped_even_after_a_restart",
+   "tests/unit/test_inbox_store.py::test_a_listener_that_dies_at_once_is_reported_not_waited_for",
+   "tests/unit/test_inbox_store.py::test_a_redelivery_after_a_crash_between_log_and_queue_is_queued_not_dropped",
+   "tests/unit/test_inbox_store.py::test_a_taken_message_nobody_answered_comes_back_after_an_hour",
+   "tests/unit/test_inbox_store.py::test_default_home_is_under_dot_co_unless_overridden",
+   "tests/unit/test_inbox_store.py::test_different_unsafe_ids_cannot_share_a_queue_file",
+   "tests/unit/test_inbox_store.py::test_done_clears_the_queue_too_and_matches_the_whole_id",
+   "tests/unit/test_inbox_store.py::test_done_forgets_a_taken_message",
+   "tests/unit/test_inbox_store.py::test_done_without_a_reply_survives_redelivery_and_restart",
+   "tests/unit/test_inbox_store.py::test_ensure_listener_pins_the_directory_and_forwards_the_env_file",
+   "tests/unit/test_inbox_store.py::test_ensure_listener_starts_one_only_when_none_is_running",
+   "tests/unit/test_inbox_store.py::test_junk_in_new_is_skipped_and_a_torn_queue_file_is_set_aside",
+   "tests/unit/test_inbox_store.py::test_lookup_finds_a_message_by_id_and_skips_a_torn_line",
+   "tests/unit/test_inbox_store.py::test_lookup_skips_a_log_line_that_is_not_a_whole_message",
+   "tests/unit/test_inbox_store.py::test_mailbox_defaults_follow_the_global_configuration_directory",
+   "tests/unit/test_inbox_store.py::test_message_json_has_the_same_seven_keys_in_order",
+   "tests/unit/test_inbox_store.py::test_raw_payload_is_logged_only_when_asked_and_never_queued",
+   "tests/unit/test_inbox_store.py::test_receive_takes_the_oldest_and_moves_it_to_cur",
+   "tests/unit/test_inbox_store.py::test_receive_wakes_when_a_message_arrives",
+   "tests/unit/test_inbox_store.py::test_receive_with_no_message_returns_none_after_the_timeout",
+   "tests/unit/test_inbox_store.py::test_recovery_uses_the_original_logged_message",
+   "tests/unit/test_inbox_store.py::test_releasing_listener_keeps_the_same_lock_inode",
+   "tests/unit/test_inbox_store.py::test_sent_log_records_replies_so_a_second_reply_can_be_refused",
+   "tests/unit/test_inbox_store.py::test_sweep_cannot_reclaim_a_message_between_rename_and_claim_timestamp",
+   "tests/unit/test_inbox_store.py::test_the_directory_is_private",
+   "tests/unit/test_inbox_store.py::test_the_lock_ignores_a_dead_pid",
+   "tests/unit/test_inbox_store.py::test_the_lock_is_held_by_the_kernel_not_by_the_pid_in_the_file",
+   "tests/unit/test_inbox_store.py::test_the_lock_is_taken_exclusively",
+   "tests/unit/test_inbox_store.py::test_the_stale_clock_starts_at_the_claim_not_at_delivery",
+   "tests/unit/test_inbox_store.py::test_torn_log_tail_does_not_swallow_the_next_message",
+   "tests/unit/test_inbox_store.py::test_two_consumers_never_take_the_same_message",
+   "tests/unit/test_inbox_store.py::test_two_receives_in_the_same_instant_get_one_listener"
+  ],
+  "negCounts": {
+   "FAILED": 2,
+   "PASSED": 33
+  },
+  "posCounts": {
+   "PASSED": 35
+  },
+  "tests": [
+   "tests/unit/test_inbox_store.py"
+  ]
+ },
+ {
+  "tag": "wemake-services__django-modern-rest-1501",
+  "repo": "wemake-services/django-modern-rest",
+  "pr": 1501,
+  "title": "fix(openapi): fill Schema anchor, comment and schema_uri",
+  "verdict": "UNUSABLE",
+  "why": "no tests collected: iJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/wemake-services__django-modern-rest-1501/dmr_pytest.py\", line 6, in <module>\n    import pytest_django  # noqa: F401  # pyright: ignore[reportUnusedImport]\n    ^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named 'pytest_django'\n",
+  "installSec": 2,
+  "testSec": 0,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {},
+  "posCounts": {},
+  "tests": [
+   "tests/test_unit/test_openapi/test_mappers/test_schema/test_jsonschema_load.py"
+  ]
+ },
+ {
+  "tag": "wemake-services__django-modern-rest-1498",
+  "repo": "wemake-services/django-modern-rest",
+  "pr": 1498,
+  "title": "fix: no empty `description` in merged `requestBody`",
+  "verdict": "UNUSABLE",
+  "why": "no tests collected: iJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/wemake-services__django-modern-rest-1498/dmr_pytest.py\", line 6, in <module>\n    import pytest_django  # noqa: F401  # pyright: ignore[reportUnusedImport]\n    ^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named 'pytest_django'\n",
+  "installSec": 2,
+  "testSec": 0,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {},
+  "posCounts": {},
+  "tests": [
+   "tests/test_unit/test_openapi/test_files_snapshots.py"
+  ]
+ },
+ {
+  "tag": "wemake-services__django-modern-rest-1472",
+  "repo": "wemake-services/django-modern-rest",
+  "pr": 1472,
+  "title": "Raise `EndpointMetadataError` on `as_view` of abstract controllers",
+  "verdict": "UNUSABLE",
+  "why": "no tests collected: iJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/wemake-services__django-modern-rest-1472/dmr_pytest.py\", line 6, in <module>\n    import pytest_django  # noqa: F401  # pyright: ignore[reportUnusedImport]\n    ^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named 'pytest_django'\n",
+  "installSec": 1,
+  "testSec": 0,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {},
+  "posCounts": {},
+  "tests": [
+   "tests/test_unit/test_controllers/test_abstract_as_view.py",
+   "tests/test_unit/test_openapi/test_collector.py"
+  ]
+ },
+ {
+  "tag": "wemake-services__django-modern-rest-1407",
+  "repo": "wemake-services/django-modern-rest",
+  "pr": 1407,
+  "title": "Fix `q` weights in `Accept` header parsing",
+  "verdict": "UNUSABLE",
+  "why": "no tests collected: iJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/wemake-services__django-modern-rest-1407/dmr_pytest.py\", line 6, in <module>\n    import pytest_django  # noqa: F401  # pyright: ignore[reportUnusedImport]\n    ^^^^^^^^^^^^^^^^^^^^\nModuleNotFoundError: No module named 'pytest_django'\n",
+  "installSec": 2,
+  "testSec": 0,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {},
+  "posCounts": {},
+  "tests": [
+   "tests/test_unit/test_compiled/test_negotiate_compiled.py",
+   "tests/test_unit/test_negotiation/test_tricky_headers.py"
+  ]
+ },
+ {
+  "tag": "antoniorodr__cronboard-41",
+  "repo": "antoniorodr/cronboard",
+  "pr": 41,
+  "title": "fix: notify once when disconnecting server",
+  "verdict": "UNUSABLE",
+  "why": "install: ion (3.12.12) does not satisfy\n      Python>=3.13 and cronboard==0.5.2 depends on Python>=3.13, we can\n      conclude that cronboard==0.5.2 cannot be used.\n      And because only cronboard==0.5.2 is available and you require\n      cronboard, we can conclude that your requirements are unsatisfiable.\n"
+ },
+ {
+  "tag": "pydantic__httpx2-1204",
+  "repo": "pydantic/httpx2",
+  "pr": 1204,
+  "title": "Avoid nested async generator finalization errors",
+  "verdict": "UNUSABLE",
+  "why": "install: error: Failed to parse metadata from built wheel\n  Caused by: Metadata field Name not found\n"
+ },
+ {
+  "tag": "pydantic__httpx2-1093",
+  "repo": "pydantic/httpx2",
+  "pr": 1093,
+  "title": "fix: HTTP 2.0 Throws KeyError rather than the internal exception thrown in th...",
+  "verdict": "UNUSABLE",
+  "why": "install: error: Failed to parse metadata from built wheel\n  Caused by: Metadata field Name not found\n"
+ },
+ {
+  "tag": "MiroShark__MiroShark-301",
+  "repo": "MiroShark/MiroShark",
+  "pr": 301,
+  "title": "fix(i18n): thread locale through graph_builder ThreadPoolExecutor",
+  "verdict": "UNUSABLE",
+  "why": "install: error: /private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/MiroShark__MiroShark-301 does not appear to be a Python project, as neither `pyproject.toml` nor `setup.py` are present in the directory\n"
+ },
+ {
+  "tag": "MiroShark__MiroShark-241",
+  "repo": "MiroShark/MiroShark",
+  "pr": 241,
+  "title": "Fix/social agent tool messages",
+  "verdict": "UNUSABLE",
+  "why": "install: error: /private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/MiroShark__MiroShark-241 does not appear to be a Python project, as neither `pyproject.toml` nor `setup.py` are present in the directory\n"
+ },
+ {
+  "tag": "MiroShark__MiroShark-232",
+  "repo": "MiroShark/MiroShark",
+  "pr": 232,
+  "title": "fix(social-agent): preserve tool_calls when filtering empty LLM messages",
+  "verdict": "UNUSABLE",
+  "why": "install: error: /private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/MiroShark__MiroShark-232 does not appear to be a Python project, as neither `pyproject.toml` nor `setup.py` are present in the directory\n"
+ },
+ {
+  "tag": "GradientHQ__parallax-471",
+  "repo": "GradientHQ/parallax",
+  "pr": 471,
+  "title": "fix(cli): remove join defaults and set 32k sequence length",
+  "verdict": "UNUSABLE",
+  "why": "no tests collected: 2c/scratchpad/unfamiliar/work/GradientHQ__parallax-471/tests/conftest.py'.\ntests/conftest.py:9: in <module>\n    from parallax.utils.utils import get_current_device, is_metal_available\nsrc/parallax/utils/utils.py:9: in <module>\n    import mlx.core as mx\nE   ModuleNotFoundError: No module named 'mlx'\n",
+  "installSec": 2,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {},
+  "posCounts": {},
+  "tests": [
+   "tests/test_cli.py",
+   "tests/test_server_args.py"
+  ]
+ },
+ {
+  "tag": "mubaraknumann__unifideck-449",
+  "repo": "mubaraknumann/unifideck",
+  "pr": 449,
+  "title": "fix: keep game sidecars out of GOG setup helpers",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 3,
+  "testSec": 1,
+  "f2p": [
+   "tests/unit/test_gog_setup_common.py::test_run_wine_does_not_forward_sidecar_through_pressure_vessel",
+   "tests/unit/test_gog_setup_common.py::test_run_wine_does_not_start_sidecar_for_setup_helper"
+  ],
+  "p2p": [],
+  "negCounts": {
+   "FAILED": 2
+  },
+  "posCounts": {
+   "PASSED": 2
+  },
+  "tests": [
+   "tests/unit/test_gog_setup_common.py"
+  ]
+ },
+ {
+  "tag": "pinchbench__skill-385",
+  "repo": "pinchbench/skill",
+  "pr": 385,
+  "title": "fix(judge): keep full workspace file context",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 12,
+  "testSec": 1,
+  "f2p": [
+   "tests/test_lib_grading.py::WorkspaceFilesForJudgeTests::test_compute_cache_key_changes_when_workspace_content_changes",
+   "tests/test_lib_grading.py::WorkspaceFilesForJudgeTests::test_read_workspace_files_preserves_full_text_file_content"
+  ],
+  "p2p": [
+   "tests/test_lib_grading.py::JudgeNormalizationTests::test_hybrid_score_uses_normalized_judge_total",
+   "tests/test_lib_grading.py::JudgeNormalizationTests::test_normalize_judge_response_averages_summed_total_when_breakdown_is_unit_scale",
+   "tests/test_lib_grading.py::JudgeNormalizationTests::test_parse_judge_response_ignores_waiting_messages_before_final_json",
+   "tests/test_lib_grading.py::JudgeNormalizationTests::test_parse_judge_response_prefers_latest_assistant_json_over_embedded_tool_json"
+  ],
+  "negCounts": {
+   "FAILED": 2,
+   "PASSED": 4
+  },
+  "posCounts": {
+   "PASSED": 6
+  },
+  "tests": [
+   "tests/test_lib_grading.py"
+  ]
+ },
+ {
+  "tag": "pinchbench__skill-108",
+  "repo": "pinchbench/skill",
+  "pr": 108,
+  "title": "fix: rename task_24_access_log_anomaly to task_25",
+  "verdict": "UNUSABLE",
+  "why": "install: error: /private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/pinchbench__skill-108 does not appear to be a Python project, as neither `pyproject.toml` nor `setup.py` are present in the directory\n"
+ },
+ {
+  "tag": "awslabs__cli-agent-orchestrator-787",
+  "repo": "awslabs/cli-agent-orchestrator",
+  "pr": 787,
+  "title": "fix(mcp): honour server.mcp_request_timeout in the mcp_server helper modules",
+  "verdict": "UNUSABLE",
+  "why": "no tests collected: s__cli-agent-orchestrator-787/.venv/lib/python3.12/site-packages/_pytest/outcomes.py\", line 162, in __call__\n    raise Failed(msg=reason, pytrace=pytrace)\nFailed: Marks cannot be applied to fixtures.\nSee docs: https://docs.pytest.org/en/stable/deprecations.html#applying-a-mark-to-a-fixture-function\n",
+  "installSec": 41,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {},
+  "posCounts": {},
+  "tests": [
+   "test/mcp_server/test_mcp_request_timeout_setting.py"
+  ]
+ },
+ {
+  "tag": "awslabs__cli-agent-orchestrator-764",
+  "repo": "awslabs/cli-agent-orchestrator",
+  "pr": 764,
+  "title": "fix(grok): classify the weekly-limit picker as ERROR instead of stale PROCESSING",
+  "verdict": "UNUSABLE",
+  "why": "no tests collected: s__cli-agent-orchestrator-764/.venv/lib/python3.12/site-packages/_pytest/outcomes.py\", line 162, in __call__\n    raise Failed(msg=reason, pytrace=pytrace)\nFailed: Marks cannot be applied to fixtures.\nSee docs: https://docs.pytest.org/en/stable/deprecations.html#applying-a-mark-to-a-fixture-function\n",
+  "installSec": 40,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {},
+  "posCounts": {},
+  "tests": [
+   "test/providers/test_grok_cli_unit.py"
+  ]
+ },
+ {
+  "tag": "awslabs__cli-agent-orchestrator-763",
+  "repo": "awslabs/cli-agent-orchestrator",
+  "pr": 763,
+  "title": "fix(codex): match hollow-bullet spinner glyph so a working turn reads PROCESSING, not IDLE",
+  "verdict": "UNUSABLE",
+  "why": "no tests collected: s__cli-agent-orchestrator-763/.venv/lib/python3.12/site-packages/_pytest/outcomes.py\", line 162, in __call__\n    raise Failed(msg=reason, pytrace=pytrace)\nFailed: Marks cannot be applied to fixtures.\nSee docs: https://docs.pytest.org/en/stable/deprecations.html#applying-a-mark-to-a-fixture-function\n",
+  "installSec": 30,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {},
+  "posCounts": {},
+  "tests": [
+   "test/providers/test_codex_provider_unit.py"
+  ]
+ },
+ {
+  "tag": "awslabs__cli-agent-orchestrator-748",
+  "repo": "awslabs/cli-agent-orchestrator",
+  "pr": 748,
+  "title": "fix(security): require cao:write for the PTY WebSocket",
+  "verdict": "UNUSABLE",
+  "why": "no tests collected: s__cli-agent-orchestrator-748/.venv/lib/python3.12/site-packages/_pytest/outcomes.py\", line 162, in __call__\n    raise Failed(msg=reason, pytrace=pytrace)\nFailed: Marks cannot be applied to fixtures.\nSee docs: https://docs.pytest.org/en/stable/deprecations.html#applying-a-mark-to-a-fixture-function\n",
+  "installSec": 19,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {},
+  "posCounts": {},
+  "tests": [
+   "test/api/test_ws_auth.py"
+  ]
+ },
+ {
+  "tag": "vipshop__cache-dit-1115",
+  "repo": "vipshop/cache-dit",
+  "pr": 1115,
+  "title": "Fix silent GQA corruption in replicate_kv_sequence",
+  "verdict": "UNUSABLE",
+  "why": "no tests collected: \nno tests ran in 14.23s\n",
+  "installSec": 35,
+  "testSec": 17,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {},
+  "posCounts": {},
+  "tests": [
+   "tests/parallelism/test_ulysses_gqa_multirank.py"
+  ]
+ },
+ {
+  "tag": "vipshop__cache-dit-1111",
+  "repo": "vipshop/cache-dit",
+  "pr": 1111,
+  "title": "fix(offload): dedupe tied weights across layerwise targets",
+  "verdict": "UNUSABLE",
+  "why": "install: error: /private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/vipshop__cache-dit-1111 does not appear to be a Python project, as neither `pyproject.toml` nor `setup.py` are present in the directory\n"
+ },
+ {
+  "tag": "vipshop__cache-dit-1102",
+  "repo": "vipshop/cache-dit",
+  "pr": 1102,
+  "title": "Fix _is_cached class/instance mismatch for multi-transformer pipelines",
+  "verdict": "UNUSABLE",
+  "why": "install: error: /private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/vipshop__cache-dit-1102 does not appear to be a Python project, as neither `pyproject.toml` nor `setup.py` are present in the directory\n"
+ },
+ {
+  "tag": "air-embodied-brain__Zetta-Embodiment-31",
+  "repo": "air-embodied-brain/Zetta-Embodiment",
+  "pr": 31,
+  "title": "Fix RoboCasa EGL resource ownership during deferred cleanup",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 30,
+  "testSec": 2,
+  "f2p": [
+   "tests/test_robocasa_stable_renderer.py::test_context_cleanup_tolerates_failed_initialization",
+   "tests/test_robocasa_stable_renderer.py::test_deferred_cleanup_uses_owner_and_restores_other_context[1]",
+   "tests/test_robocasa_stable_renderer.py::test_deferred_cleanup_uses_owner_and_restores_other_context[2]",
+   "tests/test_robocasa_stable_renderer.py::test_deferred_cleanup_uses_owner_and_restores_other_context[None]",
+   "tests/test_robocasa_stable_renderer.py::test_native_renderer_installer_is_idempotent",
+   "tests/test_robocasa_stable_renderer.py::test_native_renderer_serializes_render_readback_and_returns_owned_frames"
+  ],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 1
+  },
+  "posCounts": {
+   "PASSED": 6
+  },
+  "tests": [
+   "tests/test_robocasa_stable_renderer.py"
+  ]
+ },
+ {
+  "tag": "air-embodied-brain__Zetta-Embodiment-26",
+  "repo": "air-embodied-brain/Zetta-Embodiment",
+  "pr": 26,
+  "title": "fix: seed LIBERO critic EEF state on reset",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 18,
+  "testSec": 21,
+  "f2p": [
+   "tests/runtime/test_libero_critic_recovery.py::test_first_step_command_realization_uses_reset_eef",
+   "tests/runtime/test_libero_critic_recovery.py::test_reset_rebuilds_critic_and_clears_history"
+  ],
+  "p2p": [
+   "tests/runtime/test_libero_critic_recovery.py::test_cooldown_suppresses_repeated_hits",
+   "tests/runtime/test_libero_critic_recovery.py::test_critic_rule_missing_required_field_is_rejected",
+   "tests/runtime/test_libero_critic_recovery.py::test_critic_rules_rejected_for_lockstep_vector_core_form",
+   "tests/runtime/test_libero_critic_recovery.py::test_critic_state_persists_across_chunk_calls",
+   "tests/runtime/test_libero_critic_recovery.py::test_empty_critic_rules_list_is_equivalent_to_absent",
+   "tests/runtime/test_libero_critic_recovery.py::test_hit_rule_populates_proposals_and_interrupts_by_default",
+   "tests/runtime/test_libero_critic_recovery.py::test_interrupt_on_proposal_false_keeps_running_the_chunk",
+   "tests/runtime/test_libero_critic_recovery.py::test_invalid_critic_rules_payload_is_rejected_at_reset",
+   "tests/runtime/test_libero_critic_recovery.py::test_no_critic_rules_means_no_critic_proposals_key",
+   "tests/runtime/test_libero_critic_recovery.py::test_reset_without_critic_rules_disables_critic_after_previous_episode"
+  ],
+  "negCounts": {
+   "FAILED": 2,
+   "PASSED": 10
+  },
+  "posCounts": {
+   "PASSED": 12
+  },
+  "tests": [
+   "tests/runtime/test_libero_critic_recovery.py"
+  ]
+ },
+ {
+  "tag": "air-embodied-brain__Zetta-Embodiment-23",
+  "repo": "air-embodied-brain/Zetta-Embodiment",
+  "pr": 23,
+  "title": "fix(runtime): improve synchronous batch dispatch",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 3,
+  "testSec": 15,
+  "f2p": [
+   "tests/runtime/test_batch_scheduler.py::test_busy_sync_policy_keeps_next_batch_mergeable"
+  ],
+  "p2p": [
+   "tests/runtime/test_batch_scheduler.py::test_batch_fires_when_max_batch_size_is_reached",
+   "tests/runtime/test_batch_scheduler.py::test_complete_releases_quota_and_counts",
+   "tests/runtime/test_batch_scheduler.py::test_execute_batches_really_coalesces",
+   "tests/runtime/test_batch_scheduler.py::test_high_priority_arrival_jumps_the_queue_across_buckets",
+   "tests/runtime/test_batch_scheduler.py::test_incompatible_compat_keys_never_share_a_batch",
+   "tests/runtime/test_batch_scheduler.py::test_max_wait_ms_fires_a_partial_batch_on_time",
+   "tests/runtime/test_batch_scheduler.py::test_per_session_inflight_limit_is_enforced",
+   "tests/runtime/test_batch_scheduler.py::test_priority_and_deadline_decide_who_goes_first",
+   "tests/runtime/test_batch_scheduler.py::test_queue_depth_gates_backpressure",
+   "tests/runtime/test_batch_scheduler.py::test_single_tenant_cannot_fill_the_batch",
+   "tests/runtime/test_batch_scheduler.py::test_sync_inference_gate_does_not_wait_for_response_delivery",
+   "tests/runtime/test_batch_scheduler.py::test_update_weights_never_mixes_versions_in_one_batch",
+   "tests/runtime/test_batch_scheduler.py::test_version_fence_blocks_new_batches_until_inflight_drains"
+  ],
+  "negCounts": {
+   "FAILED": 1,
+   "PASSED": 13
+  },
+  "posCounts": {
+   "PASSED": 14
+  },
+  "tests": [
+   "tests/runtime/test_batch_scheduler.py"
+  ]
+ },
+ {
+  "tag": "air-embodied-brain__Zetta-Embodiment-21",
+  "repo": "air-embodied-brain/Zetta-Embodiment",
+  "pr": 21,
+  "title": "fix: relax sparse critic feature contract #18",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 3,
+  "testSec": 3,
+  "f2p": [
+   "tests/test_evolution_refinement.py::test_candidate_feature_contract_classifies_split_and_sparse_features",
+   "tests/test_evolution_refinement.py::test_feature_contract_rejection_is_append_only_and_does_not_count_round",
+   "tests/test_evolution_refinement.py::test_five_action_chunk_sparse_privileged_feature_requires_online_validation",
+   "tests/test_evolution_refinement.py::test_sparse_feature_contract_forces_online_gate_after_inconclusive_replay"
+  ],
+  "p2p": [
+   "tests/test_evolution_refinement.py::test_candidate_round_bound_counts_late_gate_rejections[heldout_50]",
+   "tests/test_evolution_refinement.py::test_candidate_round_bound_counts_late_gate_rejections[regression]",
+   "tests/test_evolution_refinement.py::test_causal_isolation_prefers_proven_trigger_and_underexposed_recovery",
+   "tests/test_evolution_refinement.py::test_gate_descriptor_prompt_slice_caps_unique_summaries_per_type",
+   "tests/test_evolution_refinement.py::test_gate_descriptor_prompt_slice_is_stratified_and_bounded",
+   "tests/test_evolution_refinement.py::test_gate_evidence_replay_uses_the_frozen_schema_threshold",
+   "tests/test_evolution_refinement.py::test_refinement_artifact_index_keeps_only_diagnosis_and_latest_gate",
+   "tests/test_evolution_refinement.py::test_registered_candidate_recovers_without_duplicate_provider_call",
+   "tests/test_evolution_refinement.py::test_registered_candidate_recovery_cannot_bypass_shadow_false_positives",
+   "tests/test_evolution_refinement.py::test_registered_noop_candidate_is_rejected_before_live_gate",
+   "tests/test_evolution_refinement.py::test_rejected_gate_evidence_is_opaque_and_refinement_reconstructs_fresh_thread",
+   "tests/test_evolution_refinement.py::test_replicated_development_calibration_preserves_the_proven_trigger",
+   "tests/test_evolution_refinement.py::test_shadow_success_control_false_positives_fail_closed_by_default",
+   "tests/test_evolution_refinement.py::test_shadow_success_control_relaxed_override_is_explicit_and_auditable",
+   "tests/test_evolution_refinement.py::test_stage2_calibration_binding_requires_all_replicated_parameters",
+   "tests/test_evolution_refinement.py::test_v3_style_shadow_false_positives_are_artifacted_before_live_gate"
+  ],
+  "negCounts": {
+   "FAILED": 4,
+   "PASSED": 16
+  },
+  "posCounts": {
+   "PASSED": 20
+  },
+  "tests": [
+   "tests/test_evolution_refinement.py"
+  ]
+ },
+ {
+  "tag": "googlecolab__google-colab-cli-112",
+  "repo": "googlecolab/google-colab-cli",
+  "pr": 112,
+  "title": "fix: surface friendly error on 412 GPU/TPU allocation instead of a traceback",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 11,
+  "testSec": 8,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 50
+  },
+  "posCounts": {
+   "ERROR": 50
+  },
+  "tests": [
+   "tests/test_cli.py",
+   "tests/test_client.py",
+   "tests/test_run.py"
+  ]
+ },
+ {
+  "tag": "googlecolab__google-colab-cli-95",
+  "repo": "googlecolab/google-colab-cli",
+  "pr": 95,
+  "title": "fix: support both ColabKernelClient and KernelClient in runtime",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 7,
+  "testSec": 6,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 8
+  },
+  "posCounts": {
+   "ERROR": 8
+  },
+  "tests": [
+   "tests/test_runtime.py"
+  ]
+ },
+ {
+  "tag": "googlecolab__google-colab-cli-53",
+  "repo": "googlecolab/google-colab-cli",
+  "pr": 53,
+  "title": "fix: use cross-platform filelock instead of POSIX-only fcntl",
+  "verdict": "UNUSABLE",
+  "why": "install: 320d4518b depends on\n      Python>=3.13, we can conclude that google-colab-cli==0.1.dev1+g320d4518b\n      cannot be used.\n      And because only google-colab-cli==0.1.dev1+g320d4518b is available and\n      you require google-colab-cli, we can conclude that your requirements\n      are unsatisfiable.\n"
+ },
+ {
+  "tag": "googlecolab__google-colab-cli-30",
+  "repo": "googlecolab/google-colab-cli",
+  "pr": 30,
+  "title": "Fix package name in auto-update upgrade hint",
+  "verdict": "UNUSABLE",
+  "why": "install: d43a4bb8b depends on\n      Python>=3.13, we can conclude that google-colab-cli==0.1.dev1+gd43a4bb8b\n      cannot be used.\n      And because only google-colab-cli==0.1.dev1+gd43a4bb8b is available and\n      you require google-colab-cli, we can conclude that your requirements\n      are unsatisfiable.\n"
+ },
+ {
+  "tag": "stabldev__torrra-346",
+  "repo": "stabldev/torrra",
+  "pr": 346,
+  "title": "fix: retain scroll position in details panel tables during periodic updates",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 17,
+  "testSec": 3,
+  "f2p": [],
+  "p2p": [
+   "tests/screens/test_home.py::test_status_bar_formatting",
+   "tests/screens/test_home.py::test_status_bar_turtle_badge"
+  ],
+  "negCounts": {
+   "FAILED": 45,
+   "PASSED": 2
+  },
+  "posCounts": {
+   "FAILED": 45,
+   "PASSED": 2
+  },
+  "tests": [
+   "tests/screens/test_home.py",
+   "tests/test_widgets_details_panel.py"
+  ]
+ },
+ {
+  "tag": "stabldev__torrra-336",
+  "repo": "stabldev/torrra",
+  "pr": 336,
+  "title": "fix: speed limit handling and metadata fetching optimizations",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 5,
+  "testSec": 7,
+  "f2p": [
+   "tests/test_core_download.py::test_global_speed_limits_disabled_by_default",
+   "tests/test_core_download.py::test_save_and_load_session_state"
+  ],
+  "p2p": [
+   "tests/test_core_download.py::test_add_torrent_rejects_active_path_change",
+   "tests/test_core_download.py::test_add_torrent_save_path_expanded",
+   "tests/test_core_download.py::test_add_torrent_sets_explicit_save_path",
+   "tests/test_core_download.py::test_get_session_stats",
+   "tests/test_core_download.py::test_get_session_stats_fallback",
+   "tests/test_core_download.py::test_get_torrent_status_abi2_error_handling",
+   "tests/test_core_download.py::test_get_torrent_status_save_path_config_fallback_expanded",
+   "tests/test_core_download.py::test_get_torrent_status_save_path_expanded",
+   "tests/test_core_download.py::test_global_speed_limits_enabled_on_startup",
+   "tests/test_core_download.py::test_global_speed_limits_toggle",
+   "tests/test_core_download.py::test_limits_seeded_on_add_are_applied",
+   "tests/test_core_download.py::test_metadata_handle_is_replaced_with_final_save_path",
+   "tests/test_core_download.py::test_set_and_get_torrent_limits",
+   "tests/test_core_download.py::test_state_map_abi2",
+   "tests/test_core_download.py::test_state_text_checking",
+   "tests/test_core_download.py::test_state_text_missing_files_and_error",
+   "tests/test_core_download.py::test_state_text_paused_and_queued",
+   "tests/test_core_download.py::test_state_text_seeding_completed_fetching",
+   "tests/test_core_download.py::test_state_text_stalled_and_downloading",
+   "tests/test_core_download.py::test_torrent_limits_persisted_to_db"
+  ],
+  "negCounts": {
+   "FAILED": 2,
+   "PASSED": 20
+  },
+  "posCounts": {
+   "PASSED": 22
+  },
+  "tests": [
+   "tests/test_core_download.py"
+  ]
+ },
+ {
+  "tag": "stabldev__torrra-324",
+  "repo": "stabldev/torrra",
+  "pr": 324,
+  "title": "fix: expand and resolve download_path in config",
+  "verdict": "UNUSABLE",
+  "why": "4 tests still failing with gold patch",
+  "installSec": 5,
+  "testSec": 7,
+  "f2p": [
+   "tests/screens/test_downloads_only.py::test_app_rejects_invalid_download_path_at_startup",
+   "tests/test_core_config.py::test_config_get_download_path_allows_literal_dollar_after_tilde",
+   "tests/test_core_config.py::test_config_get_download_path_default_expansion",
+   "tests/test_core_config.py::test_config_get_download_path_expands_env_vars",
+   "tests/test_core_config.py::test_config_get_download_path_expands_tilde",
+   "tests/test_core_config.py::test_config_get_download_path_relative_to_absolute",
+   "tests/test_core_config.py::test_config_get_download_path_relative_with_dollar_raises_error",
+   "tests/test_core_download.py::test_add_torrent_save_path_expanded",
+   "tests/test_core_download.py::test_get_torrent_status_save_path_config_fallback_expanded",
+   "tests/test_core_download.py::test_get_torrent_status_save_path_expanded"
+  ],
+  "p2p": [
+   "tests/screens/test_downloads_only.py::test_app_accepts_literal_dollar_in_download_path",
+   "tests/test_core_config.py::test_config_get_download_path_allows_literal_dollar_in_absolute_path",
+   "tests/test_core_config.py::test_config_get_existing_value",
+   "tests/test_core_config.py::test_config_get_non_path_key_not_expanded",
+   "tests/test_core_config.py::test_config_get_nonexistent_raises_error",
+   "tests/test_core_config.py::test_config_get_nonexistent_with_default",
+   "tests/test_core_config.py::test_config_get_section_raises_error",
+   "tests/test_core_config.py::test_config_initialization_creates_default_file",
+   "tests/test_core_config.py::test_config_list_flattens_correctly",
+   "tests/test_core_config.py::test_config_set_and_get_new_value",
+   "tests/test_core_config.py::test_config_set_type_conversion",
+   "tests/test_core_download.py::test_get_session_stats",
+   "tests/test_core_download.py::test_get_session_stats_fallback",
+   "tests/test_core_download.py::test_get_torrent_status_abi2_error_handling",
+   "tests/test_core_download.py::test_state_map_abi2",
+   "tests/test_core_download.py::test_state_text_checking",
+   "tests/test_core_download.py::test_state_text_missing_files_and_error",
+   "tests/test_core_download.py::test_state_text_paused_and_queued",
+   "tests/test_core_download.py::test_state_text_seeding_completed_fetching",
+   "tests/test_core_download.py::test_state_text_stalled_and_downloading"
+  ],
+  "negCounts": {
+   "FAILED": 14,
+   "PASSED": 20
+  },
+  "posCounts": {
+   "FAILED": 4,
+   "PASSED": 30
+  },
+  "tests": [
+   "tests/screens/test_downloads_only.py",
+   "tests/test_core_config.py",
+   "tests/test_core_download.py"
+  ]
+ },
+ {
+  "tag": "stabldev__torrra-323",
+  "repo": "stabldev/torrra",
+  "pr": 323,
+  "title": "fix: resolve libtorrent ABI 2 compatibility issues",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 2,
+  "testSec": 3,
+  "f2p": [
+   "tests/test_core_download.py::test_state_map_abi2"
+  ],
+  "p2p": [
+   "tests/test_core_download.py::test_get_session_stats",
+   "tests/test_core_download.py::test_get_session_stats_fallback",
+   "tests/test_core_download.py::test_get_torrent_status_abi2_error_handling",
+   "tests/test_core_download.py::test_state_text_checking",
+   "tests/test_core_download.py::test_state_text_missing_files_and_error",
+   "tests/test_core_download.py::test_state_text_paused_and_queued",
+   "tests/test_core_download.py::test_state_text_seeding_completed_fetching",
+   "tests/test_core_download.py::test_state_text_stalled_and_downloading"
+  ],
+  "negCounts": {
+   "FAILED": 1,
+   "PASSED": 8
+  },
+  "posCounts": {
+   "PASSED": 9
+  },
+  "tests": [
+   "tests/test_core_download.py"
+  ]
+ },
+ {
+  "tag": "sgl-project__sglang-omni-2115",
+  "repo": "sgl-project/sglang-omni",
+  "pr": 2115,
+  "title": "fix(scheduler): defer abort row filtering to safe boundaries",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 44,
+  "testSec": 2,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 1
+  },
+  "posCounts": {
+   "ERROR": 1
+  },
+  "tests": [
+   "tests/unit_test/pipeline/test_scheduler.py"
+  ]
+ },
+ {
+  "tag": "sgl-project__sglang-omni-2099",
+  "repo": "sgl-project/sglang-omni",
+  "pr": 2099,
+  "title": "[Fix][MOSS-TTS] Prevent pipeline crashes on empty Local audio output",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 39,
+  "testSec": 43,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 3
+  },
+  "posCounts": {
+   "ERROR": 3
+  },
+  "tests": [
+   "tests/unit_test/moss_tts_local/test_pipeline.py",
+   "tests/unit_test/moss_tts_local/test_state_pool.py",
+   "tests/unit_test/serve/test_openai_api.py"
+  ]
+ },
+ {
+  "tag": "sgl-project__sglang-omni-2079",
+  "repo": "sgl-project/sglang-omni",
+  "pr": 2079,
+  "title": "fix(pd): preserve the hidden-state mode and custom sampling params across handoff",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 37,
+  "testSec": 27,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 1
+  },
+  "posCounts": {
+   "ERROR": 1
+  },
+  "tests": [
+   "tests/unit_test/pipeline/test_pd_utils.py"
+  ]
+ },
+ {
+  "tag": "sgl-project__sglang-omni-1986",
+  "repo": "sgl-project/sglang-omni",
+  "pr": 1986,
+  "title": "fix(fun-asr): clamp requests to scheduler capacity",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 5,
+  "testSec": 32,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 1
+  },
+  "posCounts": {
+   "ERROR": 1
+  },
+  "tests": [
+   "tests/unit_test/fun_asr/test_request_builders.py"
+  ]
+ },
+ {
+  "tag": "axoviq-ai__synthadoc-400",
+  "repo": "axoviq-ai/synthadoc",
+  "pr": 400,
+  "title": "fix: plugin integration entry point that bypasses server.py for config load error handling + live test fixes",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 12,
+  "testSec": 4,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 1
+  },
+  "posCounts": {
+   "ERROR": 1
+  },
+  "tests": [
+   "tests/live/live_plugin_test.py",
+   "tests/live/test_orphan_resolver_live.py"
+  ]
+ },
+ {
+  "tag": "axoviq-ai__synthadoc-392",
+  "repo": "axoviq-ai/synthadoc",
+  "pr": 392,
+  "title": "fix(http): invalidate BM25 search corpus after lifecycle transition",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 4,
+  "testSec": 5,
+  "f2p": [],
+  "p2p": [
+   "tests/test_http_lifecycle.py::test_lifecycle_events_total_reflects_db_count",
+   "tests/test_http_lifecycle.py::test_lifecycle_status_returns_flat_counts_for_all_states",
+   "tests/test_http_lifecycle.py::test_lifecycle_transition_blocked_returns_422",
+   "tests/test_http_lifecycle.py::test_lifecycle_transition_invalidates_search_index",
+   "tests/test_http_lifecycle.py::test_lifecycle_transition_same_state_returns_422",
+   "tests/test_http_lifecycle.py::test_lifecycle_transition_stale_to_active_allowed",
+   "tests/test_http_lifecycle.py::test_lifecycle_transition_valid_cross_state_allowed",
+   "tests/test_http_lifecycle.py::test_lifecycle_transition_valid_returns_slug_states_timestamp"
+  ],
+  "negCounts": {
+   "PASSED": 8
+  },
+  "posCounts": {
+   "PASSED": 8
+  },
+  "tests": [
+   "tests/test_http_lifecycle.py"
+  ]
+ },
+ {
+  "tag": "axoviq-ai__synthadoc-381",
+  "repo": "axoviq-ai/synthadoc",
+  "pr": 381,
+  "title": "fix(contradiction-resolver): render per-item summary lines in WebUI",
+  "verdict": "UNUSABLE",
+  "why": "50 tests still failing with gold patch",
+  "installSec": 4,
+  "testSec": 8,
+  "f2p": [
+   "tests/agents/test_action_agent.py::test_detect_adversarial_pages",
+   "tests/agents/test_action_agent.py::test_detect_auto_resolve",
+   "tests/agents/test_action_agent.py::test_detect_auto_resolve_no_hyphen",
+   "tests/agents/test_action_agent.py::test_detect_can_you_run_lint",
+   "tests/agents/test_action_agent.py::test_detect_check_job",
+   "tests/agents/test_action_agent.py::test_detect_clarify_continuation",
+   "tests/agents/test_action_agent.py::test_detect_clarify_continuation_second_chip",
+   "tests/agents/test_action_agent.py::test_detect_clarify_lookback_exhausted_without_match",
+   "tests/agents/test_action_agent.py::test_detect_clear_contradictions",
+   "tests/agents/test_action_agent.py::test_detect_could_you_run_lint",
+   "tests/agents/test_action_agent.py::test_detect_fix_contradictions",
+   "tests/agents/test_action_agent.py::test_detect_generic_question_returns_false",
+   "tests/agents/test_action_agent.py::test_detect_how_question_returns_false",
+   "tests/agents/test_action_agent.py::test_detect_ingest_url",
+   "tests/agents/test_action_agent.py::test_detect_ingest_url_still_true",
+   "tests/agents/test_action_agent.py::test_detect_job_list",
+   "tests/agents/test_action_agent.py::test_detect_job_progress",
+   "tests/agents/test_action_agent.py::test_detect_lifecycle_activate",
+   "tests/agents/test_action_agent.py::test_detect_lint_report",
+   "tests/agents/test_action_agent.py::test_detect_no_clarify_continuation_without_prefix",
+   "tests/agents/test_action_agent.py::test_detect_orphan_pages_query",
+   "tests/agents/test_action_agent.py::test_detect_reingest_question_returns_false",
+   "tests/agents/test_action_agent.py::test_detect_repeat_phrases_with_history",
+   "tests/agents/test_action_agent.py::test_detect_repeat_with_history_routes_to_action_agent",
+   "tests/agents/test_action_agent.py::test_detect_repeat_without_history_returns_false",
+   "tests/agents/test_action_agent.py::test_detect_resolve_contradictions",
+   "tests/agents/test_action_agent.py::test_detect_run_lint",
+   "tests/agents/test_action_agent.py::test_detect_run_lint_with_flags",
+   "tests/agents/test_action_agent.py::test_detect_scaffold",
+   "tests/agents/test_action_agent.py::test_detect_schedule_add",
+   "tests/agents/test_action_agent.py::test_detect_schedule_add_chinese_mixed",
+   "tests/agents/test_action_agent.py::test_detect_schedule_add_chinese_operation_first",
+   "tests/agents/test_action_agent.py::test_detect_schedule_add_via_create",
+   "tests/agents/test_action_agent.py::test_detect_schedule_add_via_register",
+   "tests/agents/test_action_agent.py::test_detect_schedule_add_via_scheduler_noun",
+   "tests/agents/test_action_agent.py::test_detect_schedule_list",
+   "tests/agents/test_action_agent.py::test_detect_show_contradictions",
+   "tests/agents/test_action_agent.py::test_detect_show_job_status",
+   "tests/agents/test_action_agent.py::test_detect_what_contradictions",
+   "tests/agents/test_action_agent.py::test_detect_wiki_status",
+   "tests/agents/test_action_agent.py::test_fmt_ts_invalid",
+   "tests/agents/test_action_agent.py::test_fmt_ts_none"
+  ],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 1
+  },
+  "posCounts": {
+   "FAILED": 50,
+   "PASSED": 42
+  },
+  "tests": [
+   "tests/agents/test_action_agent.py",
+   "tests/agents/workflows/test_tools.py"
+  ]
+ },
+ {
+  "tag": "axoviq-ai__synthadoc-378",
+  "repo": "axoviq-ai/synthadoc",
+  "pr": 378,
+  "title": "fix(workflows): show subscription note instead of dollar cost for CLI providers",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 4,
+  "testSec": 7,
+  "f2p": [],
+  "p2p": [
+   "tests/agents/workflows/test_tools.py::test_apply_single_fix_case_insensitive",
+   "tests/agents/workflows/test_tools.py::test_apply_single_fix_ignores_unrelated_links",
+   "tests/agents/workflows/test_tools.py::test_apply_single_fix_preserves_display_text",
+   "tests/agents/workflows/test_tools.py::test_apply_single_fix_removes_link_keeps_display_text_when_none",
+   "tests/agents/workflows/test_tools.py::test_apply_single_fix_removes_link_when_new_ref_is_none",
+   "tests/agents/workflows/test_tools.py::test_apply_single_fix_replaces_plain_link",
+   "tests/agents/workflows/test_tools.py::test_resolve_source_path_absolute",
+   "tests/agents/workflows/test_tools.py::test_resolve_source_path_relative_direct",
+   "tests/agents/workflows/test_tools.py::test_resolve_source_path_relative_raw_sources_fallback",
+   "tests/agents/workflows/test_tools.py::test_resolve_source_path_url_is_returned_unchanged"
+  ],
+  "negCounts": {
+   "FAILED": 50,
+   "PASSED": 10
+  },
+  "posCounts": {
+   "FAILED": 50,
+   "PASSED": 10
+  },
+  "tests": [
+   "tests/agents/workflows/test_tools.py",
+   "tests/integration/test_http_server.py"
+  ]
+ },
+ {
+  "tag": "2akouwu__reverify-13",
+  "repo": "2akouwu/reverify",
+  "pr": 13,
+  "title": "benchmarks: add elf_shoff prior probe (guessed ELF64 section-table offset) + fix --probe filter",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 5,
+  "testSec": 1,
+  "f2p": [
+   "reverify/tests/test_probes.py::TestElfShoffProbe::test_elf32_not_applicable",
+   "reverify/tests/test_probes.py::TestElfShoffProbe::test_guard_flags_contradictory_verdict",
+   "reverify/tests/test_probes.py::TestElfShoffProbe::test_pe_not_applicable",
+   "reverify/tests/test_probes.py::TestElfShoffProbe::test_shoff_0x1000_verified_not_false_accept",
+   "reverify/tests/test_probes.py::TestElfShoffProbe::test_shoff_not_0x1000_refuted"
+  ],
+  "p2p": [
+   "reverify/tests/test_probes.py::TestGuardInversion::test_prologue_guard_flags_contradictory_verdict",
+   "reverify/tests/test_probes.py::TestImportProbe::test_gets_absent_refuted",
+   "reverify/tests/test_probes.py::TestImportProbe::test_gets_applies_to_elf",
+   "reverify/tests/test_probes.py::TestMd5Probe::test_md5_const_skips_arm",
+   "reverify/tests/test_probes.py::TestMd5Probe::test_md5_constant_absent_refuted",
+   "reverify/tests/test_probes.py::TestMd5Probe::test_md5_constant_present_verified_not_false_accept",
+   "reverify/tests/test_probes.py::TestProbeApplicability::test_x86_only_probes_skip_arm",
+   "reverify/tests/test_probes.py::TestSectionProbe::test_rodata_absent_in_pe_refuted",
+   "reverify/tests/test_probes.py::TestSectionProbe::test_rodata_applies_to_elf"
+  ],
+  "negCounts": {
+   "SKIPPED": 1,
+   "FAILED": 5,
+   "PASSED": 9
+  },
+  "posCounts": {
+   "SKIPPED": 1,
+   "PASSED": 14
+  },
+  "tests": [
+   "reverify/tests/test_probes.py"
+  ]
+ },
+ {
+  "tag": "2akouwu__reverify-12",
+  "repo": "2akouwu/reverify",
+  "pr": 12,
+  "title": "fix: 32-bit x86 arg passing + guard arch/bits mismatch in unicorn runner",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 1,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [
+   "reverify/tests/test_behavior.py::TestExprSafety::test_arithmetic",
+   "reverify/tests/test_behavior.py::TestExprSafety::test_rejects_calls_and_attributes"
+  ],
+  "negCounts": {
+   "SKIPPED": 1,
+   "PASSED": 2
+  },
+  "posCounts": {
+   "SKIPPED": 1,
+   "PASSED": 2
+  },
+  "tests": [
+   "reverify/tests/test_behavior.py"
+  ]
+ },
+ {
+  "tag": "2akouwu__reverify-5",
+  "repo": "2akouwu/reverify",
+  "pr": 5,
+  "title": "fix(disasm): route arm64/aarch64 to the ARM64 decoder, not x86_64",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 2,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [
+   "reverify/tests/test_differential.py::TestProtocolRoundTrip::test_tlv_round_trip",
+   "reverify/tests/test_differential.py::TestProtocolRoundTrip::test_varint_round_trip",
+   "reverify/tests/test_differential.py::TestRobustnessFuzz::test_parser_never_raises_or_warns",
+   "reverify/tests/test_differential.py::TestRobustnessFuzz::test_soundness_verify_iff_match",
+   "reverify/tests/test_differential.py::TestRobustnessFuzz::test_verifier_never_raises_and_no_false_verified",
+   "reverify/tests/test_disasm.py::TestDisassembler::test_create_patch",
+   "reverify/tests/test_disasm.py::TestDisassembler::test_disasm_basic_x86_64",
+   "reverify/tests/test_disasm.py::TestDisassembler::test_pattern_scan"
+  ],
+  "negCounts": {
+   "SKIPPED": 1,
+   "PASSED": 8
+  },
+  "posCounts": {
+   "SKIPPED": 1,
+   "PASSED": 8
+  },
+  "tests": [
+   "reverify/tests/test_differential.py",
+   "reverify/tests/test_disasm.py"
+  ]
+ },
+ {
+  "tag": "daaain__claude-code-log-289",
+  "repo": "daaain/claude-code-log",
+  "pr": 289,
+  "title": "Fix ty on Windows (#276)",
+  "verdict": "UNUSABLE",
+  "why": "no tests collected: ad/unfamiliar/work/daaain__claude-code-log-289/test/conftest.py'.\ntest/conftest.py:12: in <module>\n    from test.snapshot_serializers import (\ntest/snapshot_serializers.py:6: in <module>\n    from syrupy.extensions.amber import AmberSnapshotExtension\nE   ModuleNotFoundError: No module named 'syrupy'\n",
+  "installSec": 10,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {},
+  "posCounts": {},
+  "tests": [
+   "test/test_cli.py",
+   "test/test_output_explicit.py"
+  ]
+ },
+ {
+  "tag": "daaain__claude-code-log-253",
+  "repo": "daaain/claude-code-log",
+  "pr": 253,
+  "title": "Regenerate single-file output when its source grows; fix success-message accuracy (#221 follow-up)",
+  "verdict": "UNUSABLE",
+  "why": "install: error: /private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/daaain__claude-code-log-253 does not appear to be a Python project, as neither `pyproject.toml` nor `setup.py` are present in the directory\n"
+ },
+ {
+  "tag": "hkjarral__AVA-AI-Voice-Agent-for-Asterisk-634",
+  "repo": "hkjarral/AVA-AI-Voice-Agent-for-Asterisk",
+  "pr": 634,
+  "title": "fix(admin-ui): honor api_key_file/api_key_env in google_live test",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 9,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "SKIPPED": 1
+  },
+  "posCounts": {
+   "SKIPPED": 1
+  },
+  "tests": [
+   "admin_ui/backend/tests/test_google_live_provider_test_connection.py"
+  ]
+ },
+ {
+  "tag": "hkjarral__AVA-AI-Voice-Agent-for-Asterisk-509",
+  "repo": "hkjarral/AVA-AI-Voice-Agent-for-Asterisk",
+  "pr": 509,
+  "title": "Fix provider output lifecycle through transport drain",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 6,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 1
+  },
+  "posCounts": {
+   "ERROR": 1
+  },
+  "tests": [
+   "tests/test_no_input_watchdog.py"
+  ]
+ },
+ {
+  "tag": "hkjarral__AVA-AI-Voice-Agent-for-Asterisk-492",
+  "repo": "hkjarral/AVA-AI-Voice-Agent-for-Asterisk",
+  "pr": 492,
+  "title": "Fix unknown Call History rows for non-AAVA PBX channels",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 3,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 1
+  },
+  "posCounts": {
+   "ERROR": 1
+  },
+  "tests": [
+   "tests/test_engine_call_persistence_v701.py"
+  ]
+ },
+ {
+  "tag": "hkjarral__AVA-AI-Voice-Agent-for-Asterisk-473",
+  "repo": "hkjarral/AVA-AI-Voice-Agent-for-Asterisk",
+  "pr": 473,
+  "title": "fix(engine): honor per-agent email fields on the YAML/fallback path (#437)",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 3,
+  "testSec": 1,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 1
+  },
+  "posCounts": {
+   "ERROR": 1
+  },
+  "tests": [
+   "tests/operator/test_yaml_email_fields.py"
+  ]
+ },
+ {
+  "tag": "sentient-agi__EvoSkill-51",
+  "repo": "sentient-agi/EvoSkill",
+  "pr": 51,
+  "title": "fix(opencode): stop re-fetching messages after chat POST (opencode #25430)",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 19,
+  "testSec": 2,
+  "f2p": [
+   "tests/test_harness.py::TestOpencodeExecuteQuery::test_does_not_refetch_messages_after_chat_post"
+  ],
+  "p2p": [
+   "tests/test_harness.py::TestAgentGetOptions::test_callable_is_called_on_each_access",
+   "tests/test_harness.py::TestAgentGetOptions::test_mock_object_returned_directly",
+   "tests/test_harness.py::TestAgentGetOptions::test_static_dict_returned_as_is",
+   "tests/test_harness.py::TestAgentRetryLogic::test_agent_accepts_timeout_and_retry_overrides",
+   "tests/test_harness.py::TestAgentRetryLogic::test_raises_after_all_retries_exhausted",
+   "tests/test_harness.py::TestAgentRetryLogic::test_retries_on_failure_then_succeeds",
+   "tests/test_harness.py::TestAgentRetryLogic::test_retry_count_respects_instance_override",
+   "tests/test_harness.py::TestAgentRetryLogic::test_success_on_first_attempt",
+   "tests/test_harness.py::TestAgentRetryLogic::test_timeout_triggers_retry",
+   "tests/test_harness.py::TestAgentTrace::test_default_model_is_empty_string",
+   "tests/test_harness.py::TestAgentTrace::test_default_tools_is_empty_list",
+   "tests/test_harness.py::TestAgentTrace::test_default_uuid_is_empty_string",
+   "tests/test_harness.py::TestAgentTrace::test_is_error_true_reflected",
+   "tests/test_harness.py::TestAgentTrace::test_minimal_construction",
+   "tests/test_harness.py::TestAgentTrace::test_output_can_be_pydantic_model",
+   "tests/test_harness.py::TestAgentTrace::test_parse_error_defaults_to_none",
+   "tests/test_harness.py::TestAgentTrace::test_summarize_contains_full_result_when_no_error",
+   "tests/test_harness.py::TestAgentTrace::test_summarize_contains_model_info",
+   "tests/test_harness.py::TestAgentTrace::test_summarize_contains_turns",
+   "tests/test_harness.py::TestAgentTrace::test_summarize_no_truncation_without_parse_error",
+   "tests/test_harness.py::TestAgentTrace::test_summarize_shows_output_when_present",
+   "tests/test_harness.py::TestAgentTrace::test_summarize_shows_parse_error",
+   "tests/test_harness.py::TestAgentTrace::test_summarize_truncates_large_result_on_parse_error",
+   "tests/test_harness.py::TestClaudeParseResponse::test_complex_schema",
+   "tests/test_harness.py::TestClaudeParseResponse::test_extracts_metadata",
+   "tests/test_harness.py::TestClaudeParseResponse::test_handles_invalid_structured_output",
+   "tests/test_harness.py::TestClaudeParseResponse::test_handles_none_structured_output",
+   "tests/test_harness.py::TestClaudeParseResponse::test_is_error_propagates_from_last_message",
+   "tests/test_harness.py::TestClaudeParseResponse::test_parses_structured_output_successfully",
+   "tests/test_harness.py::TestCodexExecuteQuery::test_passes_thread_options_and_prompt_to_sdk",
+   "tests/test_harness.py::TestCodexOptions::test_basic_structure",
+   "tests/test_harness.py::TestCodexOptions::test_data_dirs_appended_to_system",
+   "tests/test_harness.py::TestCodexOptions::test_default_model_used_when_none",
+   "tests/test_harness.py::TestCodexOptions::test_no_data_dirs_system_unchanged",
+   "tests/test_harness.py::TestCodexOptions::test_tools_stored_as_list",
+   "tests/test_harness.py::TestCodexParseResponse::test_cost_is_always_zero",
+   "tests/test_harness.py::TestCodexParseResponse::test_handles_empty_final_response",
+   "tests/test_harness.py::TestCodexParseResponse::test_handles_non_json_response",
+   "tests/test_harness.py::TestCodexParseResponse::test_handles_none_final_response",
+   "tests/test_harness.py::TestCodexParseResponse::test_json_schema_validation_error_recorded",
+   "tests/test_harness.py::TestCodexParseResponse::test_model_comes_from_options",
+   "tests/test_harness.py::TestCodexParseResponse::test_parses_valid_json_response",
+   "tests/test_harness.py::TestCodexParseResponse::test_result_text_equals_final_response",
+   "tests/test_harness.py::TestCodexParseResponse::test_session_id_from_thread_id",
+   "tests/test_harness.py::TestCodexParseResponse::test_uuid_from_turn_id",
+   "tests/test_harness.py::TestGooseExecuteQueryErrors::test_raises_runtime_error_when_goose_not_found",
+   "tests/test_harness.py::TestGooseExecuteQueryErrors::test_raises_runtime_error_when_openrouter_key_missing",
+   "tests/test_harness.py::TestGooseOptions::test_basic_structure",
+   "tests/test_harness.py::TestGooseOptions::test_data_dirs_appended_to_system",
+   "tests/test_harness.py::TestGooseOptions::test_default_model_and_provider_when_none",
+   "tests/test_harness.py::TestGooseOptions::test_model_with_slash_splits",
+   "tests/test_harness.py::TestGooseOptions::test_no_data_dirs_system_unchanged",
+   "tests/test_harness.py::TestGooseOptions::test_tools_stored_as_list",
+   "tests/test_harness.py::TestGooseParseResponse::test_cost_is_always_zero",
+   "tests/test_harness.py::TestGooseParseResponse::test_extracts_from_tool_call_arguments",
+   "tests/test_harness.py::TestGooseParseResponse::test_handles_empty_stdout",
+   "tests/test_harness.py::TestGooseParseResponse::test_handles_no_json_in_stdout",
+   "tests/test_harness.py::TestGooseParseResponse::test_handles_nonzero_returncode",
+   "tests/test_harness.py::TestGooseParseResponse::test_json_validation_error_recorded",
+   "tests/test_harness.py::TestGooseParseResponse::test_model_comes_from_options",
+   "tests/test_harness.py::TestGooseParseResponse::test_parses_structured_output_from_conversation",
+   "tests/test_harness.py::TestGooseParseResponse::test_provider_comes_from_options",
+   "tests/test_harness.py::TestGooseParseResponse::test_uuid_and_session_id_are_unknown",
+   "tests/test_harness.py::TestGooseSplitModel::test_multiple_slashes_splits_only_on_first",
+   "tests/test_harness.py::TestGooseSplitModel::test_none_returns_defaults",
+   "tests/test_harness.py::TestGooseSplitModel::test_with_slash_splits_on_first_slash",
+   "tests/test_harness.py::TestGooseSplitModel::test_without_slash_uses_default_provider",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_complex_schema",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_extracts_cost",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_extracts_text_from_parts",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_handles_invalid_structured_output",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_handles_missing_info",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_handles_missing_structured_output",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_invalid_structured_output_falls_back_to_text_json",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_model_from_options",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_parses_structured_output_from_info",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_structured_key_fallback",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_text_fallback_strips_code_fences",
+   "tests/test_harness.py::TestOpencodeParseResponse::test_text_fallback_when_no_structured_output",
+   "tests/test_harness.py::TestOptionsUtils::test_build_opencode_options_structure",
+   "tests/test_harness.py::TestOptionsUtils::test_build_opencode_options_with_data_dirs",
+   "tests/test_harness.py::TestOptionsUtils::test_normalize_permission_block_dict",
+   "tests/test_harness.py::TestOptionsUtils::test_normalize_permission_block_none",
+   "tests/test_harness.py::TestOptionsUtils::test_normalize_permission_block_string",
+   "tests/test_harness.py::TestOptionsUtils::test_resolve_data_dirs_absolute_paths",
+   "tests/test_harness.py::TestOptionsUtils::test_resolve_project_root_explicit_path",
+   "tests/test_harness.py::TestOptionsUtils::test_split_opencode_model_none_uses_default",
+   "tests/test_harness.py::TestOptionsUtils::test_split_opencode_model_with_slash",
+   "tests/test_harness.py::TestOptionsUtils::test_split_opencode_model_without_slash_uses_default_provider",
+   "tests/test_harness.py::TestOptionsUtils::test_to_opencode_tools_basic",
+   "tests/test_harness.py::TestOptionsUtils::test_to_opencode_tools_skips_none_mappings",
+   "tests/test_harness.py::TestOptionsUtils::test_to_opencode_tools_unknown_tool_lowercased",
+   "tests/test_harness.py::TestSdkConfig::test_default_sdk_is_claude",
+   "tests/test_harness.py::TestSdkConfig::test_invalid_sdk_does_not_change_state",
+   "tests/test_harness.py::TestSdkConfig::test_invalid_sdk_raises_value_error",
+   "tests/test_harness.py::TestSdkConfig::test_is_claude_sdk_true_by_default",
+   "tests/test_harness.py::TestSdkConfig::test_is_opencode_sdk_false_by_default",
+   "tests/test_harness.py::TestSdkConfig::test_is_openhands_sdk_false_by_default",
+   "tests/test_harness.py::TestSdkConfig::test_set_sdk_back_to_claude",
+   "tests/test_harness.py::TestSdkConfig::test_set_sdk_to_opencode",
+   "tests/test_harness.py::TestSdkConfig::test_set_sdk_to_openhands",
+   "tests/test_harness.py::TestSdkConfigCodex::test_invalid_sdk_still_raises",
+   "tests/test_harness.py::TestSdkConfigCodex::test_is_codex_sdk_false_by_default",
+   "tests/test_harness.py::TestSdkConfigCodex::test_set_sdk_codex_then_back_to_claude",
+   "tests/test_harness.py::TestSdkConfigCodex::test_set_sdk_to_codex",
+   "tests/test_harness.py::TestSdkConfigGoose::test_invalid_sdk_still_raises",
+   "tests/test_harness.py::TestSdkConfigGoose::test_is_goose_sdk_false_by_default",
+   "tests/test_harness.py::TestSdkConfigGoose::test_set_sdk_goose_then_back_to_claude",
+   "tests/test_harness.py::TestSdkConfigGoose::test_set_sdk_to_goose"
+  ],
+  "negCounts": {
+   "FAILED": 1,
+   "PASSED": 109
+  },
+  "posCounts": {
+   "PASSED": 110
+  },
+  "tests": [
+   "tests/test_harness.py"
+  ]
+ },
+ {
+  "tag": "sentient-agi__EvoSkill-38",
+  "repo": "sentient-agi/EvoSkill",
+  "pr": 38,
+  "title": "fix: use async session API for heavy upload commands",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 16,
+  "testSec": 3,
+  "f2p": [
+   "tests/test_remote_daytona.py::test_exec_async_includes_log_in_error",
+   "tests/test_remote_daytona.py::test_exec_async_raises_on_nonzero_exit",
+   "tests/test_remote_daytona.py::test_exec_async_returns_on_success",
+   "tests/test_remote_daytona.py::test_exec_async_times_out",
+   "tests/test_remote_daytona.py::test_exec_async_uses_provided_session_id",
+   "tests/test_remote_daytona.py::test_upload_creates_upload_session",
+   "tests/test_remote_daytona.py::test_upload_dispatches_git_unbundle_via_session",
+   "tests/test_remote_daytona.py::test_upload_single_chunk_data_uses_async_for_extract"
+  ],
+  "p2p": [
+   "tests/test_remote_daytona.py::test_cleanup_current_deletes_sandbox",
+   "tests/test_remote_daytona.py::test_download_creates_branches",
+   "tests/test_remote_daytona.py::test_logs_follow_exits_on_completion",
+   "tests/test_remote_daytona.py::test_logs_returns_content",
+   "tests/test_remote_daytona.py::test_remote_env_sets_bypass_permissions",
+   "tests/test_remote_daytona.py::test_run_includes_path_overrides",
+   "tests/test_remote_daytona.py::test_run_passes_extra_args",
+   "tests/test_remote_daytona.py::test_run_saves_run_info_with_cmd_id",
+   "tests/test_remote_daytona.py::test_run_uses_session_api",
+   "tests/test_remote_daytona.py::test_run_works_for_all_harnesses[claude]",
+   "tests/test_remote_daytona.py::test_run_works_for_all_harnesses[codex]",
+   "tests/test_remote_daytona.py::test_run_works_for_all_harnesses[goose]",
+   "tests/test_remote_daytona.py::test_run_works_for_all_harnesses[opencode]",
+   "tests/test_remote_daytona.py::test_run_works_for_all_harnesses[openhands]",
+   "tests/test_remote_daytona.py::test_setup_creates_sandbox",
+   "tests/test_remote_daytona.py::test_setup_sets_env_vars",
+   "tests/test_remote_daytona.py::test_setup_validates_api_key",
+   "tests/test_remote_daytona.py::test_setup_validates_image",
+   "tests/test_remote_daytona.py::test_status_completed",
+   "tests/test_remote_daytona.py::test_status_failed",
+   "tests/test_remote_daytona.py::test_status_running",
+   "tests/test_remote_daytona.py::test_stop_deletes_sandbox",
+   "tests/test_remote_daytona.py::test_upload_remaps_external_data_dirs",
+   "tests/test_remote_daytona.py::test_upload_sends_bundle",
+   "tests/test_remote_daytona.py::test_upload_sends_project_files",
+   "tests/test_remote_daytona.py::test_upload_skips_excluded"
+  ],
+  "negCounts": {
+   "FAILED": 8,
+   "PASSED": 26
+  },
+  "posCounts": {
+   "PASSED": 34
+  },
+  "tests": [
+   "tests/test_remote_daytona.py"
+  ]
+ },
+ {
+  "tag": "sentient-agi__EvoSkill-18",
+  "repo": "sentient-agi/EvoSkill",
+  "pr": 18,
+  "title": "Scoring Logic Fix for script and llm mode",
+  "verdict": "DISCRIMINATES",
+  "why": "",
+  "installSec": 17,
+  "testSec": 116,
+  "f2p": [
+   "tests/test_scorer_llm_script.py::TestLLMScorer::test_llm_scorer_api_error_logs_error",
+   "tests/test_scorer_llm_script.py::TestLLMScorer::test_llm_scorer_non_numeric_response_logs_warning",
+   "tests/test_scorer_llm_script.py::TestLLMScorer::test_llm_scorer_works_inside_running_event_loop",
+   "tests/test_scorer_llm_script.py::TestScriptScorer::test_script_scorer_none_command_raises_at_creation",
+   "tests/test_scorer_llm_script.py::TestScriptScorer::test_script_scorer_unknown_placeholder_left_as_literal"
+  ],
+  "p2p": [
+   "tests/test_scorer_llm_script.py::TestLLMScorer::test_llm_scorer_defaults",
+   "tests/test_scorer_llm_script.py::TestLLMScorer::test_llm_scorer_happy_path",
+   "tests/test_scorer_llm_script.py::TestScriptScorer::test_script_scorer_braces_in_answer",
+   "tests/test_scorer_llm_script.py::TestScriptScorer::test_script_scorer_command_failure",
+   "tests/test_scorer_llm_script.py::TestScriptScorer::test_script_scorer_happy_path",
+   "tests/test_scorer_llm_script.py::TestScriptScorer::test_script_scorer_non_numeric_output",
+   "tests/test_scorer_llm_script.py::TestScriptScorer::test_script_scorer_shell_metachar_in_answer",
+   "tests/test_scorer_llm_script.py::TestScriptScorer::test_script_scorer_timeout",
+   "tests/test_scorer_llm_script.py::TestScriptScorer::test_script_scorer_uses_format_placeholders"
+  ],
+  "negCounts": {
+   "FAILED": 5,
+   "PASSED": 9
+  },
+  "posCounts": {
+   "PASSED": 14
+  },
+  "tests": [
+   "tests/test_scorer_llm_script.py"
+  ]
+ },
+ {
+  "tag": "Anionex__agent-vision-toolkit-36",
+  "repo": "Anionex/agent-vision-toolkit",
+  "pr": 36,
+  "title": "fix: decompress gzip responses from OpenAI-compatible endpoints",
+  "verdict": "UNUSABLE",
+  "why": "install: error: /private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/Anionex__agent-vision-toolkit-36 does not appear to be a Python project, as neither `pyproject.toml` nor `setup.py` are present in the directory\n"
+ },
+ {
+  "tag": "Anionex__agent-vision-toolkit-25",
+  "repo": "Anionex/agent-vision-toolkit",
+  "pr": 25,
+  "title": "fix: handle Qwen and Gemini grounding coordinate orders",
+  "verdict": "UNUSABLE",
+  "why": "install: error: /private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/Anionex__agent-vision-toolkit-25 does not appear to be a Python project, as neither `pyproject.toml` nor `setup.py` are present in the directory\n"
+ },
+ {
+  "tag": "Anionex__agent-vision-toolkit-10",
+  "repo": "Anionex/agent-vision-toolkit",
+  "pr": 10,
+  "title": "fix: run bare shebang glance scripts via the interpreter on Windows",
+  "verdict": "UNUSABLE",
+  "why": "install: error: /private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/Anionex__agent-vision-toolkit-10 does not appear to be a Python project, as neither `pyproject.toml` nor `setup.py` are present in the directory\n"
+ },
+ {
+  "tag": "Anionex__agent-vision-toolkit-4",
+  "repo": "Anionex/agent-vision-toolkit",
+  "pr": 4,
+  "title": "fix: vision failures degrade to a visible note instead of 502",
+  "verdict": "UNUSABLE",
+  "why": "install: error: /private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad/unfamiliar/work/Anionex__agent-vision-toolkit-4 does not appear to be a Python project, as neither `pyproject.toml` nor `setup.py` are present in the directory\n"
+ },
+ {
+  "tag": "sipyourdrink-ltd__bernstein-5992",
+  "repo": "sipyourdrink-ltd/bernstein",
+  "pr": 5992,
+  "title": "fix: fail quarantined skip tasks to unblock quiescence (#5967)",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 20,
+  "testSec": 16,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "FAILED": 2
+  },
+  "posCounts": {
+   "ERROR": 2
+  },
+  "tests": [
+   "tests/unit/tasks/test_quarantined_task_skip.py",
+   "tests/unit/tasks/test_task_lifecycle.py"
+  ]
+ },
+ {
+  "tag": "sipyourdrink-ltd__bernstein-5912",
+  "repo": "sipyourdrink-ltd/bernstein",
+  "pr": 5912,
+  "title": "fix(quorum): the hourly sweep re-runs verdicts older than their own reviews",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 15,
+  "testSec": 22,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 45,
+   "FAILED": 3
+  },
+  "posCounts": {
+   "ERROR": 50
+  },
+  "tests": [
+   "tests/unit/scripts/test_quorum_check.py",
+   "tests/unit/test_quorum_rerun_workflow_yaml.py"
+  ]
+ },
+ {
+  "tag": "sipyourdrink-ltd__bernstein-5905",
+  "repo": "sipyourdrink-ltd/bernstein",
+  "pr": 5905,
+  "title": "feat(bench): a declined task scores above a wrong one, and suites report three rates (#5567)",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 8,
+  "testSec": 17,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "FAILED": 7
+  },
+  "posCounts": {
+   "ERROR": 7
+  },
+  "tests": [
+   "tests/unit/test_bench_abstention_scoring.py"
+  ]
+ },
+ {
+  "tag": "sipyourdrink-ltd__bernstein-5889",
+  "repo": "sipyourdrink-ltd/bernstein",
+  "pr": 5889,
+  "title": "fix(grpc): fall back to title when a task has no goal field",
+  "verdict": "UNUSABLE",
+  "why": "no test flips fail->pass",
+  "installSec": 9,
+  "testSec": 22,
+  "f2p": [],
+  "p2p": [],
+  "negCounts": {
+   "ERROR": 14,
+   "FAILED": 7
+  },
+  "posCounts": {
+   "ERROR": 17,
+   "FAILED": 4
+  },
+  "tests": [
+   "tests/unit/test_grpc_server.py"
+  ]
+ }
+]

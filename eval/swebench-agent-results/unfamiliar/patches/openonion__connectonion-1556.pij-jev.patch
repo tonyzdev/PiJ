@@ -1,0 +1,394 @@
+diff --git a/connectonion/cli/co_ai/listen.py b/connectonion/cli/co_ai/listen.py
+index 33d5a9b..117553a 100644
+--- a/connectonion/cli/co_ai/listen.py
++++ b/connectonion/cli/co_ai/listen.py
+@@ -67,9 +67,9 @@ def _handler(channel: Channel, inbox: Inbox, provider, agent, sessions: dict, gu
+         try:
+             sent = provider.send(message.chat, reply, reply_to=message.id)
+         except Exception as exc:
+-            inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, error=str(exc))
++            inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, error=str(exc), by="co-ai")
+             raise RuntimeError(f"reply failed: {exc}") from exc
+-        inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, provider_id=sent)
++        inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, provider_id=sent, by="co-ai")
+ 
+     return answer
+ 
+@@ -94,7 +94,7 @@ def listen(channels: Sequence[Channel], agent_factory: Callable, *,
+         handler = _handler(channel, inbox, provider, agent, sessions, guard)
+         loops.append(threading.Thread(
+             target=inbox.serve, args=(handler,),
+-            kwargs={"workers": workers, "idle_seconds": idle_seconds,
++            kwargs={"by": "co-ai", "workers": workers, "idle_seconds": idle_seconds,
+                     "should_stop": stop, "once": once},
+             name=f"listen-{channel.provider}", daemon=True))
+ 
+diff --git a/connectonion/cli/commands/listen_commands.py b/connectonion/cli/commands/listen_commands.py
+index 6ee0637..ab1c7ea 100644
+--- a/connectonion/cli/commands/listen_commands.py
++++ b/connectonion/cli/commands/listen_commands.py
+@@ -79,7 +79,7 @@ def _listener_or_exit(inbox: Inbox) -> None:
+ 
+ def handle_done(name: str, message_id: str) -> None:
+     """Forget a taken message without replying, so it does not come back."""
+-    Inbox(name).done(message_id)
++    Inbox(name).done(message_id, by="done")
+ 
+ 
+ def handle_listen(name: str, raw: bool = False) -> None:
+@@ -138,9 +138,9 @@ WATCH_SECONDS = 60
+ 
+ def _receive(inbox: Inbox, timeout: Optional[float], watch: bool):
+     if not watch or timeout is not None:
+-        return inbox.receive(timeout)
++        return inbox.receive(timeout, by="receive")
+     while True:
+-        message = inbox.receive(WATCH_SECONDS)
++        message = inbox.receive(WATCH_SECONDS, by="receive")
+         if message is not None:
+             return message
+         _listener_or_exit(inbox)
+@@ -171,10 +171,10 @@ def handle_send(name: str, chat: str, text: Optional[str] = None, reply_to: Opti
+     try:
+         sent = p.send(chat, body, reply_to=reply_to)
+     except Exception as exc:
+-        inbox.record_sent(chat=chat, text=body, reply_to=reply_to, error=str(exc))
++        inbox.record_sent(chat=chat, text=body, reply_to=reply_to, error=str(exc), by="send")
+         errors.print(str(exc), style="red")
+         sys.exit(1)
+-    inbox.record_sent(chat=chat, text=body, reply_to=reply_to, provider_id=sent)
++    inbox.record_sent(chat=chat, text=body, reply_to=reply_to, provider_id=sent, by="send")
+     print(sent)
+ 
+ 
+@@ -193,11 +193,11 @@ def handle_reply(name: str, message_id: str, text: Optional[str] = None, again:
+     try:
+         sent = p.send(original.chat, body, reply_to=message_id, fresh=again)
+     except Exception as exc:
+-        inbox.record_sent(chat=original.chat, text=body, reply_to=message_id, error=str(exc))
++        inbox.record_sent(chat=original.chat, text=body, reply_to=message_id, error=str(exc), by="reply")
+         errors.print(str(exc), style="red")
+         sys.exit(1)
+-    inbox.record_sent(chat=original.chat, text=body, reply_to=message_id, provider_id=sent)
+-    inbox.done(message_id)
++    inbox.record_sent(chat=original.chat, text=body, reply_to=message_id, provider_id=sent, by="reply")
++    inbox.done(message_id, by="reply")
+     print(sent)
+ 
+ 
+@@ -247,23 +247,35 @@ def handle_check(name: str) -> None:
+ 
+ 
+ def handle_ls(name: str) -> None:
+-    """Unread messages, one per line: id, chat, sender, text."""
++    """Unread messages, one per line: id, chat, sender, text.
++
++    A message that has already been handled somewhere shows the consumers
++    that touched it as a trailing column; unread ones have none.
++    """
+     inbox = Inbox(name)
+     for message in inbox.list_messages():
+         record = message.to_dict()
+         text = " ".join(str(record.get("text", "")).split())
+-        print(f"{record['id']}\t{record['chat']}\t{record.get('sender', '')}\t{text}")
++        line = f"{record['id']}\t{record['chat']}\t{record.get('sender', '')}\t{text}"
++        names = inbox.handled_by(str(record["id"]))
++        if names:
++            line += "\t" + ",".join(names)
++        print(line)
+ 
+ 
+ def handle_log(name: str, follow: bool = False) -> None:
+-    """Every message ever received; -f keeps printing new ones."""
++    """Every message ever received; -f keeps printing new ones.
++
++    Each line is the received record with `by` added when a consumer has
++    handled it, so the last few lines answer "who had this".
++    """
+     inbox = Inbox(name)
+     inbox.received.touch()
+     with inbox.received.open("r", encoding="utf-8") as handle:
+         while True:
+             line = handle.readline()
+             if line:
+-                sys.stdout.write(line)
++                sys.stdout.write(_with_handlers(inbox, line))
+                 sys.stdout.flush()
+                 continue
+             if not follow:
+@@ -271,6 +283,23 @@ def handle_log(name: str, follow: bool = False) -> None:
+             time.sleep(0.5)
+ 
+ 
++def _with_handlers(inbox: Inbox, line: str) -> str:
++    """A received.jsonl line with the consumers that handled it appended."""
++    stripped = line.strip()
++    if not stripped:
++        return line
++    try:
++        record = json.loads(stripped)
++    except ValueError:
++        return line
++    if not isinstance(record, dict) or "id" not in record:
++        return line
++    names = inbox.handled_by(str(record["id"]))
++    if names:
++        record["by"] = names
++    return json.dumps(record, ensure_ascii=False, separators=(",", ":")) + "\n"
++
++
+ def handle_consume(name: str, command: List[str], once: bool = False, workers: int = 1) -> None:
+     """For each message: run COMMAND with the message on stdin, send its
+     stdout back as the reply. Empty stdout or a non-zero exit sends nothing."""
+@@ -283,6 +312,7 @@ def handle_consume(name: str, command: List[str], once: bool = False, workers: i
+         errors.print(f"cannot run {command[0] if command else '(no command)'}: not found or not executable", style="red")
+         sys.exit(2)
+     _listener_or_exit(inbox)
++    by = f"consume:{os.path.basename(command[0])}"
+ 
+     def answer(message) -> None:
+         env = dict(
+@@ -312,15 +342,15 @@ def handle_consume(name: str, command: List[str], once: bool = False, workers: i
+         try:
+             sent = p.send(message.chat, reply, reply_to=message.id)
+         except Exception as exc:
+-            inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, error=str(exc))
++            inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, error=str(exc), by=by)
+             raise RuntimeError(f"reply failed: {exc}") from exc
+-        inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, provider_id=sent)
++        inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, provider_id=sent, by=by)
+ 
+     try:
+         # workers=1: a shell command written for this has always run one at a
+         # time, and some of them are not safe to run twice at once. The lanes
+         # still give it ordering, lease renewal and the give-up rule; anyone
+         # who wants the parallelism asks for it with --workers.
+-        inbox.serve(answer, workers=workers, once=once)
++        inbox.serve(answer, by=by, workers=workers, once=once)
+     except KeyboardInterrupt:
+         return
+diff --git a/connectonion/inbox/consumer.py b/connectonion/inbox/consumer.py
+index d739017..fc55adb 100644
+--- a/connectonion/inbox/consumer.py
++++ b/connectonion/inbox/consumer.py
+@@ -60,9 +60,10 @@ class _Lane:
+ 
+ class _Loop:
+     def __init__(self, inbox, handler, *, lane_key, workers, lease_seconds,
+-                 max_attempts, idle_seconds, should_stop):
++                 max_attempts, idle_seconds, should_stop, by=None):
+         self.inbox = inbox
+         self.handler = handler
++        self.by = by
+         self.lane_key = lane_key
+         self.lease_seconds = lease_seconds
+         self.max_attempts = max_attempts
+@@ -111,7 +112,7 @@ class _Loop:
+             # into an unanswered question.
+             self.inbox.log(f"{message.id} not finished: {type(error).__name__}: {error}")
+         else:
+-            self.inbox.done(message.id)
++            self.inbox.done(message.id, by=self.by)
+         finally:
+             keep_alive.set()
+             lease.join(timeout=1)
+@@ -135,7 +136,7 @@ class _Loop:
+ 
+     def run(self, *, once: bool) -> None:
+         while not self.stopped():
+-            message = self.inbox.receive(timeout=0.25)
++            message = self.inbox.receive(timeout=0.25, by=self.by)
+             if message is None:
+                 continue
+             attempts = self.inbox.attempts(message.id)
+@@ -146,7 +147,7 @@ class _Loop:
+                 # consumer too, every hour, forever.
+                 self.inbox.log(
+                     f"gave up on {message.id} after {attempts - 1} attempts")
+-                self.inbox.done(message.id)
++                self.inbox.done(message.id, by=self.by)
+                 continue
+             self.dispatch(message)
+             if once:
+@@ -172,7 +173,8 @@ class _Loop:
+ def serve(inbox, handler: Callable, *, lane_key: Optional[Callable] = None,
+           workers: int = 4, lease_seconds: float = 300.0, max_attempts: int = 3,
+           idle_seconds: float = 600.0, once: bool = False,
+-          should_stop: Optional[threading.Event] = None) -> None:
++          should_stop: Optional[threading.Event] = None,
++          by: Optional[str] = None) -> None:
+     """Take messages from `inbox` and give them to `handler`, forever.
+ 
+     `handler(message)` owns the outcome. Returning means the message is
+@@ -181,9 +183,11 @@ def serve(inbox, handler: Callable, *, lane_key: Optional[Callable] = None,
+     for the sweep. That is the whole contract, which is why the same loop can
+     drive a subprocess, an Agent, or a Host.
+ 
++    `by` names this consumer in every completion record it writes.
++
+     Blocks until `should_stop` is set.
+     """
+     loop = _Loop(inbox, handler, lane_key=lane_key or default_lane, workers=workers,
+                  lease_seconds=lease_seconds, max_attempts=max_attempts,
+-                 idle_seconds=idle_seconds, should_stop=should_stop)
++                 idle_seconds=idle_seconds, should_stop=should_stop, by=by)
+     loop.run(once=once)
+diff --git a/connectonion/inbox/store.py b/connectonion/inbox/store.py
+index 7d33c49..3dd3524 100644
+--- a/connectonion/inbox/store.py
++++ b/connectonion/inbox/store.py
+@@ -244,17 +244,21 @@ class Inbox:
+         sort order is arrival order."""
+         return sorted(p for p in self.new.iterdir() if not p.is_symlink() and p.is_file() and _QUEUE_NAME.match(p.name))
+ 
+-    def receive(self, timeout: Optional[float] = None, poll: float = 0.25) -> Optional[Message]:
++    def receive(self, timeout: Optional[float] = None, poll: float = 0.25,
++                by: Optional[str] = None) -> Optional[Message]:
+         """Block until a message is available, take it, return it.
+ 
+         timeout=None waits forever; timeout=0 looks once. Taking is a rename
+         into cur/, so two consumers on one directory never get the same
+         message: the one whose rename fails just tries the next file.
++
++        `by` names the consumer in the handout record, so a message taken
++        twice after a lease expiry shows both takers.
+         """
+         deadline = None if timeout is None else time.monotonic() + timeout
+         while True:
+             for path in self.unread():
+-                message = self._claim(path)
++                message = self._claim(path, by=by)
+                 if message is not None:
+                     return message
+             if deadline is not None and time.monotonic() >= deadline:
+@@ -262,7 +266,7 @@ class Inbox:
+             time.sleep(poll)
+ 
+     @_serialized
+-    def _claim(self, path: Path) -> Optional[Message]:
++    def _claim(self, path: Path, by: Optional[str] = None) -> Optional[Message]:
+         target = self.cur / path.name
+         try:
+             os.rename(path, target)
+@@ -278,7 +282,10 @@ class Inbox:
+             # Record the handout before returning it: a consumer that dies
+             # while working must still have this attempt counted, or a message
+             # that kills consumers is immortal.
+-            self._append(self.handouts, json.dumps({"id": message.id, "at": _now_iso()}))
++            record = {"id": message.id, "at": _now_iso()}
++            if by is not None:
++                record["by"] = by
++            self._append(self.handouts, json.dumps(record))
+         return message
+ 
+     def _read_queue_file(self, path: Path) -> Optional[Message]:
+@@ -301,13 +308,19 @@ class Inbox:
+                 if (message := self._read_queue_file(path)) is not None]
+ 
+     @_serialized
+-    def done(self, message_id: str) -> None:
++    def done(self, message_id: str, by: Optional[str] = None) -> None:
+         """Forget a message: the reply went out, or the consumer decided there
+         is nothing to say. Clears the queue as well as cur/, so a reply made
+         straight from `ls` without a `receive` does not leave the message
+-        waiting to be handed out again."""
++        waiting to be handed out again.
++
++        `by` names the consumer that finished it. It is a label on work that
++        happened, not an identity: nothing reads it to decide anything."""
+         # Persist completion before removal; silence is an outcome, not a send.
+-        self._append(self.completed, json.dumps({"id": message_id, "at": _now_iso()}))
++        record = {"id": message_id, "at": _now_iso()}
++        if by is not None:
++            record["by"] = by
++        self._append(self.completed, json.dumps(record))
+         wanted = _safe(message_id)
+         for directory in (self.cur, self.new):
+             for path in directory.iterdir():
+@@ -381,6 +394,7 @@ class Inbox:
+         reply_to: Optional[str] = None,
+         provider_id: Optional[str] = None,
+         error: Optional[str] = None,
++        by: Optional[str] = None,
+     ) -> None:
+         record = {
+             "at": _now_iso(),
+@@ -391,6 +405,8 @@ class Inbox:
+             "ok": error is None,
+             "error": error,
+         }
++        if by is not None:
++            record["by"] = by
+         self._append(self.sent, json.dumps(record, ensure_ascii=False, separators=(",", ":")))
+ 
+     def already_replied(self, message_id: str) -> bool:
+@@ -408,6 +424,22 @@ class Inbox:
+                 found = Message.from_dict(record)
+         return found
+ 
++    def handled_by(self, message_id: str) -> list:
++        """The consumers that touched this message, in order, deduplicated.
++
++        A message handed out, lost to a lease expiry and handed out again has
++        two takers; one that was answered has a finisher and a sender. The
++        label is descriptive: nothing here decides anything on its strength.
++        """
++        names = []
++        for path in (self.handouts, self.completed, self.sent):
++            for record in self._records(path):
++                if record.get("id") == message_id or record.get("reply_to") == message_id:
++                    name = record.get("by")
++                    if name and name not in names:
++                        names.append(name)
++        return names
++
+     # ---- the tool's own log --------------------------------------------------
+ 
+     def log(self, line: str) -> None:
+@@ -516,15 +548,17 @@ class Inbox:
+ 
+     # ---- internals ----------------------------------------------------------
+ 
+-    def serve(self, handler, **options) -> None:
++    def serve(self, handler, by: Optional[str] = None, **options) -> None:
+         """Hand every message to `handler`, one lane per conversation.
+ 
+-        See inbox/consumer.py for the contract. Imported there and not here so
+-        that reading a directory never costs a thread module.
++        `by` names this consumer once, so every completion it writes says who
++        did the work without each call site repeating it. See inbox/consumer.py
++        for the contract. Imported there and not here so that reading a
++        directory never costs a thread module.
+         """
+         from .consumer import serve as run
+ 
+-        return run(self, handler, **options)
++        return run(self, handler, by=by, **options)
+ 
+     @staticmethod
+     def _append(path: Path, line: str) -> None:
+diff --git a/connectonion/network/host/inbox.py b/connectonion/network/host/inbox.py
+index e2780b9..f8e321b 100644
+--- a/connectonion/network/host/inbox.py
++++ b/connectonion/network/host/inbox.py
+@@ -82,9 +82,9 @@ def create_inbox_lifespan(co_dir: Path, create_agent, storage, result_ttl: int,
+             try:
+                 sent = provider.send(message.chat, reply, reply_to=message.id)
+             except Exception as exc:
+-                inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, error=str(exc))
++                inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, error=str(exc), by="host")
+                 raise RuntimeError(f"reply failed: {exc}") from exc
+-            inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, provider_id=sent)
++            inbox.record_sent(chat=message.chat, text=reply, reply_to=message.id, provider_id=sent, by="host")
+ 
+         return answer
+ 
+@@ -110,7 +110,7 @@ def create_inbox_lifespan(co_dir: Path, create_agent, storage, result_ttl: int,
+                 continue
+             thread = threading.Thread(
+                 target=inbox.serve, args=(_handler(channel, inbox, provider),),
+-                kwargs={"workers": 1, "should_stop": stop},
++                kwargs={"by": "host", "workers": 1, "should_stop": stop},
+                 name=f"inbox-{channel.provider}", daemon=True)
+             thread.start()
+             threads.append(thread)

@@ -1,0 +1,24 @@
+diff --git a/rollout_runtime/backends/rlinf_env.py b/rollout_runtime/backends/rlinf_env.py
+index ed3d7f2..bfa1e7e 100644
+--- a/rollout_runtime/backends/rlinf_env.py
++++ b/rollout_runtime/backends/rlinf_env.py
+@@ -997,6 +997,19 @@ class LiberoEnvCore:
+             slot = self._slots[slot_index]
+             index = lanes.index(slot.lane_index)
+             self._after_reset(slot_index, int(reset_state_ids[index]), reset_spec)
++            # Seed the realized-displacement anchor from the reset
++            # observation, exactly as the legacy ``LiberoEnvClient.reset``
++            # does (``env_server.py``). Without this the first physical step
++            # has ``previous_eef is None``, so
++            # ``command.realization.eef_motion_m`` is never emitted and a
++            # rule that references it raises ``KeyError`` (surfacing as
++            # ``INVALID_ARGUMENT: critic feature is unavailable``).
++            reset_states = _to_numpy(obs["states"])[slot.lane_index].reshape(-1)
++            slot.critic_previous_eef = (
++                reset_states[:3].astype(np.float64).copy()
++                if reset_states.size >= 3
++                else None
++            )
+             observations.append(self._observation(slot_index, obs))
+         return observations
+ 

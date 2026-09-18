@@ -1,0 +1,73 @@
+diff --git a/rollout_runtime/workers/batch_scheduler.py b/rollout_runtime/workers/batch_scheduler.py
+index bee77a7..375c7c9 100644
+--- a/rollout_runtime/workers/batch_scheduler.py
++++ b/rollout_runtime/workers/batch_scheduler.py
+@@ -184,7 +184,9 @@ class InferenceBatchScheduler:
+         bucket.append(pending)
+         self.enqueued_count += 1
+ 
+-    def next_batch(self, now: float) -> list[PendingRequest]:
++    def next_batch(
++        self, now: float, *, allow_partial: bool = True
++    ) -> list[PendingRequest]:
+         """Pull out one executable batch.
+ 
+         Trigger condition: the number of **selectable** requests in a bucket reaches
+@@ -196,6 +198,12 @@ class InferenceBatchScheduler:
+         Args:
+             now: Current time (a monotonic clock is fine, as long as it shares the
+                 same source as ``PendingRequest.enqueued_at``).
++            allow_partial: When ``False``, only buckets that have reached the batch
++                limit are eligible; a partial (timer-triggered) batch is held back.
++                ``RuntimeRolloutWorker`` passes ``False`` while a batch is already in
++                flight, so requests keep accumulating into a larger next batch
++                instead of queueing a long series of tiny forwards that cannot be
++                merged after spawn.
+ 
+         Returns:
+             A list of requests sharing the same ``compat_key``; empty if no batch is
+@@ -216,8 +224,13 @@ class InferenceBatchScheduler:
+             selectable = self._selectable(bucket, limit)
+             if not selectable:
+                 continue
+-            oldest = min(item.enqueued_at for item in selectable)
+-            ready = len(selectable) >= limit or (now - oldest) >= wait_seconds
++            if len(selectable) >= limit:
++                ready = True
++            elif not allow_partial:
++                ready = False
++            else:
++                oldest = min(item.enqueued_at for item in selectable)
++                ready = (now - oldest) >= wait_seconds
+             if not ready:
+                 continue
+             rank = (selectable[0].sort_key[0], selectable[0].sort_key[1])
+diff --git a/rollout_runtime/workers/rollout_worker.py b/rollout_runtime/workers/rollout_worker.py
+index 12efd7b..861fab6 100644
+--- a/rollout_runtime/workers/rollout_worker.py
++++ b/rollout_runtime/workers/rollout_worker.py
+@@ -225,11 +225,23 @@ class RuntimeRolloutWorker:
+         """
+         loop = asyncio.get_running_loop()
+         while self._serving:
+-            batch = self.scheduler.next_batch(loop.time())
++            # While a batch is still executing on this rank's GPU, only issue a
++            # batch that has already reached ``max_batch_size`` (it cannot grow
++            # further). Partial batches are held back so requests arriving during
++            # the forward accumulate into a larger next batch, instead of queueing
++            # a long series of tiny forwards that cannot be merged after spawn.
++            batch = self.scheduler.next_batch(
++                loop.time(), allow_partial=self.scheduler.inflight_total == 0
++            )
+             if batch:
+                 self._spawn(self._run_batch(batch, response_channel))
+                 continue
+             self._wake.clear()
++            if self.scheduler.inflight_total > 0:
++                # A partial batch is waiting behind the in-flight batch; the
++                # completion of that batch sets ``_wake``, so just wait for it.
++                await self._wake.wait()
++                continue
+             delay = self.scheduler.time_until_ready(loop.time())
+             if delay is None:
+                 await self._wake.wait()

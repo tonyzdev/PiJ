@@ -203,7 +203,11 @@ export function testModules(ids: string[]): string[] {
 async function evaluate(inst: Instance, workspace: string, dir: string) {
   const git = (...args: string[]) => exec("git", ["-c", "user.name=eval", "-c", "user.email=eval@local", ...args], { cwd: workspace, maxBuffer: 64_000_000 });
   await git("add", "-A");
-  const patch = (await git("diff", "--cached", "HEAD")).stdout;
+  // The exported patch is a record, not the oracle's input: the tests run in the
+  // workspace. Keep it bounded when an agent vendors a dependency into the tree.
+  let patch = "";
+  try { patch = (await git("diff", "--cached", "HEAD", "--", ".", ":!.*")).stdout; }
+  catch { patch = `[diff exceeded buffer]\n${(await git("diff", "--cached", "HEAD", "--stat")).stdout.slice(-4000)}`; }
   await writeFile(join(dir, "model.patch"), patch, { mode: 0o600 });
   const touched = goldFiles(patch);
   const gold = goldFiles(inst.patch);

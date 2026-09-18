@@ -1,0 +1,20 @@
+diff --git a/py_modules/unifideck/launcher/proton/compat/gog_setup/common.py b/py_modules/unifideck/launcher/proton/compat/gog_setup/common.py
+index db64b78..78ba4a5 100644
+--- a/py_modules/unifideck/launcher/proton/compat/gog_setup/common.py
++++ b/py_modules/unifideck/launcher/proton/compat/gog_setup/common.py
+@@ -139,6 +139,15 @@ async def run_wine(
+     env["GAMEID"] = "umu-0"
+     env["STORE"] = "gog"
+     env["PROTON_VERB"] = "run"
++    # PROTON_REMOTE_DEBUG_CMD belongs to the final game process: it tells
++    # Proton to start the CheatDeck trainer alongside the game. The GOG setup
++    # helper (scriptinterpreter.exe / redist installers) is not the game, and
++    # if the variable reaches it Proton starts the trainer during setup and
++    # can wait indefinitely on that unrelated Wine process. Drop it here so
++    # it never reaches the helper — including via the escaped command, which
++    # derives its forwarded env from this same dict. Everything else,
++    # notably PRESSURE_VESSEL_FILESYSTEMS_RW, is left untouched.
++    env.pop("PROTON_REMOTE_DEBUG_CMD", None)
+     # Escape Steam's pressure-vessel when Force-Compat wrapped us, or every
+     # setup step nests a second container and returns rc=1 — observed as 9
+     # straight failures (scriptinterpreter + all four vcredists) in a field

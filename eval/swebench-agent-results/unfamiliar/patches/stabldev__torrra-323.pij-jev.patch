@@ -1,0 +1,58 @@
+diff --git a/src/torrra/core/download.py b/src/torrra/core/download.py
+index e0b6c7f..f791788 100644
+--- a/src/torrra/core/download.py
++++ b/src/torrra/core/download.py
+@@ -16,17 +16,29 @@ def get_download_manager() -> DownloadManager:
+     return DownloadManager()
+ 
+ 
+-class DownloadManager:
+-    _STATE_MAP: ClassVar[dict[int, tuple[str, str]]] = {
+-        lt.torrent_status.states.downloading: ("Downloading", "DOWN"),
+-        lt.torrent_status.states.seeding: ("Seeding", "SEED"),
+-        lt.torrent_status.states.finished: ("Completed", "DONE"),
+-        lt.torrent_status.states.downloading_metadata: ("Fetching", "META"),
+-        lt.torrent_status.states.checking_files: ("Checking", "CHCK"),
+-        lt.torrent_status.states.checking_resume_data: ("Checking", "CHCK"),
+-        lt.torrent_status.states.queued_for_checking: ("Checking", "CHCK"),
+-        lt.torrent_status.states.allocating: ("Allocating", "ALOC"),
++def _build_state_map() -> dict[int, tuple[str, str]]:
++    states = lt.torrent_status.states
++    state_map: dict[int, tuple[str, str]] = {
++        states.downloading: ("Downloading", "DOWN"),
++        states.seeding: ("Seeding", "SEED"),
++        states.finished: ("Completed", "DONE"),
++        states.downloading_metadata: ("Fetching", "META"),
++        states.checking_files: ("Checking", "CHCK"),
++        states.checking_resume_data: ("Checking", "CHCK"),
+     }
++    # ABI-1-only states; absent from ABI-2 bindings (e.g. Homebrew's libtorrent).
++    for name, label in (
++        ("queued_for_checking", ("Checking", "CHCK")),
++        ("allocating", ("Allocating", "ALOC")),
++    ):
++        state = getattr(states, name, None)
++        if state is not None:
++            state_map[state] = label
++    return state_map
++
++
++class DownloadManager:
++    _STATE_MAP: ClassVar[dict[int, tuple[str, str]]] = _build_state_map()
+ 
+     def __init__(self) -> None:
+         settings: lt.settings_pack = {
+@@ -221,8 +233,11 @@ class DownloadManager:
+         error_msg: str | None = None
+         if s.errc and s.errc.value() != 0:
+             error_msg = s.errc.message()
+-        elif s.error:
+-            error_msg = s.error
++        else:
++            # ABI-1-only legacy string; absent from ABI-2 bindings.
++            legacy_error = getattr(s, "error", None)
++            if legacy_error:
++                error_msg = legacy_error
+ 
+         error_file = getattr(s, "error_file", -1)
+ 
