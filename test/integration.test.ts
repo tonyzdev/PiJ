@@ -88,12 +88,12 @@ for (const mode of ["assist", "observe", "off"] satisfies DecisionMode[]) {
     await session.prompt("Inspect token refresh code, then write proof.txt.");
     assert.equal(await readFile(join(cwd, "proof.txt"), "utf8"), "PiJ tool execution verified\n");
     assert.equal(llmCalls, 4);
-    assert.equal(modelRequests[0]!.includes("PiJ source evidence"), retrieval === "briefing");
+    assert.equal(modelRequests[0]!.includes("PiJ initial evidence"), retrieval === "briefing");
     if (retrieval === "briefing") {
       assert.ok(modelRequests[0]!.includes("refreshToken"));
-      assert.equal(modelRequests[0]!.includes("Jev ranked initial snapshot"), mode === "assist");
+      assert.equal(modelRequests[0]!.includes("ranked by a judgement model"), mode === "assist");
       const conversation = JSON.parse(modelRequests[3]!).messages as { role: string; content: unknown }[];
-      const snapshotIndex = conversation.findIndex((message) => JSON.stringify(message.content).includes("PiJ source evidence"));
+      const snapshotIndex = conversation.findIndex((message) => JSON.stringify(message.content).includes("PiJ initial evidence"));
       assert.ok(snapshotIndex > 0 && snapshotIndex < conversation.findIndex((message) => message.role === "assistant"), "initial evidence must precede subsequent tool observations, not arrive as a fresh user message after every tool");
     }
     const search = session.messages.find((m) => m.role === "toolResult" && m.toolName === "pij_search");
