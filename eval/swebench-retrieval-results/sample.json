@@ -1,0 +1,206 @@
+[
+ {
+  "instance_id": "django__django-10097",
+  "repo": "django/django",
+  "base_commit": "b9cf764be62e77b4777b3a75ec256f6209a57671",
+  "difficulty": "<15 min fix",
+  "gold": [
+   "django/core/validators.py"
+  ]
+ },
+ {
+  "instance_id": "django__django-10554",
+  "repo": "django/django",
+  "base_commit": "14d026cccb144c6877294ba4cd4e03ebf0842498",
+  "difficulty": "1-4 hours",
+  "gold": [
+   "django/db/models/sql/compiler.py",
+   "django/db/models/sql/query.py"
+  ]
+ },
+ {
+  "instance_id": "django__django-10880",
+  "repo": "django/django",
+  "base_commit": "838e432e3e5519c5383d12018e6c78f8ec7833c1",
+  "difficulty": "<15 min fix",
+  "gold": [
+   "django/db/models/aggregates.py"
+  ]
+ },
+ {
+  "instance_id": "django__django-10914",
+  "repo": "django/django",
+  "base_commit": "e7fd69d051eaa67cb17f172a39b57253e9cb831a",
+  "difficulty": "<15 min fix",
+  "gold": [
+   "django/conf/global_settings.py"
+  ]
+ },
+ {
+  "instance_id": "django__django-10973",
+  "repo": "django/django",
+  "base_commit": "ddb293685235fd09e932805771ae97f72e817181",
+  "difficulty": "15 min - 1 hour",
+  "gold": [
+   "django/db/backends/postgresql/client.py"
+  ]
+ },
+ {
+  "instance_id": "django__django-10999",
+  "repo": "django/django",
+  "base_commit": "36300ef336e3f130a0dadc1143163ff3d23dc843",
+  "difficulty": "<15 min fix",
+  "gold": [
+   "django/utils/dateparse.py"
+  ]
+ },
+ {
+  "instance_id": "django__django-11087",
+  "repo": "django/django",
+  "base_commit": "8180ffba21bf10f4be905cb0d4890dc2bcff2788",
+  "difficulty": "15 min - 1 hour",
+  "gold": [
+   "django/db/models/deletion.py"
+  ]
+ },
+ {
+  "instance_id": "django__django-11095",
+  "repo": "django/django",
+  "base_commit": "7d49ad76562e8c0597a0eb66046ab423b12888d8",
+  "difficulty": "15 min - 1 hour",
+  "gold": [
+   "django/contrib/admin/options.py"
+  ]
+ },
+ {
+  "instance_id": "django__django-11138",
+  "repo": "django/django",
+  "base_commit": "c84b91b7603e488f7171fdff8f08368ef3d6b856",
+  "difficulty": "1-4 hours",
+  "gold": [
+   "django/db/backends/mysql/operations.py",
+   "django/db/backends/oracle/operations.py",
+   "django/db/backends/sqlite3/base.py",
+   "django/db/backends/sqlite3/operations.py"
+  ]
+ },
+ {
+  "instance_id": "django__django-11141",
+  "repo": "django/django",
+  "base_commit": "5d9cf79baf07fc4aed7ad1b06990532a65378155",
+  "difficulty": "15 min - 1 hour",
+  "gold": [
+   "django/db/migrations/loader.py"
+  ]
+ },
+ {
+  "instance_id": "sympy__sympy-11618",
+  "repo": "sympy/sympy",
+  "base_commit": "360290c4c401e386db60723ddb0109ed499c9f6e",
+  "difficulty": "15 min - 1 hour",
+  "gold": [
+   "sympy/geometry/point.py"
+  ]
+ },
+ {
+  "instance_id": "sympy__sympy-12096",
+  "repo": "sympy/sympy",
+  "base_commit": "d7c3045115693e887bcd03599b7ca4650ac5f2cb",
+  "difficulty": "<15 min fix",
+  "gold": [
+   "sympy/core/function.py"
+  ]
+ },
+ {
+  "instance_id": "sympy__sympy-12419",
+  "repo": "sympy/sympy",
+  "base_commit": "479939f8c65c8c2908bbedc959549a257a7c0b0b",
+  "difficulty": "15 min - 1 hour",
+  "gold": [
+   "sympy/matrices/expressions/matexpr.py"
+  ]
+ },
+ {
+  "instance_id": "sympy__sympy-12481",
+  "repo": "sympy/sympy",
+  "base_commit": "c807dfe7569692cad24f02a08477b70c1679a4dd",
+  "difficulty": "<15 min fix",
+  "gold": [
+   "sympy/combinatorics/permutations.py"
+  ]
+ },
+ {
+  "instance_id": "sympy__sympy-12489",
+  "repo": "sympy/sympy",
+  "base_commit": "aa9780761ad8c3c0f68beeef3a0ce5caac9e100b",
+  "difficulty": "1-4 hours",
+  "gold": [
+   "sympy/combinatorics/permutations.py"
+  ]
+ },
+ {
+  "instance_id": "sympy__sympy-13031",
+  "repo": "sympy/sympy",
+  "base_commit": "2dfa7457f20ee187fbb09b5b6a1631da4458388c",
+  "difficulty": "15 min - 1 hour",
+  "gold": [
+   "sympy/matrices/sparse.py"
+  ]
+ },
+ {
+  "instance_id": "sympy__sympy-13091",
+  "repo": "sympy/sympy",
+  "base_commit": "d1320814eda6549996190618a21eaf212cfd4d1e",
+  "difficulty": "15 min - 1 hour",
+  "gold": [
+   "sympy/core/basic.py",
+   "sympy/core/exprtools.py",
+   "sympy/core/numbers.py",
+   "sympy/geometry/entity.py",
+   "sympy/physics/optics/medium.py",
+   "sympy/physics/vector/dyadic.py",
+   "sympy/physics/vector/frame.py",
+   "sympy/physics/vector/vector.py",
+   "sympy/polys/agca/modules.py",
+   "sympy/polys/domains/domain.py",
+   "sympy/polys/domains/expressiondomain.py",
+   "sympy/polys/domains/pythonrational.py",
+   "sympy/polys/domains/quotientring.py",
+   "sympy/polys/fields.py",
+   "sympy/polys/monomials.py",
+   "sympy/polys/polyclasses.py",
+   "sympy/polys/polytools.py",
+   "sympy/polys/rings.py",
+   "sympy/polys/rootoftools.py",
+   "sympy/tensor/array/ndim_array.py",
+   "sympy/utilities/enumerative.py"
+  ]
+ },
+ {
+  "instance_id": "sympy__sympy-13372",
+  "repo": "sympy/sympy",
+  "base_commit": "30379ea6e225e37833a764ac2da7b7fadf5fe374",
+  "difficulty": "<15 min fix",
+  "gold": [
+   "sympy/core/evalf.py"
+  ]
+ },
+ {
+  "instance_id": "sympy__sympy-13480",
+  "repo": "sympy/sympy",
+  "base_commit": "f57fe3f4b3f2cab225749e1b3b38ae1bf80b62f0",
+  "difficulty": "<15 min fix",
+  "gold": [
+   "sympy/functions/elementary/hyperbolic.py"
+  ]
+ },
+ {
+  "instance_id": "sympy__sympy-13852",
+  "repo": "sympy/sympy",
+  "base_commit": "c935e1d106743efd5bf0705fbeedbd18fadff4dc",
+  "difficulty": "1-4 hours",
+  "gold": [
+   "sympy/functions/special/zeta_functions.py"
+  ]
+ }
+]
