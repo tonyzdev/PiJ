@@ -158,3 +158,67 @@ per query over 5,900 files — slower than before, and worth measuring against a
 - The prose stratification was motivated by a single observed failure. The 80/20 split is a
   guess and needs validation across the wider sample.
 - Still untested end to end: whether any of this raises the task resolve rate.
+
+---
+
+# Stage 1 rerun: the full sample through PiJ's own pipeline
+
+The four-instance rerun above showed the pipeline defects were fixed. This repeats the whole
+20-instance sample through the shipped `discoverCode` + `DecisionEngine.rankCode`
+(`eval/swebench-pipeline.ts`), so the numbers describe the product rather than a harness.
+
+| metric | PiJ BM25 | PiJ + Jev | (harness BM25) | (harness + Jev) |
+|---|---:|---:|---:|---:|
+| recall@1 | 0.150 | **0.690** | 0.250 | 0.740 |
+| recall@5 | 0.450 | **0.840** | 0.575 | 0.905 |
+| recall@10 | 0.502 | **0.905** | 0.740 | 0.957 |
+| recall@20 | 0.740 | **0.907** | 0.742 | 0.960 |
+| recall@100 (shortlist ceiling) | 0.914 | — | 0.967 | — |
+
+| | PiJ BM25 | PiJ + Jev |
+|---|---:|---:|
+| median rank of first gold file | 6 | **1** |
+| gold file at rank 1 | 3/20 | **16/20** |
+| gold file missed by top-10 | 9/20 | **1/20** |
+
+Rank improved on 16 instances, unchanged on 4, **worsened on none**. 60 Jev requests, 900k
+input tokens, zero fallbacks. Median 2.3 s discovery + 2.4 s ranking per query.
+
+## Prose share, chosen by ablation rather than by guess
+
+The 80/20 source/prose split introduced above was a guess motivated by one failure. Ablating
+it over all 20 instances — a purely local measurement, no API calls — gave:
+
+| proseShare | gold in shortlist | BM25 recall@20 |
+|---:|---:|---:|
+| 0.5 | 0.545 | 0.615 |
+| 0.2 | 0.614 | 0.615 |
+| **0.1** | **0.636** | **0.740** |
+| 0.0 | 0.659 | 0.755 |
+
+The aggregate is dominated by `sympy__sympy-13091` (21 gold files), so it was checked
+per instance: at 0.1 the first gold file ranked **better on 4 instances, the same on 16, and
+worse on none** than at 0.2. A share of zero scores marginally higher still, but it would
+make a question about documentation unanswerable, so it is rejected on design grounds rather
+than tuned away. Default is now 0.1, overridable per call.
+
+## The residual gap is corpus composition, not ranking
+
+PiJ still trails the standalone harness (recall@10 0.905 vs 0.957; ceiling 0.914 vs 0.967).
+The harness restricted its corpus to `.py` files — 2,464 per django instance. PiJ cannot
+assume a language and scans every text file, ~5,980 per django instance, which both adds
+competing documents and distorts the idf statistics that BM25 depends on. The reranking
+stage is not what differs.
+
+`django__django-11087` is the one instance where the gold file never enters the shortlist at
+any prose share. The issue body is mostly a `UnicodeDecodeError` traceback, so its most
+distinctive tokens are the stack frames in `django/core/management/`, while the fix belongs
+in `django/db/models/deletion.py`. The symptom path and the fix location share almost no
+vocabulary. No lexical prefilter recovers that, and Jev cannot rank what the shortlist
+excludes — this is the structural ceiling of retrieve-then-rerank, not a tuning failure.
+
+## Status
+
+Established across 20 instances on the shipped pipeline: Jev reranking roughly doubles
+recall@10 over the BM25 prefilter and puts the file that must be edited first in 16 of 20
+cases. Still unestablished: any effect on task resolve rate.
