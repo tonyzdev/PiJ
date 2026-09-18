@@ -1,0 +1,41 @@
+diff --git a/django/conf/global_settings.py b/django/conf/global_settings.py
+index acee988..bdeec80 100644
+--- a/django/conf/global_settings.py
++++ b/django/conf/global_settings.py
+@@ -304,7 +304,7 @@ FILE_UPLOAD_TEMP_DIR = None
+ 
+ # The numeric mode to set newly-uploaded files to. The value should be a mode
+ # you'd pass directly to os.chmod; see https://docs.python.org/library/os.html#files-and-directories.
+-FILE_UPLOAD_PERMISSIONS = None
++FILE_UPLOAD_PERMISSIONS = 0o644
+ 
+ # The numeric mode to assign to newly-created directories, when uploading files.
+ # The value should be a mode as you'd pass to os.chmod;
+diff --git a/docs/ref/settings.txt b/docs/ref/settings.txt
+index 46e99af..eba5bd2 100644
+--- a/docs/ref/settings.txt
++++ b/docs/ref/settings.txt
+@@ -1484,7 +1484,7 @@ This value mirrors the functionality and caveats of the
+ ``FILE_UPLOAD_PERMISSIONS``
+ ---------------------------
+ 
+-Default: ``None``
++Default: ``0o644``
+ 
+ The numeric mode (i.e. ``0o644``) to set newly uploaded files to. For
+ more information about what these modes mean, see the documentation for
+diff --git a/docs/releases/3.0.txt b/docs/releases/3.0.txt
+index 5d9bff0..ebe2fa4 100644
+--- a/docs/releases/3.0.txt
++++ b/docs/releases/3.0.txt
+@@ -290,6 +290,10 @@ Miscellaneous
+ * ``ContentType.__str__()`` now includes the model's ``app_label`` to
+   disambiguate model's with the same name in different apps.
+ 
++* The default value of the :setting:`FILE_UPLOAD_PERMISSIONS` setting is
++  changed from ``None`` to ``0o644``. This ensures that all uploaded files
++  have consistent permissions regardless of their size.
++
+ .. _deprecated-features-3.0:
+ 
+ Features deprecated in 3.0

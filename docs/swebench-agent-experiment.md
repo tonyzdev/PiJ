@@ -31,65 +31,89 @@ and achieves on a real task?
   and bash `cat|head|sed -n…` are *read*; `runtests.py|pytest` is *test*.
 
 Harness: `eval/swebench-agent.ts`. Raw per-run records, patches and summary:
-`eval/swebench-agent-results/`. 60 runs, 0 harness errors, $0.20 of main-model spend in total.
+`eval/swebench-agent-results/` (first pass) and `eval/swebench-agent-results/v2/` (corrected
+prompt). 100 runs, 0 harness errors, $0.32 of main-model spend in total.
 
-## Results
+## A confound, caught and corrected
+
+The first pass of this experiment showed `pij_search` being called twice in forty PiJ runs,
+and this report initially attributed that to the model's habits. That attribution was wrong.
+Capturing the system prompt from the actual provider request showed what the model was told:
+
+```
+Available tools:
+- bash: Execute bash commands (ls, grep, find, etc.)        ← listed second
+- pij_search: Find and rank source excerpts ...              ← listed last
+Guidelines:
+- Use bash for file operations like ls, rg, find             ← the first guideline
+- ...
+- When locating unfamiliar behavior, ask pij_search ...      ← ninth, conditional, hedged
+```
+
+Pi's default prompt instructs the model to search with `rg` through bash before it ever
+reaches the PiJ guideline. PiJ had not overridden that. The extension now rewrites exactly
+those two lines so that locating code goes through `pij_search` first (`preferPijSearch` in
+`src/ui.ts`, verified in the real request), and both PiJ arms were rerun with the corrected
+prompt. The plain-Pi arm is unaffected and is not rerun. Numbers below are from the rerun;
+the first pass is kept in `eval/swebench-agent-results/results.json` for comparison.
+
+## Results (corrected prompt)
 
 | | Pi | PiJ, no Jev | PiJ + Jev |
 |---|---:|---:|---:|
-| **resolved** | **15/20** | 14/20 | **15/20** |
-| FAIL_TO_PASS passed | 16/20 | 15/20 | 16/20 |
-| edited a gold file | 18/20 | 18/20 | 18/20 |
-| token budget exhausted | 4 | 3 | 5 |
-| **first tool call reads a gold file** | 5/20 | 7/20 | **12/20** |
-| search calls, mean / median | 4.6 / 3.0 | 4.0 / 2.0 | 4.7 / **1.5** |
-| tool calls, mean / median | 17.1 / 11.0 | 15.8 / 12.0 | 15.7 / **9.5** |
-| prompt tokens per task, mean / median | 192k / **47k** | 172k / 77k | 195k / 62k |
-| wall time per task, mean / median | 42 s / 20 s | **33 s** / 29 s | 60 s / 26 s |
-| Jev requests per task | — | — | 3.9 (+9.5 s) |
+| **resolved** | **15/20** | 14/20 | 14/20 |
+| **first tool call reads a gold file** | 5/20 | 7/20 | **11/20** |
+| `pij_search` calls / runs using it | — | 9 / 8 | 7 / 5 |
+| search calls, mean / median | 4.6 / 3.0 | 5.2 / 2.0 | 4.3 / **1.5** |
+| tool calls, mean / median | 17.1 / 11.0 | 16.4 / 9.0 | 16.1 / 10.0 |
+| prompt tokens per task, mean / median | **192k / 47k** | 216k / 55k | 202k / 61k |
+| wall time per task, mean / median | **42 s / 20 s** | 50 s / 21 s | 58 s / 29 s |
+| Jev requests per task | — | — | 4.1 (+3.9 s) |
 
-Paired against plain Pi on the same instance, PiJ + Jev used **fewer search calls on 8,
-the same on 7, more on 5**; fewer tool calls on 12 of 20; but more prompt tokens on 12 of 20
-and more wall time on 15 of 20.
+Paired against plain Pi on the same instance, PiJ + Jev used **fewer search calls on 11,
+the same on 4, more on 5**; fewer tool calls on 12 of 20; more prompt tokens on 12 of 20;
+more wall time on 16 of 20. First pass, for reference: PiJ + Jev resolved 15/20 with
+`pij_search` used in 1 run, 4.7 / 1.5 searches, 195k tokens, 60 s.
 
 ## What happened
 
-**The retrieval advantage did reach the agent.** With the Jev-ranked briefing, the very first
-action reads the file that the reference patch edits in 12 of 20 runs, against 5 of 20 for
-plain Pi and 7 of 20 for the BM25 briefing. That is the Stage 1 result showing up end to end,
-and it is the one metric on which the three arms clearly separate.
+**Fixing the prompt raised adoption, not outcomes.** With the guideline corrected, the model
+reached for `pij_search` in 5–8 of 20 runs instead of 1, and still one or two calls per run
+with bash grep for the rest. Resolve rate did not move (15 → 14 → 14), and neither did the
+means of any effort metric. What did move is the same thing that moved in the first pass:
+with the Jev-ranked briefing, the first action reads the file the reference patch edits in
+11 of 20 runs against 5 of 20 for plain Pi. The Stage 1 retrieval advantage reaches the
+agent. It does not carry through to the result.
 
-**It did not change the outcome.** Resolve rate is identical (15/20 vs 15/20). Two things
-explain the gap between "pointed at the right file" and "solved the task":
+**Variance after localization dominates.** On 9 of 20 instances plain Pi needed fewer than
+three searches: the issue text names the file. Where retrieval mattered, arms diverge both
+ways. `django__django-11206`: Pi spent 37 tool calls and 414k tokens, PiJ + Jev 33 calls
+and 425k after the fix (9 calls and 65k in the first pass), all resolved.
+`django__django-11239`: 5 searches became 0, and then the fix was wrong. `django__django-11087`
+is reproducible in the other direction: plain Pi resolved it with 5 searches in 55 s; PiJ +
+Jev read the gold file *first* in both passes, then went on to 18 and 24 searches, exhausted
+the budget and did not resolve it. The traces show the model second-guessing its fix — trying
+to download Django 3.0, searching for other copies of `deletion.py` — rather than failing to
+find the file. Medians move in PiJ's favour (searches 3 → 1.5); a few runaway runs erase the
+difference in the means, and with one run per configuration a single runaway run moves a
+mean by 10%.
 
-1. **The model ignored `pij_search`.** Across all 40 PiJ runs, `pij_search` was called
-   twice. DeepSeek-flash searches the way it always searches — bash grep — regardless of an
-   opt-in tool being offered. So the only channel through which Jev ranking reached the
-   agent was the one-off briefing; every later search was lexical in every arm.
-2. **Variance after localization dominates.** On 9 of 20 instances plain Pi needed fewer than
-   three searches: the issue text names the file, and retrieval is not the bottleneck. On the
-   instances where it was, the arms diverge both ways. `django__django-11206`: Pi spent 37
-   tool calls and 414k tokens, PiJ + Jev 9 calls and 65k, both resolved. `django__django-11239`:
-   5 searches became 0. But `django__django-11087`: Pi resolved it in 55 s with 5 searches
-   while PiJ + Jev, having read the right file first, went on to 18 searches, exhausted its
-   budget at 280 s and did not resolve it. Medians move in PiJ's favour (searches 3 → 1.5,
-   tool calls 11 → 9.5); a few runaway runs erase the difference in the means.
-
-**Jev is not free at this model's speed.** deepseek-v4-flash answers in about a second, so
-~3.9 Jev requests per task at ~2.4 s each, plus a 6,000-file discovery pass, add roughly 18 s
-to a 42 s task. The same latency was negligible against Sonnet-class response times in the
-earlier experiments; it is not negligible here.
+**Jev is not free at this model's speed.** deepseek-v4-flash answers in about a second.
+Four Jev requests per task plus a 6,000-file discovery pass add 16 s to a 42 s task on
+average. Against Sonnet-class response times in the earlier experiments the same latency was
+negligible; here it is the largest measured cost of the design.
 
 ## What this changes
 
-The position — rerank a lexical shortlist, keep the ranker out of the context window — is
-still right: it is the only arm whose first move lands on the right file more often than not.
-What is wrong is the **delivery**. An opt-in tool the model does not pick up delivers nothing
-after turn one. The evidence points at one design: put the reranker inside the search path
-the model already uses — intercept the `grep`/`rg` results it asks for and rerank *those*, or
-make the search tool the model reaches for be the ranked one — rather than offering a
-parallel tool and hoping it is chosen. That is also where the latency has to be paid for: a
-ranked grep result is worth 2 s only if it removes more than 2 s of subsequent searching.
+The position — rerank a lexical shortlist and keep the ranker out of the context window — is
+still the right one: it is the only configuration whose first move lands on the right file
+more often than not. Delivery is where the evidence points. An opt-in tool, even when the
+prompt says to use it first, is picked up in a quarter of runs; the model's searching still
+goes through bash grep. If the reranker is to matter after turn one, it has to sit inside
+that path — intercept the `grep`/`rg` output the model already asked for and rerank it —
+rather than beside it. That is also where the latency has to earn its keep: a ranked grep
+result is worth 2 s only where it removes more than 2 s of subsequent searching, which on
+this task set is roughly half the instances.
 
 ## Limitations
 
@@ -99,6 +123,6 @@ ranked grep result is worth 2 s only if it removes more than 2 s of subsequent s
   for plain Pi. A set chosen for retrieval difficulty (Stage 1 knows which instances rank
   poorly under BM25) would test the hypothesis more sharply.
 - `pij_search` adoption may differ across main models; this result is specific to
-  deepseek-v4-flash's tool-selection habits.
+  deepseek-v4-flash, and the first pass shows how sensitive adoption is to the prompt.
 - One run per arm hit a transient DeepSeek "Connection error" that Pi retried; the run
   completed normally and is counted as such.
