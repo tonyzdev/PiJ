@@ -1,0 +1,250 @@
+TAP version 13
+# Subtest: session.abort cancels an in-flight skill decision before any coding-model request
+ok 1 - session.abort cancels an in-flight skill decision before any coding-model request
+  ---
+  duration_ms: 45.858667
+  type: 'test'
+  ...
+# Subtest: help and doctor work without model credentials, do not expose keys or create sessions
+ok 2 - help and doctor work without model credentials, do not expose keys or create sessions
+  ---
+  duration_ms: 516.962
+  type: 'test'
+  ...
+# Subtest: invalid modes fail with an actionable error
+ok 3 - invalid modes fail with an actionable error
+  ---
+  duration_ms: 130.332375
+  type: 'test'
+  ...
+# Subtest: doctor recognizes Gateway credentials for both Jev and the coding model without printing them
+ok 4 - doctor recognizes Gateway credentials for both Jev and the coding model without printing them
+  ---
+  duration_ms: 117.393042
+  type: 'test'
+  ...
+# Subtest: keeps PiJ state separate from Pi and defaults to assist mode
+ok 5 - keeps PiJ state separate from Pi and defaults to assist mode
+  ---
+  duration_ms: 0.496875
+  type: 'test'
+  ...
+# Subtest: validates mode, deadline and HTTPS endpoint without including credential values
+ok 6 - validates mode, deadline and HTTPS endpoint without including credential values
+  ---
+  duration_ms: 0.54675
+  type: 'test'
+  ...
+# Subtest: selects the matching Jev provider, credentials, model and endpoint
+ok 7 - selects the matching Jev provider, credentials, model and endpoint
+  ---
+  duration_ms: 0.071917
+  type: 'test'
+  ...
+# Subtest: skill gate can see the eligible roster without sibling questions
+ok 8 - skill gate can see the eligible roster without sibling questions
+  ---
+  duration_ms: 1.073208
+  type: 'test'
+  ...
+# Subtest: skill advice is drawn from eligible candidates and only after body verification
+ok 9 - skill advice is drawn from eligible candidates and only after body verification
+  ---
+  duration_ms: 0.849125
+  type: 'test'
+  ...
+# Subtest: uncertain or unavailable decisions produce no skill recommendation
+ok 10 - uncertain or unavailable decisions produce no skill recommendation
+  ---
+  duration_ms: 0.097375
+  type: 'test'
+  ...
+# Subtest: ranking preserves all candidate identities and falls back to original order
+ok 11 - ranking preserves all candidate identities and falls back to original order
+  ---
+  duration_ms: 0.277375
+  type: 'test'
+  ...
+# Subtest: uncertain failure classification does not invent a root cause
+ok 12 - uncertain failure classification does not invent a root cause
+  ---
+  duration_ms: 0.131125
+  type: 'test'
+  ...
+# Subtest: Vercel uses the evaluation protocol and normalizes boolean and confidence metadata
+ok 13 - Vercel uses the evaluation protocol and normalizes boolean and confidence metadata
+  ---
+  duration_ms: 46.605333
+  type: 'test'
+  ...
+# Subtest: Vercel rate-limit preserves bounded fallback without retries or raw error leakage
+ok 14 - Vercel rate-limit preserves bounded fallback without retries or raw error leakage
+  ---
+  duration_ms: 9.158542
+  type: 'test'
+  ...
+# Subtest: Vercel malformed preserves bounded fallback without retries or raw error leakage
+ok 15 - Vercel malformed preserves bounded fallback without retries or raw error leakage
+  ---
+  duration_ms: 4.837792
+  type: 'test'
+  ...
+# Subtest: Vercel timeout preserves bounded fallback without retries or raw error leakage
+ok 16 - Vercel timeout preserves bounded fallback without retries or raw error leakage
+  ---
+  duration_ms: 51.754416
+  type: 'test'
+  ...
+# Subtest: Vercel oversized preserves bounded fallback without retries or raw error leakage
+ok 17 - Vercel oversized preserves bounded fallback without retries or raw error leakage
+  ---
+  duration_ms: 9.077916
+  type: 'test'
+  ...
+# Subtest: Vercel preserves valid rounded distributions without renormalizing scores
+ok 18 - Vercel preserves valid rounded distributions without renormalizing scores
+  ---
+  duration_ms: 4.712375
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: typesafe/assist preserves tool execution and applies only permitted Jev effects
+ok 19 - real Pi runtime: typesafe/assist preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 155.975375
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: typesafe/observe preserves tool execution and applies only permitted Jev effects
+ok 20 - real Pi runtime: typesafe/observe preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 28.508625
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: typesafe/off preserves tool execution and applies only permitted Jev effects
+ok 21 - real Pi runtime: typesafe/off preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 29.376542
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: vercel/assist preserves tool execution and applies only permitted Jev effects
+ok 22 - real Pi runtime: vercel/assist preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 42.643458
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: vercel/observe preserves tool execution and applies only permitted Jev effects
+ok 23 - real Pi runtime: vercel/observe preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 25.374958
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: vercel/off preserves tool execution and applies only permitted Jev effects
+ok 24 - real Pi runtime: vercel/off preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 20.590333
+  type: 'test'
+  ...
+# Subtest: evaluates typed questions against the HTTP API and reuses successful results
+ok 25 - evaluates typed questions against the HTTP API and reuses successful results
+  ---
+  duration_ms: 28.132542
+  type: 'test'
+  ...
+# Subtest: rejects an option outside the requested candidate set
+ok 26 - rejects an option outside the requested candidate set
+  ---
+  duration_ms: 6.2385
+  type: 'test'
+  ...
+# Subtest: rejects incomplete, non-normalized and out-of-range probability distributions
+ok 27 - rejects incomplete, non-normalized and out-of-range probability distributions
+  ---
+  duration_ms: 7.95325
+  type: 'test'
+  ...
+# Subtest: missing key never attempts a network request
+ok 28 - missing key never attempts a network request
+  ---
+  duration_ms: 0.086375
+  type: 'test'
+  ...
+# Subtest: enforces a total deadline and user cancellation
+ok 29 - enforces a total deadline and user cancellation
+  ---
+  duration_ms: 36.79125
+  type: 'test'
+  ...
+# Subtest: rate limits fall back without retrying or retaining raw error text
+ok 30 - rate limits fall back without retrying or retaining raw error text
+  ---
+  duration_ms: 5.147291
+  type: 'test'
+  ...
+# Subtest: bounds the request before sending it
+ok 31 - bounds the request before sending it
+  ---
+  duration_ms: 2.255833
+  type: 'test'
+  ...
+# Subtest: retrieves exact file/line excerpts while excluding hidden credentials and dependencies
+ok 32 - retrieves exact file/line excerpts while excluding hidden credentials and dependencies
+  ---
+  duration_ms: 135.569042
+  type: 'test'
+  ...
+# Subtest: option-like queries are literal search data and never executed
+ok 33 - option-like queries are literal search data and never executed
+  ---
+  duration_ms: 66.532083
+  type: 'test'
+  ...
+# Subtest: rejects outside paths, including symlinks, and empty patterns
+ok 34 - rejects outside paths, including symlinks, and empty patterns
+  ---
+  duration_ms: 3.873625
+  type: 'test'
+  ...
+# Subtest: caps candidate output and explicitly reports truncation
+ok 35 - caps candidate output and explicitly reports truncation
+  ---
+  duration_ms: 43.359125
+  type: 'test'
+  ...
+# Subtest: no matches are a successful empty result, and cancellation aborts retrieval
+ok 36 - no matches are a successful empty result, and cancellation aborts retrieval
+  ---
+  duration_ms: 10.885125
+  type: 'test'
+  ...
+# Subtest: caller globs and explicit paths cannot override exclusions or ignore files
+ok 37 - caller globs and explicit paths cannot override exclusions or ignore files
+  ---
+  duration_ms: 30.637375
+  type: 'test'
+  ...
+# Subtest: ambient ripgrep configuration cannot enable hidden files or disable ignore rules
+ok 38 - ambient ripgrep configuration cannot enable hidden files or disable ignore rules
+  ---
+  duration_ms: 7.217833
+  type: 'test'
+  ...
+# Subtest: journals only decision metadata, including cache and fallback state
+ok 39 - journals only decision metadata, including cache and fallback state
+  ---
+  duration_ms: 57.903208
+  type: 'test'
+  ...
+# Subtest: expanded search rendering removes terminal commands while retaining readable lines
+ok 40 - expanded search rendering removes terminal commands while retaining readable lines
+  ---
+  duration_ms: 3.422291
+  type: 'test'
+  ...
+1..40
+# tests 40
+# suites 0
+# pass 40
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 3366.18975

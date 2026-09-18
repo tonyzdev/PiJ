@@ -59,8 +59,8 @@ persist intervention records and summaries, use unique run IDs for both tasks.
 ## Task 3: Screening and publication
 
 - [x] Persist an explicit 14-run manifest under .pij before launching.
-- [ ] Run all cells, max three concurrent, logging every failed or terminal run.
-- [ ] After all terminate, independently run each fixture's five check groups.
-- [ ] Review actual patches/tests/final explanations; retain incompleteness.
+- [x] Attempt all cells (13 ended with HTTP 402; comparative screening remains incomplete). Run all cells, max three concurrent, logging every failed or terminal run.
+- [x] After all terminate, independently run each fixture's five check groups.
+- [x] Review actual patches/tests/final explanations; retain incompleteness.
 - [ ] Publish sanitized results/patches/logs, verify hashes and replay applicability,
   update the experiment ledger/PR, push, and verify CI on the published revision.

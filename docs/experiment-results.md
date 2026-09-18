@@ -2,7 +2,19 @@
 
 These are development observations, not performance claims. Initial runs use `alibaba/qwen3-coder-next`; the later comparison names its alternate model explicitly. Both use Vercel AI Gateway. Reported dollar values use the pinned Pi catalog, including its cache rates, not billing receipts; Jev fees are not included. Raw traces and disposable workspaces stay local.
 
-Latest follow-up: [complete project source ranking](project-source-experiment.md)
+Latest follow-up: [forced intervention placements](placement-experiment.md)
+adds tool-output selection, post-edit test selection, and bounded completion
+review, each paired with a local deterministic control. The fourteen-cell matrix
+at frozen `d08fc39` was interrupted by Gateway HTTP 402 insufficient funds: one
+completed local-checkpoint run, two mid-run cutoffs and eleven first-request
+rejections. Eight Jev output filters were delivered (six network calls/two cache
+hits); paid finish and Jev-checkpoint interventions were not exercised. The local
+checkpoint candidate passes all checks and adds sixteen meaningful tests, but
+no valid placement comparison exists. All outcomes, including unchanged seed
+artifacts, are preserved in [placement results](../eval/placement-results/README.md).
+The three mechanisms are evaluator-only; 150 offline tests pass.
+
+The preceding [complete project source ranking](project-source-experiment.md)
 runs two lexical/Jev pairs at frozen `66a8ad1`. Every eligible source/test file is
 scored; neither policy uses a keyword candidate filter or top-K output cutoff.
 Jev scores all 21 files in about 2.1–2.4 seconds. Jev-1 reaches its token budget

@@ -27,3 +27,10 @@ The default per-response output allowance is 16,384 tokens, configurable with `-
 Agent shell commands receive a minimal environment, are restricted to workspace writes, and cannot read the development repository or user home. Constructed tasks deny networking. The real repository task permits loopback fixture servers and workspace Unix sockets while denying external network access; its Pi documentation hints point to the clone's installed SDK. This is a local trusted-task harness, not a hostile-code isolation service. No personal Pi settings, skills or context files are loaded.
 
 See [fixture validation](fixtures/README.md), [experiment design](../docs/experiments.md) and [results](../docs/experiment-results.md). Passing unit tests validates mechanisms; only complete task acceptance and controlled repeated runs support task-performance claims.
+
+The [forced-placement protocol](../docs/placement-experiment.md) adds
+`--placement baseline|output-local|output-jev|checkpoint-local|checkpoint-jev|finish-local|finish-jev`
+to `eval/checkpoint-run.ts`, with `--task session-mode|attribution`. It changes
+actual tool-result delivery, executes bounded post-edit tests, or forces one
+completion review. The [initial matrix](placement-results/README.md) was interrupted
+by provider credit exhaustion and cannot establish comparative effectiveness.

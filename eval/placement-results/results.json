@@ -1,0 +1,3433 @@
+{
+  "schemaVersion": 1,
+  "protocol": "docs/placement-experiment.md",
+  "manifest": "eval/placement-manifest.json",
+  "interpretation": "Provider-credit-interrupted matrix: one completed generation, two mid-run cutoffs and eleven first-request rejections. No valid placement comparison or statistical superiority established. Frozen checks on untouched fixtures are diagnostics, not treatment performance.",
+  "cost": "Main model catalog estimates, not billing receipts; Jev tokens separately reported without assumed price.",
+  "timing": "Parent agent timer including intervention latency and any prescribed continuation, excluding fixture preparation/dependency installation.",
+  "records": [
+    {
+      "id": "session-mode-baseline",
+      "order": 1,
+      "task": "session-mode",
+      "policy": "baseline",
+      "runId": "2026-09-18T04-41-52.708Z-session-mode-1-placement-baseline",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "interrupted",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 25,
+      "tokens": 1108510,
+      "usage": {
+        "input": 26,
+        "output": 18746,
+        "cacheRead": 1021193,
+        "cacheWrite": 68545,
+        "estimatedUsd": 0.8446696499999999
+      },
+      "elapsedMs": 358924,
+      "calls": {
+        "bash": 35,
+        "edit": 1,
+        "write": 1
+      },
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 10,
+        "productionConnected": true,
+        "findings": [
+          "Interrupted by HTTP 402 after implementation and test edits; no final response.",
+          "Restoration scans oldest-first and stops; no session_tree restoration handler.",
+          "Two new reopen fixtures never trigger SDK first-response disk persistence; a command-only session is insufficient.",
+          "Independent checks: 48/50 ordinary tests, 4/8 behavior holdouts; typecheck and build pass. Retained incomplete artifact, not a fair quality comparison."
+        ]
+      },
+      "firstEdit": {
+        "toolIndex": 28,
+        "seconds": 205.907
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "manual",
+        "ready": true,
+        "startupError": false,
+        "records": 2,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": [
+          {
+            "mode": "manual",
+            "paths": [
+              "src/extension.ts"
+            ],
+            "selected": [],
+            "sessionId": "01a0b2d2-422a-7030-a42e-5e04dafb0ab5",
+            "userMessageId": "ea2c0c4b"
+          },
+          {
+            "mode": "manual",
+            "paths": [
+              "test/mode-persistence.test.ts"
+            ],
+            "selected": [],
+            "sessionId": "01a0b2d2-422a-7030-a42e-5e04dafb0ab5",
+            "userMessageId": "ea2c0c4b"
+          }
+        ]
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 50,
+          "pass": 48,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "invalid pij-mode entries are skipped; backward search finds the last valid selection",
+            "explicit saved assist overrides a configured off"
+          ]
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 4,
+          "fail": 4,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "session mode: disk reopen restores all explicit selections over a different configured default",
+            "session mode: tree navigation restores ancestors and divergent branches immediately",
+            "session mode: public runtime fork inherits selected ancestry and keeps parent/fork/new sessions independent",
+            "session mode: restored modes preserve ranking, skill advice and triage effects; restored off makes zero Jev calls"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "session-mode-baseline-ordinary.txt",
+        "visible": "session-mode-baseline-visible.txt",
+        "holdout": "session-mode-baseline-holdout.txt",
+        "check": "session-mode-baseline-check.txt",
+        "build": "session-mode-baseline-build.txt"
+      },
+      "candidate": {
+        "patch": "session-mode-baseline.patch",
+        "patchSha256": "4dec7c2ed8047659487cebd64ba21cfda6e38b4663b43036b6d917d14d73872a",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": false,
+        "authoredFiles": [
+          "src/extension.ts",
+          "test/mode-persistence.test.ts"
+        ],
+        "files": {
+          "src/extension.ts": "e6c8c6d4a7397a7a6505715d8eb897337539eb2d80eb30d371c93e1d68961d6e",
+          "test/mode-persistence.test.ts": "87d0edec6b800d35431080a30645d7662333ecaf6061003229effa7789723b94"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 2,
+          "baseOnlyCheckout": true,
+          "emptyPatch": false,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "attribution-output-jev",
+      "order": 2,
+      "task": "attribution",
+      "policy": "output-jev",
+      "runId": "2026-09-18T04-41-52.704Z-attribution-1-placement-output-jev",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "interrupted",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 19,
+      "tokens": 648065,
+      "usage": {
+        "input": 20,
+        "output": 22197,
+        "cacheRead": 553499,
+        "cacheWrite": 72349,
+        "estimatedUsd": 0.7703734499999999
+      },
+      "elapsedMs": 408297,
+      "calls": {
+        "bash": 28,
+        "read": 3
+      },
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "Interrupted by HTTP 402 during investigation. No edit/write occurred.",
+          "The complete Git diff matches the provided attribution seed exactly; no authored implementation changes.",
+          "Eight filtered outputs were delivered, with six successful network judgments and two cache hits. No coding outcome can be attributed to these judgments."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 8,
+        "outputApplied": 8,
+        "rawOutputBytes": 50110,
+        "filteredOutputBytes": 27888,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 8,
+        "jevNetworkSuccess": 6,
+        "jevCached": 2,
+        "jevFallbacks": [],
+        "jevInputTokens": 16591,
+        "jevOutputTokens": 759,
+        "jevLatencyMs": 3891,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": [
+          {
+            "kind": "output",
+            "sequence": 1,
+            "toolCallId": "toolu_01UsgmEr5vsTtBT8frw4m5tj",
+            "tool": "bash",
+            "inputBytes": 177,
+            "outputBytes": 407,
+            "inputHash": "b64b530e13894435729a922a72fffa99a942f57f4b6869998423038a63645f98",
+            "outputHash": "45b6c86496d8d27310cc3ec5da8de066bd2597e8bd89dcee6361ec44a31ac784",
+            "selected": [
+              {
+                "start": 1,
+                "end": 12
+              }
+            ],
+            "omittedChunks": 1,
+            "decision": {
+              "status": "ok",
+              "answers": {
+                "c0": {
+                  "type": "noul",
+                  "noul": 0.52
+                },
+                "c1": {
+                  "type": "noul",
+                  "noul": 0.23
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 887,
+              "outputTokens": 38,
+              "latencyMs": 558,
+              "cached": false
+            },
+            "elapsedMs": 559,
+            "deliveredOutputHash": "45b6c86496d8d27310cc3ec5da8de066bd2597e8bd89dcee6361ec44a31ac784"
+          },
+          {
+            "kind": "output",
+            "sequence": 2,
+            "toolCallId": "toolu_01JC9d38DaJQymfMGLvZqpxo",
+            "tool": "bash",
+            "inputBytes": 1067,
+            "outputBytes": 747,
+            "inputHash": "064288289787cb4db06e8b9cd4019b690e9ca2dc90828fb3e2e9f08ba5482674",
+            "outputHash": "d81c13c5c78829404a5ca9a6a17d17526ecdebedbf22d40fb120de2600806d5b",
+            "selected": [
+              {
+                "start": 13,
+                "end": 21
+              }
+            ],
+            "omittedChunks": 1,
+            "decision": {
+              "status": "ok",
+              "answers": {
+                "c0": {
+                  "type": "noul",
+                  "noul": 0.83
+                },
+                "c1": {
+                  "type": "noul",
+                  "noul": 0.87
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 1230,
+              "outputTokens": 38,
+              "latencyMs": 820,
+              "cached": false
+            },
+            "elapsedMs": 821,
+            "deliveredOutputHash": "d81c13c5c78829404a5ca9a6a17d17526ecdebedbf22d40fb120de2600806d5b"
+          },
+          {
+            "kind": "output",
+            "sequence": 3,
+            "toolCallId": "toolu_016ERfCWv7ACv8RmdyNQqBH3",
+            "tool": "read",
+            "inputBytes": 6296,
+            "outputBytes": 3500,
+            "inputHash": "837a367b5cf68d055640001745274b9e0d9557d5418c8083678b330b89395f50",
+            "outputHash": "abedc987f437f89caee5e0cbf5ebddc73a8b7cb3e03c94b4c16f7ed2818cae5f",
+            "selected": [
+              {
+                "start": 13,
+                "end": 24
+              },
+              {
+                "start": 25,
+                "end": 36
+              },
+              {
+                "start": 73,
+                "end": 84
+              },
+              {
+                "start": 85,
+                "end": 96
+              },
+              {
+                "start": 97,
+                "end": 103
+              }
+            ],
+            "omittedChunks": 4,
+            "decision": {
+              "status": "ok",
+              "answers": {
+                "c0": {
+                  "type": "noul",
+                  "noul": 0.78
+                },
+                "c1": {
+                  "type": "noul",
+                  "noul": 0.83
+                },
+                "c2": {
+                  "type": "noul",
+                  "noul": 0.84
+                },
+                "c3": {
+                  "type": "noul",
+                  "noul": 0.75
+                },
+                "c4": {
+                  "type": "noul",
+                  "noul": 0.69
+                },
+                "c5": {
+                  "type": "noul",
+                  "noul": 0.76
+                },
+                "c6": {
+                  "type": "noul",
+                  "noul": 0.92
+                },
+                "c7": {
+                  "type": "noul",
+                  "noul": 0.94
+                },
+                "c8": {
+                  "type": "noul",
+                  "noul": 0.87
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 3261,
+              "outputTokens": 157,
+              "latencyMs": 450,
+              "cached": false
+            },
+            "elapsedMs": 450,
+            "deliveredOutputHash": "abedc987f437f89caee5e0cbf5ebddc73a8b7cb3e03c94b4c16f7ed2818cae5f"
+          },
+          {
+            "kind": "output",
+            "sequence": 4,
+            "toolCallId": "toolu_01SJDnYiqViQMQkZ8fucS1i4",
+            "tool": "read",
+            "inputBytes": 6296,
+            "outputBytes": 3500,
+            "inputHash": "837a367b5cf68d055640001745274b9e0d9557d5418c8083678b330b89395f50",
+            "outputHash": "abedc987f437f89caee5e0cbf5ebddc73a8b7cb3e03c94b4c16f7ed2818cae5f",
+            "selected": [
+              {
+                "start": 13,
+                "end": 24
+              },
+              {
+                "start": 25,
+                "end": 36
+              },
+              {
+                "start": 73,
+                "end": 84
+              },
+              {
+                "start": 85,
+                "end": 96
+              },
+              {
+                "start": 97,
+                "end": 103
+              }
+            ],
+            "omittedChunks": 4,
+            "decision": {
+              "status": "ok",
+              "answers": {
+                "c0": {
+                  "type": "noul",
+                  "noul": 0.78
+                },
+                "c1": {
+                  "type": "noul",
+                  "noul": 0.83
+                },
+                "c2": {
+                  "type": "noul",
+                  "noul": 0.84
+                },
+                "c3": {
+                  "type": "noul",
+                  "noul": 0.75
+                },
+                "c4": {
+                  "type": "noul",
+                  "noul": 0.69
+                },
+                "c5": {
+                  "type": "noul",
+                  "noul": 0.76
+                },
+                "c6": {
+                  "type": "noul",
+                  "noul": 0.92
+                },
+                "c7": {
+                  "type": "noul",
+                  "noul": 0.94
+                },
+                "c8": {
+                  "type": "noul",
+                  "noul": 0.87
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 3261,
+              "outputTokens": 157,
+              "latencyMs": 0,
+              "cached": true
+            },
+            "elapsedMs": 0,
+            "deliveredOutputHash": "abedc987f437f89caee5e0cbf5ebddc73a8b7cb3e03c94b4c16f7ed2818cae5f"
+          },
+          {
+            "kind": "output",
+            "sequence": 5,
+            "toolCallId": "toolu_018wdEiAc7EV26Jdc4hYUtPM",
+            "tool": "read",
+            "inputBytes": 7247,
+            "outputBytes": 4386,
+            "inputHash": "5a734ad37f5ad88e5eb8d3bdaf2afa175ab063c5762a85b3b897b88dc2c54391",
+            "outputHash": "07c690a34116efcbec2a81b7cc324eacc70a5496e98a85965e7947631a22a83c",
+            "selected": [
+              {
+                "start": 1,
+                "end": 12
+              },
+              {
+                "start": 25,
+                "end": 36
+              },
+              {
+                "start": 37,
+                "end": 48
+              },
+              {
+                "start": 73,
+                "end": 84
+              }
+            ],
+            "omittedChunks": 4,
+            "decision": {
+              "status": "ok",
+              "answers": {
+                "c0": {
+                  "type": "noul",
+                  "noul": 0.62
+                },
+                "c1": {
+                  "type": "noul",
+                  "noul": 0.19
+                },
+                "c2": {
+                  "type": "noul",
+                  "noul": 0.68
+                },
+                "c3": {
+                  "type": "noul",
+                  "noul": 0.52
+                },
+                "c4": {
+                  "type": "noul",
+                  "noul": 0.49
+                },
+                "c5": {
+                  "type": "noul",
+                  "noul": 0.52
+                },
+                "c6": {
+                  "type": "noul",
+                  "noul": 0.55
+                },
+                "c7": {
+                  "type": "noul",
+                  "noul": 0.49
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 3177,
+              "outputTokens": 140,
+              "latencyMs": 662,
+              "cached": false
+            },
+            "elapsedMs": 662,
+            "deliveredOutputHash": "07c690a34116efcbec2a81b7cc324eacc70a5496e98a85965e7947631a22a83c"
+          },
+          {
+            "kind": "output",
+            "sequence": 6,
+            "toolCallId": "toolu_01KMHY3muHQ4c1rGAocdfGnJ",
+            "tool": "bash",
+            "inputBytes": 7247,
+            "outputBytes": 4386,
+            "inputHash": "5a734ad37f5ad88e5eb8d3bdaf2afa175ab063c5762a85b3b897b88dc2c54391",
+            "outputHash": "07c690a34116efcbec2a81b7cc324eacc70a5496e98a85965e7947631a22a83c",
+            "selected": [
+              {
+                "start": 1,
+                "end": 12
+              },
+              {
+                "start": 25,
+                "end": 36
+              },
+              {
+                "start": 37,
+                "end": 48
+              },
+              {
+                "start": 73,
+                "end": 84
+              }
+            ],
+            "omittedChunks": 4,
+            "decision": {
+              "status": "ok",
+              "answers": {
+                "c0": {
+                  "type": "noul",
+                  "noul": 0.64
+                },
+                "c1": {
+                  "type": "noul",
+                  "noul": 0.21
+                },
+                "c2": {
+                  "type": "noul",
+                  "noul": 0.67
+                },
+                "c3": {
+                  "type": "noul",
+                  "noul": 0.55
+                },
+                "c4": {
+                  "type": "noul",
+                  "noul": 0.51
+                },
+                "c5": {
+                  "type": "noul",
+                  "noul": 0.54
+                },
+                "c6": {
+                  "type": "noul",
+                  "noul": 0.55
+                },
+                "c7": {
+                  "type": "noul",
+                  "noul": 0.52
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 3183,
+              "outputTokens": 140,
+              "latencyMs": 663,
+              "cached": false
+            },
+            "elapsedMs": 664,
+            "deliveredOutputHash": "07c690a34116efcbec2a81b7cc324eacc70a5496e98a85965e7947631a22a83c"
+          },
+          {
+            "kind": "output",
+            "sequence": 7,
+            "toolCallId": "toolu_016r3BTLSSGkCcDSjun6BEqk",
+            "tool": "bash",
+            "inputBytes": 10890,
+            "outputBytes": 5481,
+            "inputHash": "8107e8ead7f96a14bff9222d15bebb8972461795d418c012eeea7c556a52286a",
+            "outputHash": "bb30d60a2179380a4f8b526787eacbb621713879a6a3e832c05e313e1da0f992",
+            "selected": [
+              {
+                "start": 13,
+                "end": 24
+              },
+              {
+                "start": 25,
+                "end": 36
+              },
+              {
+                "start": 37,
+                "end": 48
+              },
+              {
+                "start": 73,
+                "end": 84
+              },
+              {
+                "start": 85,
+                "end": 96
+              },
+              {
+                "start": 97,
+                "end": 108
+              },
+              {
+                "start": 109,
+                "end": 120
+              }
+            ],
+            "omittedChunks": 7,
+            "decision": {
+              "status": "ok",
+              "answers": {
+                "c0": {
+                  "type": "noul",
+                  "noul": 0.66
+                },
+                "c1": {
+                  "type": "noul",
+                  "noul": 0.89
+                },
+                "c2": {
+                  "type": "noul",
+                  "noul": 0.9
+                },
+                "c3": {
+                  "type": "noul",
+                  "noul": 0.9
+                },
+                "c4": {
+                  "type": "noul",
+                  "noul": 0.68
+                },
+                "c5": {
+                  "type": "noul",
+                  "noul": 0.43
+                },
+                "c6": {
+                  "type": "noul",
+                  "noul": 0.93
+                },
+                "c7": {
+                  "type": "noul",
+                  "noul": 0.87
+                },
+                "c8": {
+                  "type": "noul",
+                  "noul": 0.84
+                },
+                "c9": {
+                  "type": "noul",
+                  "noul": 0.82
+                },
+                "c10": {
+                  "type": "noul",
+                  "noul": 0.51
+                },
+                "c11": {
+                  "type": "noul",
+                  "noul": 0.76
+                },
+                "c12": {
+                  "type": "noul",
+                  "noul": 0.4
+                },
+                "c13": {
+                  "type": "noul",
+                  "noul": 0.09
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 4853,
+              "outputTokens": 246,
+              "latencyMs": 738,
+              "cached": false
+            },
+            "elapsedMs": 738,
+            "deliveredOutputHash": "bb30d60a2179380a4f8b526787eacbb621713879a6a3e832c05e313e1da0f992"
+          },
+          {
+            "kind": "output",
+            "sequence": 8,
+            "toolCallId": "toolu_01MSjsxfSZBsrrY73ksMXkiA",
+            "tool": "bash",
+            "inputBytes": 10890,
+            "outputBytes": 5481,
+            "inputHash": "8107e8ead7f96a14bff9222d15bebb8972461795d418c012eeea7c556a52286a",
+            "outputHash": "bb30d60a2179380a4f8b526787eacbb621713879a6a3e832c05e313e1da0f992",
+            "selected": [
+              {
+                "start": 13,
+                "end": 24
+              },
+              {
+                "start": 25,
+                "end": 36
+              },
+              {
+                "start": 37,
+                "end": 48
+              },
+              {
+                "start": 73,
+                "end": 84
+              },
+              {
+                "start": 85,
+                "end": 96
+              },
+              {
+                "start": 97,
+                "end": 108
+              },
+              {
+                "start": 109,
+                "end": 120
+              }
+            ],
+            "omittedChunks": 7,
+            "decision": {
+              "status": "ok",
+              "answers": {
+                "c0": {
+                  "type": "noul",
+                  "noul": 0.66
+                },
+                "c1": {
+                  "type": "noul",
+                  "noul": 0.89
+                },
+                "c2": {
+                  "type": "noul",
+                  "noul": 0.9
+                },
+                "c3": {
+                  "type": "noul",
+                  "noul": 0.9
+                },
+                "c4": {
+                  "type": "noul",
+                  "noul": 0.68
+                },
+                "c5": {
+                  "type": "noul",
+                  "noul": 0.43
+                },
+                "c6": {
+                  "type": "noul",
+                  "noul": 0.93
+                },
+                "c7": {
+                  "type": "noul",
+                  "noul": 0.87
+                },
+                "c8": {
+                  "type": "noul",
+                  "noul": 0.84
+                },
+                "c9": {
+                  "type": "noul",
+                  "noul": 0.82
+                },
+                "c10": {
+                  "type": "noul",
+                  "noul": 0.51
+                },
+                "c11": {
+                  "type": "noul",
+                  "noul": 0.76
+                },
+                "c12": {
+                  "type": "noul",
+                  "noul": 0.4
+                },
+                "c13": {
+                  "type": "noul",
+                  "noul": 0.09
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 4853,
+              "outputTokens": 246,
+              "latencyMs": 0,
+              "cached": true
+            },
+            "elapsedMs": 1,
+            "deliveredOutputHash": "bb30d60a2179380a4f8b526787eacbb621713879a6a3e832c05e313e1da0f992"
+          }
+        ]
+      },
+      "checkpoint": {
+        "mode": "manual",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "consumed steering binds the next cached decision to its actual user entry"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 5,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "holdout: a queued follow-up owns all of its later decisions, including cache hits",
+            "holdout: cancellation after consumed steering retains that message, not a queued follow-up"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "attribution-output-jev-ordinary.txt",
+        "visible": "attribution-output-jev-visible.txt",
+        "holdout": "attribution-output-jev-holdout.txt",
+        "check": "attribution-output-jev-check.txt",
+        "build": "attribution-output-jev-build.txt"
+      },
+      "candidate": {
+        "patch": "attribution-output-jev.patch",
+        "patchSha256": "64e7c4936d42dcbb67df4d1050bbbb4ed6d2852fd59c542d500bf4e70ed03772",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": true,
+        "authoredFiles": [],
+        "files": {
+          "src/extension.ts": "8107e8ead7f96a14bff9222d15bebb8972461795d418c012eeea7c556a52286a",
+          "src/telemetry.ts": "2b517951ea2a6773ed26268724bc5f3483fdfb941e5f928261dba324812d4c88",
+          "src/ui.ts": "b54515bf3f9f86f6d853e76e99beb0d5e4dc4ac6961adcc80cdbcb637fb20533"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 3,
+          "baseOnlyCheckout": true,
+          "emptyPatch": false,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "session-mode-checkpoint-local",
+      "order": 3,
+      "task": "session-mode",
+      "policy": "checkpoint-local",
+      "runId": "2026-09-18T04-41-52.708Z-session-mode-1-placement-checkpoint-local",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "generationStage": "completed",
+      "comparisonEligible": false,
+      "requests": 34,
+      "tokens": 1776847,
+      "usage": {
+        "input": 45,
+        "output": 17568,
+        "cacheRead": 1503707,
+        "cacheWrite": 255527,
+        "estimatedUsd": 1.67299335
+      },
+      "elapsedMs": 353162,
+      "calls": {
+        "bash": 25,
+        "read": 15,
+        "edit": 3,
+        "write": 1
+      },
+      "reproductionPreserved": true,
+      "runtimeAccepted": true,
+      "allChecksPassed": true,
+      "completeDeliverable": true,
+      "deliverableReview": {
+        "completeDeliverable": true,
+        "newTests": 16,
+        "productionConnected": true,
+        "tests": {
+          "productionHelper": 13,
+          "realSdk": 3
+        },
+        "findings": [
+          "Production helpers validate allowlisted metadata and reverse active-branch order; runtime restores on session start and tree navigation.",
+          "Three SDK tests exercise off/assist overrides after actual saved-session reopen and absence of mode metadata in outgoing model context.",
+          "All independent checks pass; final response documents changes. No copied test implementation or concrete defect found in independent review.",
+          "Only completed arm; local checkpoint success does not establish incremental Jev value."
+        ]
+      },
+      "firstEdit": {
+        "toolIndex": 36,
+        "seconds": 199.773
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 4,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "dependencies",
+        "ready": true,
+        "startupError": false,
+        "records": 4,
+        "executed": 4,
+        "scheduledFiles": 8,
+        "executionMs": 4599,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": [
+          {
+            "mode": "dependencies",
+            "paths": [
+              "src/extension.ts"
+            ],
+            "selected": [
+              "test/cancellation.test.ts",
+              "test/integration.test.ts"
+            ],
+            "sessionId": "01a0b2d2-422a-75b8-9a98-4dcef7b8c256",
+            "userMessageId": "5b43c3db",
+            "execution": {
+              "status": "passed",
+              "elapsedMs": 1002,
+              "exitCode": 0,
+              "outputSha256": "38d76a2a7d57b7ae8a32458693777bcb3d5f2182332c459999298346497f7908"
+            }
+          },
+          {
+            "mode": "dependencies",
+            "paths": [
+              "src/extension.ts"
+            ],
+            "selected": [
+              "test/cancellation.test.ts",
+              "test/integration.test.ts"
+            ],
+            "sessionId": "01a0b2d2-422a-75b8-9a98-4dcef7b8c256",
+            "userMessageId": "5b43c3db",
+            "execution": {
+              "status": "passed",
+              "elapsedMs": 1232,
+              "exitCode": 0,
+              "outputSha256": "ebccf433f4f15fcb69de8db81e4ba2dd91922564eca282349921d50637da6346"
+            }
+          },
+          {
+            "mode": "dependencies",
+            "paths": [
+              "src/extension.ts"
+            ],
+            "selected": [
+              "test/cancellation.test.ts",
+              "test/integration.test.ts"
+            ],
+            "sessionId": "01a0b2d2-422a-75b8-9a98-4dcef7b8c256",
+            "userMessageId": "5b43c3db",
+            "execution": {
+              "status": "passed",
+              "elapsedMs": 1227,
+              "exitCode": 0,
+              "outputSha256": "61a55a001e91e18ff1296b6cc5f408cf1a21fc5f781425869ee975430abcd035"
+            }
+          },
+          {
+            "mode": "dependencies",
+            "paths": [
+              "test/mode-persistence.test.ts"
+            ],
+            "selected": [
+              "test/mode-persistence.test.ts",
+              "test/cancellation.test.ts"
+            ],
+            "sessionId": "01a0b2d2-422a-75b8-9a98-4dcef7b8c256",
+            "userMessageId": "5b43c3db",
+            "execution": {
+              "status": "passed",
+              "elapsedMs": 1138,
+              "exitCode": 0,
+              "outputSha256": "871a738a586eb50ba3a9b429a8551b3849b1e091ada1e9024415d58190143ad0"
+            }
+          }
+        ]
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 56,
+          "pass": 56,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "session-mode-checkpoint-local-ordinary.txt",
+        "visible": "session-mode-checkpoint-local-visible.txt",
+        "holdout": "session-mode-checkpoint-local-holdout.txt",
+        "check": "session-mode-checkpoint-local-check.txt",
+        "build": "session-mode-checkpoint-local-build.txt"
+      },
+      "candidate": {
+        "patch": "session-mode-checkpoint-local.patch",
+        "patchSha256": "11491473a3069fa1c9dc912e6d1d3be08502965f38b046f4a644b7a1a991c00a",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": false,
+        "authoredFiles": [
+          "src/extension.ts",
+          "test/mode-persistence.test.ts"
+        ],
+        "files": {
+          "src/extension.ts": "26d1ba3f18bf9e92e382eef70c2d3d677522884b0a1c2bd242dd5838abac03b7",
+          "test/mode-persistence.test.ts": "6d62d9069d29e2f04d9c7f4b4f211bd4bdc2724982e8fd16291a431ccf54f02c"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 2,
+          "baseOnlyCheckout": true,
+          "emptyPatch": false,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "attribution-finish-local",
+      "order": 4,
+      "task": "attribution",
+      "policy": "finish-local",
+      "runId": "2026-09-18T04-47-52.068Z-attribution-1-placement-finish-local",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "provider_rejected_before_generation",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 1,
+      "tokens": 0,
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "estimatedUsd": 0
+      },
+      "elapsedMs": 1830,
+      "calls": {},
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "The first model request was rejected with HTTP 402 insufficient_funds. No generation or assigned intervention occurred; do not interpret unchanged fixture failures as treatment performance."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "manual",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "consumed steering binds the next cached decision to its actual user entry"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 5,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "holdout: a queued follow-up owns all of its later decisions, including cache hits",
+            "holdout: cancellation after consumed steering retains that message, not a queued follow-up"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "attribution-finish-local-ordinary.txt",
+        "visible": "attribution-finish-local-visible.txt",
+        "holdout": "attribution-finish-local-holdout.txt",
+        "check": "attribution-finish-local-check.txt",
+        "build": "attribution-finish-local-build.txt"
+      },
+      "candidate": {
+        "patch": "attribution-finish-local.patch",
+        "patchSha256": "64e7c4936d42dcbb67df4d1050bbbb4ed6d2852fd59c542d500bf4e70ed03772",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": true,
+        "authoredFiles": [],
+        "files": {
+          "src/extension.ts": "8107e8ead7f96a14bff9222d15bebb8972461795d418c012eeea7c556a52286a",
+          "src/telemetry.ts": "2b517951ea2a6773ed26268724bc5f3483fdfb941e5f928261dba324812d4c88",
+          "src/ui.ts": "b54515bf3f9f86f6d853e76e99beb0d5e4dc4ac6961adcc80cdbcb637fb20533"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 3,
+          "baseOnlyCheckout": true,
+          "emptyPatch": false,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "session-mode-output-jev",
+      "order": 5,
+      "task": "session-mode",
+      "policy": "output-jev",
+      "runId": "2026-09-18T04-47-56.802Z-session-mode-1-placement-output-jev",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "provider_rejected_before_generation",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 1,
+      "tokens": 0,
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "estimatedUsd": 0
+      },
+      "elapsedMs": 2299,
+      "calls": {},
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "The first model request was rejected with HTTP 402 insufficient_funds. No generation or assigned intervention occurred; do not interpret unchanged fixture failures as treatment performance."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "manual",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "mode selection survives a saved SDK session being reopened"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 0,
+          "fail": 8,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "session mode: disk reopen restores all explicit selections over a different configured default",
+            "session mode: tree navigation restores ancestors and divergent branches immediately",
+            "session mode: public runtime fork inherits selected ancestry and keeps parent/fork/new sessions independent",
+            "session mode: SDK resource reuse never leaks an outgoing selection into an unrelated session",
+            "session mode: malformed, extra-field, unknown and future entries are ignored without hiding older valid state",
+            "session mode: allowlisted custom metadata never enters the model context or captures private input",
+            "session mode: restored modes preserve ranking, skill advice and triage effects; restored off makes zero Jev calls",
+            "session mode: a real mode command aborts an in-flight decision and keeps off effective after reopen"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "session-mode-output-jev-ordinary.txt",
+        "visible": "session-mode-output-jev-visible.txt",
+        "holdout": "session-mode-output-jev-holdout.txt",
+        "check": "session-mode-output-jev-check.txt",
+        "build": "session-mode-output-jev-build.txt"
+      },
+      "candidate": {
+        "patch": "session-mode-output-jev.patch",
+        "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": false,
+        "authoredFiles": [],
+        "files": {},
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 0,
+          "baseOnlyCheckout": true,
+          "emptyPatch": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "attribution-checkpoint-jev",
+      "order": 6,
+      "task": "attribution",
+      "policy": "checkpoint-jev",
+      "runId": "2026-09-18T04-47-57.853Z-attribution-1-placement-checkpoint-jev",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "provider_rejected_before_generation",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 1,
+      "tokens": 0,
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "estimatedUsd": 0
+      },
+      "elapsedMs": 1628,
+      "calls": {},
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "The first model request was rejected with HTTP 402 insufficient_funds. No generation or assigned intervention occurred; do not interpret unchanged fixture failures as treatment performance."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "jev",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "consumed steering binds the next cached decision to its actual user entry"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 5,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "holdout: a queued follow-up owns all of its later decisions, including cache hits",
+            "holdout: cancellation after consumed steering retains that message, not a queued follow-up"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "attribution-checkpoint-jev-ordinary.txt",
+        "visible": "attribution-checkpoint-jev-visible.txt",
+        "holdout": "attribution-checkpoint-jev-holdout.txt",
+        "check": "attribution-checkpoint-jev-check.txt",
+        "build": "attribution-checkpoint-jev-build.txt"
+      },
+      "candidate": {
+        "patch": "attribution-checkpoint-jev.patch",
+        "patchSha256": "64e7c4936d42dcbb67df4d1050bbbb4ed6d2852fd59c542d500bf4e70ed03772",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": true,
+        "authoredFiles": [],
+        "files": {
+          "src/extension.ts": "8107e8ead7f96a14bff9222d15bebb8972461795d418c012eeea7c556a52286a",
+          "src/telemetry.ts": "2b517951ea2a6773ed26268724bc5f3483fdfb941e5f928261dba324812d4c88",
+          "src/ui.ts": "b54515bf3f9f86f6d853e76e99beb0d5e4dc4ac6961adcc80cdbcb637fb20533"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 3,
+          "baseOnlyCheckout": true,
+          "emptyPatch": false,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "session-mode-finish-jev",
+      "order": 7,
+      "task": "session-mode",
+      "policy": "finish-jev",
+      "runId": "2026-09-18T04-48-02.090Z-session-mode-1-placement-finish-jev",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "provider_rejected_before_generation",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 1,
+      "tokens": 0,
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "estimatedUsd": 0
+      },
+      "elapsedMs": 2076,
+      "calls": {},
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "The first model request was rejected with HTTP 402 insufficient_funds. No generation or assigned intervention occurred; do not interpret unchanged fixture failures as treatment performance."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "manual",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "mode selection survives a saved SDK session being reopened"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 0,
+          "fail": 8,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "session mode: disk reopen restores all explicit selections over a different configured default",
+            "session mode: tree navigation restores ancestors and divergent branches immediately",
+            "session mode: public runtime fork inherits selected ancestry and keeps parent/fork/new sessions independent",
+            "session mode: SDK resource reuse never leaks an outgoing selection into an unrelated session",
+            "session mode: malformed, extra-field, unknown and future entries are ignored without hiding older valid state",
+            "session mode: allowlisted custom metadata never enters the model context or captures private input",
+            "session mode: restored modes preserve ranking, skill advice and triage effects; restored off makes zero Jev calls",
+            "session mode: a real mode command aborts an in-flight decision and keeps off effective after reopen"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "session-mode-finish-jev-ordinary.txt",
+        "visible": "session-mode-finish-jev-visible.txt",
+        "holdout": "session-mode-finish-jev-holdout.txt",
+        "check": "session-mode-finish-jev-check.txt",
+        "build": "session-mode-finish-jev-build.txt"
+      },
+      "candidate": {
+        "patch": "session-mode-finish-jev.patch",
+        "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": false,
+        "authoredFiles": [],
+        "files": {},
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 0,
+          "baseOnlyCheckout": true,
+          "emptyPatch": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "attribution-baseline",
+      "order": 8,
+      "task": "attribution",
+      "policy": "baseline",
+      "runId": "2026-09-18T04-48-03.038Z-attribution-1-placement-baseline",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "provider_rejected_before_generation",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 1,
+      "tokens": 0,
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "estimatedUsd": 0
+      },
+      "elapsedMs": 1472,
+      "calls": {},
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "The first model request was rejected with HTTP 402 insufficient_funds. No generation or assigned intervention occurred; do not interpret unchanged fixture failures as treatment performance."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "manual",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "consumed steering binds the next cached decision to its actual user entry"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 5,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "holdout: a queued follow-up owns all of its later decisions, including cache hits",
+            "holdout: cancellation after consumed steering retains that message, not a queued follow-up"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "attribution-baseline-ordinary.txt",
+        "visible": "attribution-baseline-visible.txt",
+        "holdout": "attribution-baseline-holdout.txt",
+        "check": "attribution-baseline-check.txt",
+        "build": "attribution-baseline-build.txt"
+      },
+      "candidate": {
+        "patch": "attribution-baseline.patch",
+        "patchSha256": "64e7c4936d42dcbb67df4d1050bbbb4ed6d2852fd59c542d500bf4e70ed03772",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": true,
+        "authoredFiles": [],
+        "files": {
+          "src/extension.ts": "8107e8ead7f96a14bff9222d15bebb8972461795d418c012eeea7c556a52286a",
+          "src/telemetry.ts": "2b517951ea2a6773ed26268724bc5f3483fdfb941e5f928261dba324812d4c88",
+          "src/ui.ts": "b54515bf3f9f86f6d853e76e99beb0d5e4dc4ac6961adcc80cdbcb637fb20533"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 3,
+          "baseOnlyCheckout": true,
+          "emptyPatch": false,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "session-mode-output-local",
+      "order": 9,
+      "task": "session-mode",
+      "policy": "output-local",
+      "runId": "2026-09-18T04-48-07.187Z-session-mode-1-placement-output-local",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "provider_rejected_before_generation",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 1,
+      "tokens": 0,
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "estimatedUsd": 0
+      },
+      "elapsedMs": 1737,
+      "calls": {},
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "The first model request was rejected with HTTP 402 insufficient_funds. No generation or assigned intervention occurred; do not interpret unchanged fixture failures as treatment performance."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "manual",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "mode selection survives a saved SDK session being reopened"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 0,
+          "fail": 8,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "session mode: disk reopen restores all explicit selections over a different configured default",
+            "session mode: tree navigation restores ancestors and divergent branches immediately",
+            "session mode: public runtime fork inherits selected ancestry and keeps parent/fork/new sessions independent",
+            "session mode: SDK resource reuse never leaks an outgoing selection into an unrelated session",
+            "session mode: malformed, extra-field, unknown and future entries are ignored without hiding older valid state",
+            "session mode: allowlisted custom metadata never enters the model context or captures private input",
+            "session mode: restored modes preserve ranking, skill advice and triage effects; restored off makes zero Jev calls",
+            "session mode: a real mode command aborts an in-flight decision and keeps off effective after reopen"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "session-mode-output-local-ordinary.txt",
+        "visible": "session-mode-output-local-visible.txt",
+        "holdout": "session-mode-output-local-holdout.txt",
+        "check": "session-mode-output-local-check.txt",
+        "build": "session-mode-output-local-build.txt"
+      },
+      "candidate": {
+        "patch": "session-mode-output-local.patch",
+        "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": false,
+        "authoredFiles": [],
+        "files": {},
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 0,
+          "baseOnlyCheckout": true,
+          "emptyPatch": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "attribution-checkpoint-local",
+      "order": 10,
+      "task": "attribution",
+      "policy": "checkpoint-local",
+      "runId": "2026-09-18T04-48-07.899Z-attribution-1-placement-checkpoint-local",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "provider_rejected_before_generation",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 1,
+      "tokens": 0,
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "estimatedUsd": 0
+      },
+      "elapsedMs": 1346,
+      "calls": {},
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "The first model request was rejected with HTTP 402 insufficient_funds. No generation or assigned intervention occurred; do not interpret unchanged fixture failures as treatment performance."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "dependencies",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "consumed steering binds the next cached decision to its actual user entry"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 5,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "holdout: a queued follow-up owns all of its later decisions, including cache hits",
+            "holdout: cancellation after consumed steering retains that message, not a queued follow-up"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "attribution-checkpoint-local-ordinary.txt",
+        "visible": "attribution-checkpoint-local-visible.txt",
+        "holdout": "attribution-checkpoint-local-holdout.txt",
+        "check": "attribution-checkpoint-local-check.txt",
+        "build": "attribution-checkpoint-local-build.txt"
+      },
+      "candidate": {
+        "patch": "attribution-checkpoint-local.patch",
+        "patchSha256": "64e7c4936d42dcbb67df4d1050bbbb4ed6d2852fd59c542d500bf4e70ed03772",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": true,
+        "authoredFiles": [],
+        "files": {
+          "src/extension.ts": "8107e8ead7f96a14bff9222d15bebb8972461795d418c012eeea7c556a52286a",
+          "src/telemetry.ts": "2b517951ea2a6773ed26268724bc5f3483fdfb941e5f928261dba324812d4c88",
+          "src/ui.ts": "b54515bf3f9f86f6d853e76e99beb0d5e4dc4ac6961adcc80cdbcb637fb20533"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 3,
+          "baseOnlyCheckout": true,
+          "emptyPatch": false,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "session-mode-finish-local",
+      "order": 11,
+      "task": "session-mode",
+      "policy": "finish-local",
+      "runId": "2026-09-18T04-48-12.356Z-session-mode-1-placement-finish-local",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "provider_rejected_before_generation",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 1,
+      "tokens": 0,
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "estimatedUsd": 0
+      },
+      "elapsedMs": 1526,
+      "calls": {},
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "The first model request was rejected with HTTP 402 insufficient_funds. No generation or assigned intervention occurred; do not interpret unchanged fixture failures as treatment performance."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "manual",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "mode selection survives a saved SDK session being reopened"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 0,
+          "fail": 8,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "session mode: disk reopen restores all explicit selections over a different configured default",
+            "session mode: tree navigation restores ancestors and divergent branches immediately",
+            "session mode: public runtime fork inherits selected ancestry and keeps parent/fork/new sessions independent",
+            "session mode: SDK resource reuse never leaks an outgoing selection into an unrelated session",
+            "session mode: malformed, extra-field, unknown and future entries are ignored without hiding older valid state",
+            "session mode: allowlisted custom metadata never enters the model context or captures private input",
+            "session mode: restored modes preserve ranking, skill advice and triage effects; restored off makes zero Jev calls",
+            "session mode: a real mode command aborts an in-flight decision and keeps off effective after reopen"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "session-mode-finish-local-ordinary.txt",
+        "visible": "session-mode-finish-local-visible.txt",
+        "holdout": "session-mode-finish-local-holdout.txt",
+        "check": "session-mode-finish-local-check.txt",
+        "build": "session-mode-finish-local-build.txt"
+      },
+      "candidate": {
+        "patch": "session-mode-finish-local.patch",
+        "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": false,
+        "authoredFiles": [],
+        "files": {},
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 0,
+          "baseOnlyCheckout": true,
+          "emptyPatch": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "attribution-output-local",
+      "order": 12,
+      "task": "attribution",
+      "policy": "output-local",
+      "runId": "2026-09-18T04-48-12.833Z-attribution-1-placement-output-local",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "provider_rejected_before_generation",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 1,
+      "tokens": 0,
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "estimatedUsd": 0
+      },
+      "elapsedMs": 1576,
+      "calls": {},
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "The first model request was rejected with HTTP 402 insufficient_funds. No generation or assigned intervention occurred; do not interpret unchanged fixture failures as treatment performance."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "manual",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "consumed steering binds the next cached decision to its actual user entry"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 5,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "holdout: a queued follow-up owns all of its later decisions, including cache hits",
+            "holdout: cancellation after consumed steering retains that message, not a queued follow-up"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "attribution-output-local-ordinary.txt",
+        "visible": "attribution-output-local-visible.txt",
+        "holdout": "attribution-output-local-holdout.txt",
+        "check": "attribution-output-local-check.txt",
+        "build": "attribution-output-local-build.txt"
+      },
+      "candidate": {
+        "patch": "attribution-output-local.patch",
+        "patchSha256": "64e7c4936d42dcbb67df4d1050bbbb4ed6d2852fd59c542d500bf4e70ed03772",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": true,
+        "authoredFiles": [],
+        "files": {
+          "src/extension.ts": "8107e8ead7f96a14bff9222d15bebb8972461795d418c012eeea7c556a52286a",
+          "src/telemetry.ts": "2b517951ea2a6773ed26268724bc5f3483fdfb941e5f928261dba324812d4c88",
+          "src/ui.ts": "b54515bf3f9f86f6d853e76e99beb0d5e4dc4ac6961adcc80cdbcb637fb20533"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 3,
+          "baseOnlyCheckout": true,
+          "emptyPatch": false,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "session-mode-checkpoint-jev",
+      "order": 13,
+      "task": "session-mode",
+      "policy": "checkpoint-jev",
+      "runId": "2026-09-18T04-48-17.847Z-session-mode-1-placement-checkpoint-jev",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "provider_rejected_before_generation",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 1,
+      "tokens": 0,
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "estimatedUsd": 0
+      },
+      "elapsedMs": 1474,
+      "calls": {},
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "The first model request was rejected with HTTP 402 insufficient_funds. No generation or assigned intervention occurred; do not interpret unchanged fixture failures as treatment performance."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "jev",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "mode selection survives a saved SDK session being reopened"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 0,
+          "fail": 8,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "session mode: disk reopen restores all explicit selections over a different configured default",
+            "session mode: tree navigation restores ancestors and divergent branches immediately",
+            "session mode: public runtime fork inherits selected ancestry and keeps parent/fork/new sessions independent",
+            "session mode: SDK resource reuse never leaks an outgoing selection into an unrelated session",
+            "session mode: malformed, extra-field, unknown and future entries are ignored without hiding older valid state",
+            "session mode: allowlisted custom metadata never enters the model context or captures private input",
+            "session mode: restored modes preserve ranking, skill advice and triage effects; restored off makes zero Jev calls",
+            "session mode: a real mode command aborts an in-flight decision and keeps off effective after reopen"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "session-mode-checkpoint-jev-ordinary.txt",
+        "visible": "session-mode-checkpoint-jev-visible.txt",
+        "holdout": "session-mode-checkpoint-jev-holdout.txt",
+        "check": "session-mode-checkpoint-jev-check.txt",
+        "build": "session-mode-checkpoint-jev-build.txt"
+      },
+      "candidate": {
+        "patch": "session-mode-checkpoint-jev.patch",
+        "patchSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": false,
+        "authoredFiles": [],
+        "files": {},
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 0,
+          "baseOnlyCheckout": true,
+          "emptyPatch": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "attribution-finish-jev",
+      "order": 14,
+      "task": "attribution",
+      "policy": "finish-jev",
+      "runId": "2026-09-18T04-48-18.459Z-attribution-1-placement-finish-jev",
+      "source": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "d08fc391b6bdc9f37e423f9e0d533002346dd702",
+        "dirty": false,
+        "sourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "trackedSourceDigest": "e757bd07f9f7d2762878a0c55015de94b46711efcce86d2da083def29ab89cba",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 244,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 3000000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "error",
+      "generationStage": "provider_rejected_before_generation",
+      "providerError": {
+        "httpStatus": 402,
+        "type": "insufficient_funds"
+      },
+      "comparisonEligible": false,
+      "requests": 1,
+      "tokens": 0,
+      "usage": {
+        "input": 0,
+        "output": 0,
+        "cacheRead": 0,
+        "cacheWrite": 0,
+        "estimatedUsd": 0
+      },
+      "elapsedMs": 1487,
+      "calls": {},
+      "reproductionPreserved": true,
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "findings": [
+          "The first model request was rejected with HTTP 402 insufficient_funds. No generation or assigned intervention occurred; do not interpret unchanged fixture failures as treatment performance."
+        ]
+      },
+      "intervention": {
+        "outputEvents": 0,
+        "outputApplied": 0,
+        "rawOutputBytes": 0,
+        "filteredOutputBytes": 0,
+        "finishAudits": 0,
+        "continuations": 0,
+        "checkpointExecutions": 0,
+        "jevDecisions": 0,
+        "jevNetworkSuccess": 0,
+        "jevCached": 0,
+        "jevFallbacks": [],
+        "jevInputTokens": 0,
+        "jevOutputTokens": 0,
+        "jevLatencyMs": 0,
+        "skips": []
+      },
+      "placement": {
+        "ready": true,
+        "records": []
+      },
+      "checkpoint": {
+        "mode": "manual",
+        "ready": true,
+        "startupError": false,
+        "records": 0,
+        "executed": 0,
+        "scheduledFiles": 0,
+        "executionMs": 0,
+        "decisions": 0,
+        "decisionMs": 0,
+        "inputTokens": 0,
+        "outputTokens": 0,
+        "details": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 0,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "consumed steering binds the next cached decision to its actual user entry"
+          ]
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 7,
+          "pass": 5,
+          "fail": 2,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "holdout: a queued follow-up owns all of its later decisions, including cache hits",
+            "holdout: cancellation after consumed steering retains that message, not a queued follow-up"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "attribution-finish-jev-ordinary.txt",
+        "visible": "attribution-finish-jev-visible.txt",
+        "holdout": "attribution-finish-jev-holdout.txt",
+        "check": "attribution-finish-jev-check.txt",
+        "build": "attribution-finish-jev-build.txt"
+      },
+      "candidate": {
+        "patch": "attribution-finish-jev.patch",
+        "patchSha256": "64e7c4936d42dcbb67df4d1050bbbb4ed6d2852fd59c542d500bf4e70ed03772",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "includesAttributionSeed": true,
+        "authoredFiles": [],
+        "files": {
+          "src/extension.ts": "8107e8ead7f96a14bff9222d15bebb8972461795d418c012eeea7c556a52286a",
+          "src/telemetry.ts": "2b517951ea2a6773ed26268724bc5f3483fdfb941e5f928261dba324812d4c88",
+          "src/ui.ts": "b54515bf3f9f86f6d853e76e99beb0d5e4dc4ac6961adcc80cdbcb637fb20533"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 3,
+          "baseOnlyCheckout": true,
+          "emptyPatch": false,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    }
+  ]
+}

@@ -65,3 +65,11 @@ and [state/questions contract](https://docs.typesafe.ai/primitives). Provider
 probabilities remain fallible; actual tests remain the acceptance authority.
 
 The immutable launch queue is recorded in [placement-manifest.json](../eval/placement-manifest.json). Three workers take its next cell when a slot opens; wall-clock finish order is not predetermined. Each cell runs once even if a different cell fails.
+
+## Recorded outcome
+
+The first frozen matrix was interrupted by Gateway HTTP 402 insufficient funds.
+One cell completed, two were cut off during work, and eleven were rejected on
+their first request. See [all outcomes and limitations](../eval/placement-results/README.md).
+The intended comparative experiment remains incomplete; no placement was
+promoted to the product.
