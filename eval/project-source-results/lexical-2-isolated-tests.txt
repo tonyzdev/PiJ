@@ -1,0 +1,124 @@
+TAP version 13
+# Subtest: parsePijModeEntry: valid entries are accepted for all three modes
+ok 1 - parsePijModeEntry: valid entries are accepted for all three modes
+  ---
+  duration_ms: 1.221959
+  type: 'test'
+  ...
+# Subtest: parsePijModeEntry: wrong customType is ignored
+ok 2 - parsePijModeEntry: wrong customType is ignored
+  ---
+  duration_ms: 0.043917
+  type: 'test'
+  ...
+# Subtest: parsePijModeEntry: wrong entry type is ignored
+ok 3 - parsePijModeEntry: wrong entry type is ignored
+  ---
+  duration_ms: 0.030208
+  type: 'test'
+  ...
+# Subtest: parsePijModeEntry: null data is rejected
+ok 4 - parsePijModeEntry: null data is rejected
+  ---
+  duration_ms: 0.028583
+  type: 'test'
+  ...
+# Subtest: parsePijModeEntry: undefined data (missing) is rejected
+ok 5 - parsePijModeEntry: undefined data (missing) is rejected
+  ---
+  duration_ms: 0.031
+  type: 'test'
+  ...
+# Subtest: parsePijModeEntry: array data is rejected
+ok 6 - parsePijModeEntry: array data is rejected
+  ---
+  duration_ms: 0.029958
+  type: 'test'
+  ...
+# Subtest: parsePijModeEntry: unknown mode value is rejected
+ok 7 - parsePijModeEntry: unknown mode value is rejected
+  ---
+  duration_ms: 0.037166
+  type: 'test'
+  ...
+# Subtest: parsePijModeEntry: unsupported version is rejected
+ok 8 - parsePijModeEntry: unsupported version is rejected
+  ---
+  duration_ms: 0.031458
+  type: 'test'
+  ...
+# Subtest: parsePijModeEntry: extra field alongside valid fields is rejected
+ok 9 - parsePijModeEntry: extra field alongside valid fields is rejected
+  ---
+  duration_ms: 0.036209
+  type: 'test'
+  ...
+# Subtest: parsePijModeEntry: missing mode field is rejected
+ok 10 - parsePijModeEntry: missing mode field is rejected
+  ---
+  duration_ms: 0.059458
+  type: 'test'
+  ...
+# Subtest: parsePijModeEntry: missing version field is rejected
+ok 11 - parsePijModeEntry: missing version field is rejected
+  ---
+  duration_ms: 0.031416
+  type: 'test'
+  ...
+# Subtest: resolveModeFromBranch: returns fallback for an empty branch
+ok 12 - resolveModeFromBranch: returns fallback for an empty branch
+  ---
+  duration_ms: 0.038292
+  type: 'test'
+  ...
+# Subtest: resolveModeFromBranch: returns fallback when no valid pij-mode entry exists
+ok 13 - resolveModeFromBranch: returns fallback when no valid pij-mode entry exists
+  ---
+  duration_ms: 0.03275
+  type: 'test'
+  ...
+# Subtest: resolveModeFromBranch: picks the most recent valid entry (last in root→leaf order)
+ok 14 - resolveModeFromBranch: picks the most recent valid entry (last in root→leaf order)
+  ---
+  duration_ms: 0.03325
+  type: 'test'
+  ...
+# Subtest: resolveModeFromBranch: invalid newer record does not hide an older valid entry
+ok 15 - resolveModeFromBranch: invalid newer record does not hide an older valid entry
+  ---
+  duration_ms: 0.032292
+  type: 'test'
+  ...
+# Subtest: resolveModeFromBranch: invalid newer record (bad version) does not hide older valid entry
+ok 16 - resolveModeFromBranch: invalid newer record (bad version) does not hide older valid entry
+  ---
+  duration_ms: 0.038166
+  type: 'test'
+  ...
+# Subtest: resolveModeFromBranch: invalid newer record (unknown mode) does not hide older valid entry
+ok 17 - resolveModeFromBranch: invalid newer record (unknown mode) does not hide older valid entry
+  ---
+  duration_ms: 0.034167
+  type: 'test'
+  ...
+# Subtest: resolveModeFromBranch: non-pij-mode custom entries are skipped transparently
+ok 18 - resolveModeFromBranch: non-pij-mode custom entries are skipped transparently
+  ---
+  duration_ms: 0.027666
+  type: 'test'
+  ...
+# Subtest: resolveModeFromBranch: saved mode overrides a different config default
+ok 19 - resolveModeFromBranch: saved mode overrides a different config default
+  ---
+  duration_ms: 0.027583
+  type: 'test'
+  ...
+1..19
+# tests 19
+# suites 0
+# pass 19
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 142.868417

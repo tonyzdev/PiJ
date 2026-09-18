@@ -2,7 +2,19 @@
 
 These are development observations, not performance claims. Initial runs use `alibaba/qwen3-coder-next`; the later comparison names its alternate model explicitly. Both use Vercel AI Gateway. Reported dollar values use the pinned Pi catalog, including its cache rates, not billing receipts; Jev fees are not included. Raw traces and disposable workspaces stay local.
 
-Latest follow-up: [API-anchored evidence diagnostic](api-evidence-experiment.md)
+Latest follow-up: [complete project source ranking](project-source-experiment.md)
+runs two lexical/Jev pairs at frozen `66a8ad1`. Every eligible source/test file is
+scored; neither policy uses a keyword candidate filter or top-K output cutoff.
+Jev scores all 21 files in about 2.1–2.4 seconds. Jev-1 reaches its token budget
+and misses tree restoration (7/8); Jev-2 passes all checks and authors meaningful
+regressions. Both lexical candidates pass behavior, but one omits new tests and
+the other's 19 tests exercise only locally copied logic, confirmed by passing
+in an empty directory without PiJ source. Only Jev-2 completes the full task;
+first-edit and efficiency signals do not repeat consistently. Full manifests,
+original patches, all independent checks, review findings and replay hashes are
+published. This remains evaluator-only and establishes no general advantage.
+
+The preceding [API-anchored evidence diagnostic](api-evidence-experiment.md)
 ran two more lexical/Jev pairs on the same session-mode task at `b7916d1`.
 All four pass the frozen behavioral checks, typecheck and build. Lexical-1
 omits required new tests; the other three add meaningful assertions, though
