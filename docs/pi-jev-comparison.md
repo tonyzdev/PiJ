@@ -42,4 +42,13 @@ repeats provide no reason to claim a PiJ efficiency advantage or enable the
 dependency preprocessor by default. They also do not prove that Jev caused
 the generated defects.
 
+The next [API-anchored evidence diagnostic](api-evidence-experiment.md) reuses
+that task with linked declarations and runtime bodies. All four candidates
+pass the independent behavioral checks, typecheck and build. Jev consistently
+selects core persistence APIs, but takes longer and costs more in both pairs;
+the investigation-call difference reverses in the repeat. One lexical run
+omits requested tests, and authored coverage has documented weaknesses in both
+conditions. This supports a concrete live-selection capability, not reliable
+removal of main-model work, superiority to pi-jev, or a product-default change.
+
 Primary implementation references: [tool gate](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/gate.ts), [output judge](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/output.ts), [extension](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/index.ts), [client](https://github.com/y0usaf/pi-jev/blob/b3478fd4ca1ac8ffcb703f6dc8d6069b555f531e/src/client.ts). See our [experiment results](experiment-results.md) for the boundary between working integration and demonstrated benefit.

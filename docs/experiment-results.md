@@ -2,7 +2,18 @@
 
 These are development observations, not performance claims. Initial runs use `alibaba/qwen3-coder-next`; the later comparison names its alternate model explicitly. Both use Vercel AI Gateway. Reported dollar values use the pinned Pi catalog, including its cache rates, not billing receipts; Jev fees are not included. Raw traces and disposable workspaces stay local.
 
-Latest follow-up: [session-mode transfer check](session-mode-evidence-experiment.md)
+Latest follow-up: [API-anchored evidence diagnostic](api-evidence-experiment.md)
+ran two more lexical/Jev pairs on the same session-mode task at `b7916d1`.
+All four pass the frozen behavioral checks, typecheck and build. Lexical-1
+omits required new tests; the other three add meaningful assertions, though
+lexical-2 also contains a vacuous malformed-record test and Jev-2 a weak
+exclusion case. Jev selects core persistence APIs consistently, but costs more
+and takes longer in both pairs; investigation is not consistently reduced.
+Original patches, review findings, independent logs and byte-exact replays are
+published. This is task-informed diagnosis, not an unseen transfer or a product
+advantage; preprocessing remains evaluator-only.
+
+The preceding [session-mode transfer check](session-mode-evidence-experiment.md)
 ran two lexical/Jev pairs at frozen `d672736`. Only lexical-1 completed the task.
 Jev-1 passed all eight behavioral holdouts but its added tests failed typecheck;
 lexical-2 omitted tree restoration (7/8); Jev-2 selected the oldest record (4/8)

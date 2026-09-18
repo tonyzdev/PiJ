@@ -1,0 +1,58 @@
+TAP version 13
+# Subtest: session mode: disk reopen restores all explicit selections over a different configured default
+ok 1 - session mode: disk reopen restores all explicit selections over a different configured default
+  ---
+  duration_ms: 70.502583
+  type: 'test'
+  ...
+# Subtest: session mode: tree navigation restores ancestors and divergent branches immediately
+ok 2 - session mode: tree navigation restores ancestors and divergent branches immediately
+  ---
+  duration_ms: 28.213042
+  type: 'test'
+  ...
+# Subtest: session mode: public runtime fork inherits selected ancestry and keeps parent/fork/new sessions independent
+ok 3 - session mode: public runtime fork inherits selected ancestry and keeps parent/fork/new sessions independent
+  ---
+  duration_ms: 18.562916
+  type: 'test'
+  ...
+# Subtest: session mode: SDK resource reuse never leaks an outgoing selection into an unrelated session
+ok 4 - session mode: SDK resource reuse never leaks an outgoing selection into an unrelated session
+  ---
+  duration_ms: 6.579584
+  type: 'test'
+  ...
+# Subtest: session mode: malformed, extra-field, unknown and future entries are ignored without hiding older valid state
+ok 5 - session mode: malformed, extra-field, unknown and future entries are ignored without hiding older valid state
+  ---
+  duration_ms: 6.779334
+  type: 'test'
+  ...
+# Subtest: session mode: allowlisted custom metadata never enters the model context or captures private input
+ok 6 - session mode: allowlisted custom metadata never enters the model context or captures private input
+  ---
+  duration_ms: 6.664333
+  type: 'test'
+  ...
+# Subtest: session mode: restored modes preserve ranking, skill advice and triage effects; restored off makes zero Jev calls
+ok 7 - session mode: restored modes preserve ranking, skill advice and triage effects; restored off makes zero Jev calls
+  ---
+  duration_ms: 42.1505
+  type: 'test'
+  ...
+# Subtest: session mode: a real mode command aborts an in-flight decision and keeps off effective after reopen
+ok 8 - session mode: a real mode command aborts an in-flight decision and keeps off effective after reopen
+  ---
+  duration_ms: 30.205459
+  type: 'test'
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 8
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1017.942292

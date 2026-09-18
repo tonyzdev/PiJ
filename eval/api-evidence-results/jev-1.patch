@@ -1,0 +1,307 @@
+diff --git a/src/extension.ts b/src/extension.ts
+index 8f06520..a67ba92 100644
+--- a/src/extension.ts
++++ b/src/extension.ts
+@@ -1,5 +1,5 @@
+ import { readFile, stat } from "node:fs/promises";
+-import type { ExtensionContext, ExtensionFactory } from "@earendil-works/pi-coding-agent";
++import type { CustomEntry, ExtensionContext, ExtensionFactory, SessionEntry } from "@earendil-works/pi-coding-agent";
+ import { Text } from "@earendil-works/pi-tui";
+ import { Type } from "typebox";
+ import type { DecisionMode, PijConfig } from "./config.js";
+@@ -9,6 +9,39 @@ import { retrieveCode, type CodeCandidate } from "./search.js";
+ import { DecisionJournal } from "./telemetry.js";
+ import { cleanText, cleanDisplayText, formatDecisions, header, statusText } from "./ui.js";
+ 
++/** Data shape stored in a pij-mode custom entry. */
++interface PijModeData {
++  version: 1;
++  mode: DecisionMode;
++}
++
++/** Validate and extract the mode from a raw pij-mode entry data field. */
++function parsePijModeData(data: unknown): DecisionMode | undefined {
++  if (typeof data !== "object" || data === null || Array.isArray(data)) return undefined;
++  const obj = data as Record<string, unknown>;
++  const keys = Object.keys(obj);
++  // Exactly two keys: version and mode — no additional fields allowed.
++  if (keys.length !== 2 || !keys.includes("version") || !keys.includes("mode")) return undefined;
++  if (obj["version"] !== 1) return undefined;
++  const m = obj["mode"];
++  if (m === "assist" || m === "observe" || m === "off") return m;
++  return undefined;
++}
++
++/**
++ * Walk the active branch (root → leaf) and return the most recent valid pij-mode
++ * entry's mode, or the provided default when no valid entry exists on this branch.
++ */
++function readModeFromBranch(entries: SessionEntry[], defaultMode: DecisionMode): DecisionMode {
++  for (let i = entries.length - 1; i >= 0; i--) {
++    const entry: SessionEntry | undefined = entries[i];
++    if (!entry || entry.type !== "custom" || (entry as CustomEntry).customType !== "pij-mode") continue;
++    const parsed = parsePijModeData((entry as CustomEntry<PijModeData>).data);
++    if (parsed !== undefined) return parsed;
++  }
++  return defaultMode;
++}
++
+ export function createPijExtension(config: PijConfig): ExtensionFactory {
+   return (pi) => {
+     let mode: DecisionMode = config.mode;
+@@ -30,6 +63,8 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       run.abort(); run = new AbortController(); request = ""; failuresThisRun = 0;
+       skillPending = false; skillAdvice = undefined; skills = [];
+       context = ctx;
++      // Restore mode from the active branch; fall back to configured default for new/unrelated sessions.
++      mode = readModeFromBranch(ctx.sessionManager.getBranch(), config.mode);
+       unsubscribeInput?.();
+       if (ctx.mode === "tui") {
+         ctx.ui.setTitle("PiJ");
+@@ -40,13 +75,22 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+     });
+     pi.on("session_shutdown", async () => { run.abort(); unsubscribeInput?.(); unsubscribeInput = undefined; context = undefined; await journal.flush(); });
+ 
++    pi.on("session_tree", (_event, ctx) => {
++      // Tree navigation moves to a different branch; abort stale Jev work and restore the mode for the new branch.
++      run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false;
++      mode = readModeFromBranch(ctx.sessionManager.getBranch(), config.mode);
++      update();
++    });
++
+     pi.registerCommand("pij", {
+       description: "PiJ status, decisions, and Jev modes: assist | observe | off",
+       getArgumentCompletions: (prefix) => ["status", "decisions", "assist", "observe", "off"].filter((item) => item.startsWith(prefix)).map((value) => ({ value, label: value })),
+       handler: async (args, ctx) => {
+         const command = args.trim() || "status";
+         if (command === "assist" || command === "observe" || command === "off") {
+-          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command; update();
++          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command;
++          pi.appendEntry<PijModeData>("pij-mode", { version: 1, mode: command });
++          update();
+           ctx.ui.notify(`PiJ mode: ${mode}. ${mode === "assist" ? "Jev suggestions can assist this session." : mode === "observe" ? "Decisions are recorded without changing recommendations or ranking." : "No Jev requests will be made."}`, "info");
+         } else if (command === "decisions") ctx.ui.notify(formatDecisions(journal.recent().slice(-8)), "info");
+         else if (command === "status") {
+diff --git a/test/session-persistence.test.ts b/test/session-persistence.test.ts
+new file mode 100644
+index 0000000..a4139cc
+--- /dev/null
++++ b/test/session-persistence.test.ts
+@@ -0,0 +1,217 @@
++/**
++ * Unit tests for pij-mode session persistence logic.
++ *
++ * These tests exercise parsePijModeData and readModeFromBranch indirectly through
++ * createPijExtension, using the Pi SDK's in-memory session. They verify:
++ *   - mode changes are appended as custom entries
++ *   - restoration from branch entries on session_start
++ *   - invalid/malformed entries are skipped
++ *   - session_tree restores mode for the new leaf's branch
++ */
++import assert from "node:assert/strict";
++import { once } from "node:events";
++import { mkdir, mkdtemp, rm } from "node:fs/promises";
++import { createServer } from "node:http";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import test from "node:test";
++import {
++  createAgentSession,
++  CustomEntry,
++  DefaultResourceLoader,
++  ModelRuntime,
++  SessionManager,
++  SettingsManager,
++} from "@earendil-works/pi-coding-agent";
++import { loadConfig } from "../src/config.js";
++import { createPijExtension } from "../src/extension.js";
++
++/** Start a minimal loopback model that replies with one short assistant message. */
++async function startLoopbackServer() {
++  let requests = 0;
++  const http = createServer(async (req, res) => {
++    for await (const _ of req) { /* drain */ }
++    requests++;
++    const body = JSON.stringify({
++      id: "local", object: "chat.completion.chunk", model: "fixture",
++      choices: [{ index: 0, delta: { role: "assistant", content: "ok." }, finish_reason: null }],
++    });
++    const done = JSON.stringify({
++      id: "local", object: "chat.completion.chunk", model: "fixture",
++      choices: [{ index: 0, delta: {}, finish_reason: "stop" }],
++    });
++    res.writeHead(200, { "Content-Type": "text/event-stream" });
++    res.write(`data: ${body}\n\ndata: ${done}\n\n`);
++    res.end("data: [DONE]\n\n");
++  });
++  http.listen(0, "127.0.0.1");
++  await once(http, "listening");
++  const addr = http.address() as { port: number };
++  return { http, port: addr.port, modelRequests: () => requests };
++}
++
++interface OpenResult {
++  session: Awaited<ReturnType<typeof createAgentSession>>["session"];
++  notices: string[];
++}
++
++async function openSession(
++  manager: SessionManager,
++  runtime: ModelRuntime,
++  home: string,
++  cwd: string,
++  port: number,
++  initialMode: "assist" | "observe" | "off" = "assist",
++): Promise<OpenResult> {
++  const config = loadConfig({ PIJ_HOME: home, PIJ_MODE: initialMode });
++  const settings = SettingsManager.inMemory({ retry: { enabled: false }, compaction: { enabled: false } });
++  const resources = new DefaultResourceLoader({
++    cwd, agentDir: home, settingsManager: settings,
++    noExtensions: true, noSkills: true, noThemes: true, noPromptTemplates: true,
++    agentsFilesOverride: () => ({ agentsFiles: [] }),
++    skillsOverride: () => ({ skills: [], diagnostics: [] }),
++    extensionFactories: [createPijExtension(config)],
++  });
++  await resources.reload();
++  assert.deepEqual(resources.getExtensions().errors, []);
++  const { session } = await createAgentSession({
++    cwd, agentDir: home,
++    modelRuntime: runtime,
++    model: runtime.getModel("persist-fixture", "fixture"),
++    resourceLoader: resources,
++    settingsManager: settings,
++    sessionManager: manager,
++    tools: [],
++  });
++  const notices: string[] = [];
++  await session.bindExtensions({ uiContext: { ...session.extensionRunner.createContext().ui, notify: (m) => notices.push(m) } });
++  return { session, notices };
++}
++
++async function makeRuntime(home: string, port: number) {
++  const runtime = await ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
++  runtime.registerProvider("persist-fixture", {
++    baseUrl: `http://127.0.0.1:${port}/v1`, api: "openai-completions", apiKey: "local-fixture",
++    models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 32000, maxTokens: 128 }],
++  });
++  return runtime;
++}
++
++// ---------------------------------------------------------------------------
++// Test 1: mode command appends a valid pij-mode entry
++// ---------------------------------------------------------------------------
++test("pij mode command appends a pij-mode custom entry to the session", { timeout: 10000 }, async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-persist-append-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  await mkdir(cwd);
++  const { http, port } = await startLoopbackServer();
++  t.after(async () => { http.closeAllConnections(); await new Promise<void>((r) => http.close(() => r())); await rm(root, { recursive: true, force: true }); });
++
++  const runtime = await makeRuntime(home, port);
++  const manager = SessionManager.inMemory();
++  const { session, notices } = await openSession(manager, runtime, home, cwd, port);
++  t.after(() => session.dispose());
++
++  await session.prompt("/pij off");
++  assert.match(notices.at(-1)!, /PiJ mode: off/);
++
++  const branch = manager.getBranch();
++  const modeEntries = branch.filter((e) => e.type === "custom" && (e as CustomEntry).customType === "pij-mode");
++  assert.equal(modeEntries.length, 1, "exactly one pij-mode entry after one mode command");
++  const entry = modeEntries[0] as CustomEntry<{ version: number; mode: string }>;
++  assert.deepEqual(entry.data, { version: 1, mode: "off" });
++});
++
++// ---------------------------------------------------------------------------
++// Test 2: restoration from branch (configured default is overridden by saved entry)
++// ---------------------------------------------------------------------------
++test("session_start restores mode from branch, overriding configured default", { timeout: 10000 }, async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-persist-restore-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  await mkdir(cwd);
++  const { http, port } = await startLoopbackServer();
++  t.after(async () => { http.closeAllConnections(); await new Promise<void>((r) => http.close(() => r())); await rm(root, { recursive: true, force: true }); });
++
++  const runtime = await makeRuntime(home, port);
++  // First session: save a file and write off.
++  const manager1 = SessionManager.create(cwd, join(root, "sessions"));
++  const { session: s1, notices: _n1 } = await openSession(manager1, runtime, home, cwd, port, "assist");
++  await s1.prompt("/pij observe");
++  // Drive a model turn so Pi saves the session to disk.
++  await s1.prompt("Save the session.");
++  const path = s1.sessionFile;
++  assert.ok(path);
++  s1.dispose();
++
++  // Second session: open the saved file; configured default is "assist" but saved is "observe".
++  const { session: s2, notices: n2 } = await openSession(SessionManager.open(path), runtime, home, cwd, port, "assist");
++  t.after(() => s2.dispose());
++  await s2.prompt("/pij status");
++  assert.match(n2.at(-1)!, /Mode: observe\b/, "restored saved observe despite configured assist");
++});
++
++// ---------------------------------------------------------------------------
++// Test 3: new/unrelated branch falls back to config.mode
++// ---------------------------------------------------------------------------
++test("new session with no pij-mode entries uses config.mode default", { timeout: 5000 }, async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-persist-default-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  await mkdir(cwd);
++  const { http, port } = await startLoopbackServer();
++  t.after(async () => { http.closeAllConnections(); await new Promise<void>((r) => http.close(() => r())); await rm(root, { recursive: true, force: true }); });
++
++  const runtime = await makeRuntime(home, port);
++  const { session, notices } = await openSession(SessionManager.inMemory(), runtime, home, cwd, port, "off");
++  t.after(() => session.dispose());
++  await session.prompt("/pij status");
++  assert.match(notices.at(-1)!, /Mode: off\b/, "empty branch must fall back to configured off");
++});
++
++// ---------------------------------------------------------------------------
++// Test 4: invalid entries are skipped, older valid entry still wins
++// ---------------------------------------------------------------------------
++test("invalid pij-mode entries are skipped; older valid entry is found", { timeout: 5000 }, async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-persist-invalid-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  await mkdir(cwd);
++  const { http, port } = await startLoopbackServer();
++  t.after(async () => { http.closeAllConnections(); await new Promise<void>((r) => http.close(() => r())); await rm(root, { recursive: true, force: true }); });
++
++  const runtime = await makeRuntime(home, port);
++  const manager = SessionManager.inMemory();
++
++  // Manually seed the session with invalid entries after a valid one.
++  // The walk must skip them and return the valid older entry.
++  const { session, notices } = await openSession(manager, runtime, home, cwd, port, "assist");
++  t.after(() => session.dispose());
++
++  // Record a valid "observe" entry via command.
++  await session.prompt("/pij observe");
++  // Append invalid entries directly (unknown version, extra field, wrong type, unknown mode).
++  manager.appendCustomEntry("pij-mode", { version: 2, mode: "observe" }); // unsupported version
++  manager.appendCustomEntry("pij-mode", { version: 1, mode: "observe", extra: true }); // extra field
++  manager.appendCustomEntry("pij-mode", { version: 1, mode: "turbocharged" }); // unknown mode
++  manager.appendCustomEntry("pij-mode", null); // null data
++  manager.appendCustomEntry("other-type", { version: 1, mode: "assist" }); // wrong customType
++
++  // Re-open the same manager as if the session is reloaded: recreate the extension bound to manager.
++  const config2 = loadConfig({ PIJ_HOME: home, PIJ_MODE: "assist" });
++  const settings2 = SettingsManager.inMemory({ retry: { enabled: false }, compaction: { enabled: false } });
++  const resources2 = new DefaultResourceLoader({
++    cwd, agentDir: home, settingsManager: settings2,
++    noExtensions: true, noSkills: true, noThemes: true, noPromptTemplates: true,
++    agentsFilesOverride: () => ({ agentsFiles: [] }),
++    skillsOverride: () => ({ skills: [], diagnostics: [] }),
++    extensionFactories: [createPijExtension(config2)],
++  });
++  await resources2.reload();
++  const { session: s2 } = await createAgentSession({
++    cwd, agentDir: home, modelRuntime: runtime, model: runtime.getModel("persist-fixture", "fixture"),
++    resourceLoader: resources2, settingsManager: settings2, sessionManager: manager, tools: [],
++  });
++  t.after(() => s2.dispose());
++  const notices2: string[] = [];
++  await s2.bindExtensions({ uiContext: { ...s2.extensionRunner.createContext().ui, notify: (m) => notices2.push(m) } });
++  await s2.prompt("/pij status");
++  assert.match(notices2.at(-1)!, /Mode: observe\b/, "valid older 'observe' must be found despite newer invalid entries");
++});
