@@ -3,6 +3,7 @@ import test from "node:test";
 import type { ExtensionAPI, Theme, ToolDefinition } from "@earendil-works/pi-coding-agent";
 import { createPijExtension } from "../src/extension.js";
 import { loadConfig } from "../src/config.js";
+import { preferPijSearch } from "../src/ui.js";
 
 test("expanded search rendering removes terminal commands while retaining readable lines", async () => {
   const registered: ToolDefinition[] = [];
@@ -16,4 +17,14 @@ test("expanded search rendering removes terminal commands while retaining readab
   assert.ok(!rendered.includes("aGFja2Vk"));
   assert.match(rendered, /1: beforeafter/);
   assert.match(rendered, /2: safe/);
+});
+
+test("preferPijSearch rewrites only Pi's bash-search guidance and leaves other prompts alone", () => {
+  const pi = "Available tools:\n- bash: Execute bash commands (ls, grep, find, etc.)\n- pij_search: Find and rank\nGuidelines:\n- Use bash for file operations like ls, rg, find\n- Be concise";
+  const out = preferPijSearch(pi);
+  assert.ok(!out.includes("Use bash for file operations like ls, rg, find"));
+  assert.ok(out.includes("call pij_search first"));
+  assert.ok(out.includes("- bash: Execute bash commands (ls, find, running tests, etc.)"));
+  assert.ok(out.includes("- Be concise"));
+  assert.equal(preferPijSearch("custom prompt without those lines"), "custom prompt without those lines");
 });

@@ -8,7 +8,7 @@ import { JevClient } from "./jev.js";
 import { retrieveCode, type CodeCandidate } from "./search.js";
 import { discoverCode } from "./discovery.js";
 import { DecisionJournal } from "./telemetry.js";
-import { cleanText, cleanDisplayText, formatDecisions, header, statusText } from "./ui.js";
+import { cleanText, cleanDisplayText, formatDecisions, header, preferPijSearch, statusText } from "./ui.js";
 
 export function createPijExtension(config: PijConfig): ExtensionFactory {
   return (pi) => {
@@ -86,6 +86,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
       briefingPending = config.sourceBriefing === true && Boolean(request.trim());
       skillPending = mode !== "off" && !/^\/skill:|<skill(?:\s|>)/.test(event.prompt);
       update();
+      return { systemPrompt: preferPijSearch(event.systemPrompt) };
     });
 
     // Pi does not create its run signal until after before_agent_start. Await
@@ -155,7 +156,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
       name: "pij_search", label: "PiJ Search",
       description: "Find source evidence for a natural-language question. Omit patterns when you do not know the identifiers: discover diverse source windows, then let Jev rank them. Provide literal patterns for exact identifier search. Returns actual paths and lines from a bounded candidate set; excluded/unreturned files may still matter. Read full context before editing. Falls back to deterministic discovery order when Jev is unavailable.",
       promptSnippet: "Find and rank source excerpts relevant to a coding question",
-      promptGuidelines: ["When locating unfamiliar behavior, ask pij_search a concrete question without patterns to inspect source evidence before guessing identifiers. Supply patterns for known identifiers. Use read/bash to expand the search and verify full context; relevance scores are suggestions, not correctness evidence."],
+      promptGuidelines: ["pij_search is the first step for locating code: ask it a concrete natural-language question (no identifiers needed) and it returns ranked real excerpts with paths and line numbers. Supply patterns only for identifiers you already know. Read the full context before editing; ranking is a suggestion, not proof."],
       parameters: Type.Object({
         query: Type.String({ description: "What you need to locate or understand", minLength: 1, maxLength: 2000 }),
         patterns: Type.Optional(Type.Array(Type.String({ minLength: 1, maxLength: 200 }), { description: "Optional 1–8 literal identifiers (OR). Omit to discover code from the question without exact identifiers.", minItems: 1, maxItems: 8 })),
