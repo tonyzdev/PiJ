@@ -1,0 +1,13 @@
+diff --git a/scripts/lib_grading.py b/scripts/lib_grading.py
+index 60746ec..c096eb8 100644
+--- a/scripts/lib_grading.py
++++ b/scripts/lib_grading.py
+@@ -534,7 +534,7 @@ def _read_workspace_files(workspace_path: str) -> str:
+             continue
+         try:
+             content = f.read_text(encoding="utf-8")
+-            file_contents.append(f"### File: {rel}\n{content[:3000]}")
++            file_contents.append(f"### File: {rel}\n{content}")
+         except (OSError, UnicodeDecodeError):
+             pass
+     return "\n\n".join(file_contents)

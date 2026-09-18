@@ -1,0 +1,107 @@
+diff --git a/rollout_runtime/backends/libero_critic.py b/rollout_runtime/backends/libero_critic.py
+index 35104f9..ee79212 100644
+--- a/rollout_runtime/backends/libero_critic.py
++++ b/rollout_runtime/backends/libero_critic.py
+@@ -312,51 +312,58 @@ class TemporalCritic:
+         proposals: list[dict[str, Any]] = []
+         for rule in self.rules:
+             state = self._state[rule.rule_id]
+-            value = resolve_feature(observation, rule.feature)
+-            if not all(
+-                self._predicate(condition, observation)
+-                for condition in rule.activation_conditions
+-            ):
+-                # Clear history when activation conditions are not met:
+-                # avoids pre-contact history spuriously triggering rules
+-                # that are only meaningful post-contact.
+-                state.consecutive = 0
+-                state.cooldown_remaining = 0
+-                state.history.clear()
++            try:
++                value = resolve_feature(observation, rule.feature)
++                if not all(
++                    self._predicate(condition, observation)
++                    for condition in rule.activation_conditions
++                ):
++                    # Clear history when activation conditions are not met:
++                    # avoids pre-contact history spuriously triggering rules
++                    # that are only meaningful post-contact.
++                    state.consecutive = 0
++                    state.cooldown_remaining = 0
++                    state.history.clear()
++                    continue
++                state.history.append(value)
++                if len(state.history) > rule.dwell_steps:
++                    state.history.pop(0)
++                if state.cooldown_remaining > 0:
++                    state.cooldown_remaining -= 1
++                    state.consecutive = 0
++                    continue
++                condition = self._condition(rule, value, state.history)
++                state.consecutive = state.consecutive + 1 if condition else 0
++                required_consecutive = 1 if rule.operator == "stagnant" else rule.dwell_steps
++                if state.consecutive >= required_consecutive:
++                    proposals.append(
++                        {
++                            "rule_id": rule.rule_id,
++                            "step_index": step_index,
++                            "feature": rule.feature,
++                            "observed_value": value,
++                            "activation_conditions": [
++                                {
++                                    **condition.as_dict(),
++                                    "observed_value": resolve_feature(
++                                        observation, condition.feature
++                                    ),
++                                }
++                                for condition in rule.activation_conditions
++                            ],
++                            "proposal": rule.proposal,
++                            "safety_only": rule.safety_only,
++                            "environment_write": False,
++                        }
++                    )
++                    state.consecutive = 0
++                    state.cooldown_remaining = rule.cooldown_steps
++            except KeyError:
++                # A feature may be legitimately absent on early steps (e.g.
++                # ``command.realization.eef_motion_m`` before the first
++                # ``previous_eef`` is available).  Skip the rule this step
++                # rather than crashing the rollout.
+                 continue
+-            state.history.append(value)
+-            if len(state.history) > rule.dwell_steps:
+-                state.history.pop(0)
+-            if state.cooldown_remaining > 0:
+-                state.cooldown_remaining -= 1
+-                state.consecutive = 0
+-                continue
+-            condition = self._condition(rule, value, state.history)
+-            state.consecutive = state.consecutive + 1 if condition else 0
+-            required_consecutive = 1 if rule.operator == "stagnant" else rule.dwell_steps
+-            if state.consecutive >= required_consecutive:
+-                proposals.append(
+-                    {
+-                        "rule_id": rule.rule_id,
+-                        "step_index": step_index,
+-                        "feature": rule.feature,
+-                        "observed_value": value,
+-                        "activation_conditions": [
+-                            {
+-                                **condition.as_dict(),
+-                                "observed_value": resolve_feature(
+-                                    observation, condition.feature
+-                                ),
+-                            }
+-                            for condition in rule.activation_conditions
+-                        ],
+-                        "proposal": rule.proposal,
+-                        "safety_only": rule.safety_only,
+-                        "environment_write": False,
+-                    }
+-                )
+-                state.consecutive = 0
+-                state.cooldown_remaining = rule.cooldown_steps
+         return proposals
+ 
+     @classmethod

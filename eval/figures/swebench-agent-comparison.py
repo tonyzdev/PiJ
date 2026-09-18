@@ -7,6 +7,7 @@ D=json.load(open(DATA))
 META=D.pop("_meta",{})
 ARMS=[("pi","Pi（bash grep）","#9a9a9a","c"),("pij-off","PiJ · 无 Jev（BM25 briefing）","#3987e5","c"),("pij-jev","PiJ · Jev 重排 briefing","#d55181","d")]
 FIRST_GOLD={k:D[k].get("first_gold",0) for k in ("pi","pij-off","pij-jev")}
+ARMS=[a for a in ARMS if D[a[0]].get("n",0)>0]
 W,H=1672,1060
 PANEL,BORDER,GRID="#1e1e1e","#3a3a3a","#2e2e2e"; INK,INK2,INK3="#ededed","#b4b4b4","#8c8c8c"; FRONT="#9a9a9a"
 SANS="'Helvetica Neue',Helvetica,Arial,'PingFang SC',sans-serif"
@@ -49,7 +50,10 @@ for k,label,col,shape in ARMS:
         v=max(XMIN,min(XMAX,inst["tokens"])); yy=PH-B-14 if k=="pi" else PH-B-9 if k=="pij-off" else PH-B-4
         o.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{yy}" y2="{yy+4}" stroke="{col}" stroke-width="2" stroke-opacity="0.55"/>')
 t(PW-R,PH-B-20,f"底部刻度：各 arm {D['pi']['n']} 个任务的逐任务 token（含超出 {XMAX//1000}k 者贴边）",INK3,12,"400","end")
-offsets={"pi":(-16,-14,"end"),"pij-off":(0,30,"middle"),"pij-jev":(16,-14,"start")}
+# Labels: leftmost point labelled to its left, rightmost to its right, any middle one below.
+order=sorted(pts,key=lambda p:p[1]); offsets={}
+for idx,pp in enumerate(order):
+    offsets[pp[0]]=(-16,-14,"end") if idx==0 else (16,-14,"start") if idx==len(order)-1 else (0,30,"middle")
 for k,v,r,col,shape,label in pts:
     mark(x(v),y(r),col,shape,10)
     dx,dy,an=offsets[k]; d=D[k]
@@ -71,7 +75,7 @@ for i,(title,sub,fmean,fmed,fmt,ymax) in enumerate(metrics):
     o.append(f'<line x1="{ax0}" x2="{ax1}" y1="{base}" y2="{base}" stroke="{BORDER}" stroke-width="1.5"/>')
     for g in (0.25,0.5,0.75,1.0):
         if ymax or g<1.0: o.append(f'<line x1="{ax0}" x2="{ax1}" y1="{yy(top*g):.1f}" y2="{yy(top*g):.1f}" stroke="{GRID}" stroke-width="1"/>')
-    slot=(ax1-ax0)/3; barw=18
+    slot=(ax1-ax0)/len(ARMS); barw=18
     for j,(k,label,col,shape) in enumerate(ARMS):
         cx=ax0+slot*(j+0.5); v=vals[j]; m=fmed(k)
         o.append(f'<rect x="{cx-barw/2:.1f}" y="{yy(v):.1f}" width="{barw}" height="{base-yy(v):.1f}" rx="2" fill="{col}"/>')

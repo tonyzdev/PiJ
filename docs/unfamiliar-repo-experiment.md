@@ -74,14 +74,47 @@ not possible.
 and dominate the mean; the medians move the other way (437k vs 457k). Wall time is flat for
 the same reason.
 
+## The same tasks with a stronger main model (deepseek-v4-pro)
+
+Plain Pi and PiJ + Jev only (26 runs, $0.51); `eval/swebench-agent-results/unfamiliar-pro/`.
+
+![comparison, v4-pro](figures/unfamiliar-pro-agent-comparison.png)
+
+| | Pi | PiJ + Jev |
+|---|---:|---:|
+| **resolved** | 4/13 | 4/13 |
+| FAIL_TO_PASS passed | 4 | 5 |
+| token budget exhausted | 5 | **3** |
+| **first tool call reads a gold file** | 0/13 | **6/13** |
+| search calls, mean / median | 8.5 / 7 | **5.2 / 3** |
+| tool calls | 23.2 | **17.3** |
+| prompt tokens per task | 424k | **329k** |
+| wall time | 102 s | 99 s |
+| L / C / V calls | 4.4 / 11.9 / 6.8 | 6.3 / **5.4** / 5.6 |
+| reads of a gold file, all runs | 40 | **28** |
+
+Paired: fewer searches on 11 of 13, fewer tool calls on **12 of 13**, fewer prompt tokens
+on 8 of 13. With the stronger model the effect is larger on every effort axis than with
+flash — searches −39%, tool calls −25%, and now prompt tokens −22% too, because two fewer
+runs exhaust the budget. The comprehension phase, which flash barely shortened, halves
+(11.9 → 5.4): the stronger model acts on the briefing instead of re-deriving it. Jev latency
+per task fell to 3.6 s, so the Jev arm is not slower.
+
+Outcome is still 4/13 each, but not the same four: PiJ + Jev resolved `connectonion-1556`
+(a five-file fix plain Pi ran out of budget on) and lost `Zetta-Embodiment-23` to a
+PASS_TO_PASS regression after passing its FAIL_TO_PASS tests. Eight of the thirteen tasks
+were solved by no arm under either model. The stronger model did not raise the floor: the
+same five or six tasks are solvable and the rest are not, for reasons that are not
+localisation.
+
 ## What would move the outcome
 
 The resolve rate can only separate arms on tasks in the band "solved if the file is found,
-not solved otherwise". This set has few such tasks: most failures are fix failures. Two
-things would sharpen the test. A stronger main model, so that finding the file is the
-binding constraint more often. And larger, more foreign codebases where grep localisation
-genuinely fails — here it still succeeded on 10 of 13. Both are affordable: this run cost
-$0.22.
+not solved otherwise". This set has few such tasks: most failures are fix failures, and a
+model tier up did not change which tasks fall in that band. Two things would sharpen the
+test: a far stronger main model, so that finding the file is the binding constraint more
+often; and larger, more foreign codebases where grep localisation genuinely fails — here it
+still succeeded on 9–10 of 13. Both are affordable: these runs cost $0.22 and $0.51.
 
 ## Limitations
 

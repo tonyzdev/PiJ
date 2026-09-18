@@ -1,0 +1,16 @@
+diff --git a/py_modules/unifideck/launcher/proton/compat/gog_setup/common.py b/py_modules/unifideck/launcher/proton/compat/gog_setup/common.py
+index db64b78..fad3411 100644
+--- a/py_modules/unifideck/launcher/proton/compat/gog_setup/common.py
++++ b/py_modules/unifideck/launcher/proton/compat/gog_setup/common.py
+@@ -136,6 +136,11 @@ async def run_wine(
+     "already installed", so callers treat failures as non-fatal.
+     """
+     env = dict(plan.env)
++    # The sidecar command belongs to the final game process. If it reaches
++    # the GOG setup helper (scriptinterpreter.exe), Proton starts the
++    # CheatDeck trainer during setup and can wait indefinitely on that
++    # unrelated Wine process.
++    env.pop("PROTON_REMOTE_DEBUG_CMD", None)
+     env["GAMEID"] = "umu-0"
+     env["STORE"] = "gog"
+     env["PROTON_VERB"] = "run"

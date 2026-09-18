@@ -1,0 +1,46 @@
+diff --git a/rollout_runtime/workers/rollout_worker.py b/rollout_runtime/workers/rollout_worker.py
+index 12efd7b..0aeb014 100644
+--- a/rollout_runtime/workers/rollout_worker.py
++++ b/rollout_runtime/workers/rollout_worker.py
+@@ -224,10 +224,21 @@ class RuntimeRolloutWorker:
+             response_channel: The ``rr_infer_resp`` channel.
+         """
+         loop = asyncio.get_running_loop()
++        limit = max(1, self.scheduler.config.fixed_batch_size or self.scheduler.config.max_batch_size)
+         while self._serving:
+             batch = self.scheduler.next_batch(loop.time())
+             if batch:
+                 self._spawn(self._run_batch(batch, response_channel))
++                # If the batch is not yet full, it was fired by ``max_wait_ms``
++                # rather than by reaching ``max_batch_size``. The GPU executes a
++                # single forward at a time, so spawning another partial batch while
++                # one is still running only fragments the queue into tiny batches
++                # that cannot be merged afterwards. Wait for the in-flight batch to
++                # finish so requests arriving during the forward accumulate into a
++                # larger batch instead. A full batch is already at capacity, so it
++                # is dispatched immediately.
++                if len(batch) < limit:
++                    await self._drain_inflight()
+                 continue
+             self._wake.clear()
+             delay = self.scheduler.time_until_ready(loop.time())
+@@ -251,6 +262,19 @@ class RuntimeRolloutWorker:
+             with contextlib.suppress(asyncio.TimeoutError, asyncio.CancelledError):
+                 await asyncio.wait_for(self._wake.wait(), delay)
+ 
++    async def _drain_inflight(self) -> None:
++        """Wait until all in-flight batch tasks have completed.
++
++        Used by ``execute_batches`` to serialize batch execution on the GPU: a new
++        batch is only issued once the previous one has finished, so requests that
++        arrive during a forward accumulate into a larger batch rather than being
++        split across many small, concurrently-queued batches.
++        """
++        while self._tasks:
++            tasks = list(self._tasks)
++            with contextlib.suppress(BaseException):
++                await asyncio.wait(tasks)
++
+     def _spawn(self, coroutine: Any) -> None:
+         task = asyncio.get_running_loop().create_task(coroutine)
+         self._tasks.add(task)

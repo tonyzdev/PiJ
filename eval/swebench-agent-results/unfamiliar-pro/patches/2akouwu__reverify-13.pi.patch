@@ -1,0 +1,71 @@
+diff --git a/BENCHMARK.md b/BENCHMARK.md
+index 7b5fafb..97fab6f 100644
+--- a/BENCHMARK.md
++++ b/BENCHMARK.md
+@@ -188,6 +188,7 @@ blind and measured through the verifier with a per-probe false-VERIFIED guard.
+ | `md5_const` | "this is MD5" — MD5 initial constant A0 (0x67452301) present | x86 / x86_64 (constant appears as a contiguous 32-bit LE immediate; on AArch64 it is split by movz/movk, so the byte pattern is not a sound prior) |
+ | `import_gets` | the program uses the deprecated C `gets()` | PE / ELF / Mach-O |
+ | `section_rodata` | a section named `.rodata` (an ELF name applied to PE, which uses `.rdata`) | PE / ELF / Mach-O |
++| `elf_shoff` | the model memorizes a textbook ELF64 layout and asserts `e_shoff == 0x1000` (the u64 at file offset 0x28) | ELF64 only (`EI_CLASS == 2`; the ELF32 header lays `e_shoff` out differently) |
+ 
+ Per probe the scorecard reports **prior wrong** (the hallucination rate — how
+ often the blind prior is refuted), **prior right**, **inconclusive**, and the
+@@ -212,6 +213,11 @@ accepted a wrong claim. The x86-only probes (`prologue`, `md5_const`) are
+ exercised on the Windows corpus above and in `tests/test_probes.py` (synthetic
+ PE/ELF fixtures pin the guard logic without needing a real binary corpus).
+ 
++`elf_shoff` is the guessed-struct-field-offset prior: on one aarch64 field run
++(33 ELFs under /usr/bin + /usr/lib on a Jetson) the prior was refuted on all 33
++with 0 false VERIFIED. Across the ~1,800 ELF64 binaries there, observed
++`e_shoff` ranges from 0x2a8 to 0xbba8d38 and none equals 0x1000.
++
+ ## Regression test
+ 
+ `tests/test_probes.py` builds a synthetic PE32+ and a minimal ELF and pins the
+diff --git a/benchmarks/hallucination_probes.py b/benchmarks/hallucination_probes.py
+index d5e960a..adcba17 100644
+--- a/benchmarks/hallucination_probes.py
++++ b/benchmarks/hallucination_probes.py
+@@ -148,11 +148,33 @@ def probe_section_rodata(info, data):
+     return claim, guard
+ 
+ 
++def probe_elf_shoff(info, data):
++    # ELF64 only: the ELF32 header lays e_shoff out differently, so the 64-bit
++    # memorized value is not a sound prior there. The prior is blind: it never
++    # reads the section table, it just asserts the textbook "typical small ELF"
++    # keeps its section header table at 0x1000, i.e. e_shoff == 0x1000 (the u64
++    # at file offset 0x28 of the ELF64 header).
++    if info.format != "ELF" or info.bits != 64:
++        return None
++    claim = Claim("u64_at", {"offset": 0x28, "expected": 0x1000})
++
++    def guard(verdict, evidence):
++        if verdict != VERIFIED:
++            return True
++        # Independent re-read of the raw bytes: the u64 at 0x28 must really be 0x1000.
++        if len(data) < 0x28 + 8:
++            return False
++        return int.from_bytes(data[0x28:0x28 + 8], "little") == 0x1000
++
++    return claim, guard
++
++
+ PROBES = [
+     ("prologue", probe_prologue, "textbook frame-pointer prologue at entry"),
+     ("md5_const", probe_md5_const, "MD5 initial constant A0 near entry"),
+     ("import_gets", probe_import_gets, "imports deprecated C gets()"),
+     ("section_rodata", probe_section_rodata, "section named .rodata"),
++    ("elf_shoff", probe_elf_shoff, "ELF64 e_shoff == 0x1000 (textbook section-table offset)"),
+ ]
+ 
+ 
+@@ -211,7 +233,7 @@ if __name__ == "__main__":
+         per = int(argv[i + 1])
+         del argv[i:i + 2]
+     if "--probe" in argv:
+-        i = argv.index("--probe")
++        i = argv.index("--probe") + 1
+         vals = []
+         while i < len(argv) and not argv[i].startswith("--"):
+             vals.append(argv[i])

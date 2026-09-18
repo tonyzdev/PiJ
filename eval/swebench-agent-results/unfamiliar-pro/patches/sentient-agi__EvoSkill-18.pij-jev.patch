@@ -1,0 +1,86 @@
+diff --git a/src/cli/shared.py b/src/cli/shared.py
+index fae97a2..b1886e2 100644
+--- a/src/cli/shared.py
++++ b/src/cli/shared.py
+@@ -3,9 +3,12 @@
+ from __future__ import annotations
+ 
+ import asyncio
++import logging
+ import os
+ from typing import TYPE_CHECKING
+ 
++logger = logging.getLogger(__name__)
++
+ import pandas as pd
+ 
+ if TYPE_CHECKING:
+@@ -183,16 +186,28 @@ def make_scorer(cfg: ProjectConfig):
+                 f"Rubric: {rubric}\n\n"
+                 "Reply with only a number between 0.0 and 1.0."
+             )
++            text = await call_llm(provider, model, prompt)
+             try:
+-                text = await call_llm(provider, model, prompt)
+                 return float(text.strip())
+-            except (ValueError, Exception):
++            except (TypeError, ValueError) as exc:
++                logger.warning(
++                    "LLM scorer returned a non-numeric score %r: %s", text, exc
++                )
+                 return 0.0
+ 
+         def llm_scorer(question: str, predicted: str, ground_truth: str) -> float:
+-            return asyncio.get_event_loop().run_until_complete(
+-                llm_score(question, predicted, ground_truth)
+-            )
++            coro = llm_score(question, predicted, ground_truth)
++            try:
++                asyncio.get_running_loop()
++            except RuntimeError:
++                # No running loop (e.g. plain sync caller): run directly.
++                return asyncio.run(coro)
++            # Already inside a running loop (e.g. SelfImprovingLoop): run the
++            # coroutine on a fresh loop in a separate thread.
++            import concurrent.futures
++
++            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
++                return pool.submit(asyncio.run, coro).result()
+ 
+         return llm_scorer
+ 
+@@ -200,12 +215,32 @@ def make_scorer(cfg: ProjectConfig):
+         import shlex
+         import subprocess
+ 
++        command = cfg.scorer.command
++        if not command:
++            raise ValueError(
++                "Script scorer requires a 'command' in [scorer] config."
++            )
++
+         def script_scorer(question: str, predicted: str, ground_truth: str) -> float:
+-            cmd = cfg.scorer.command.format(predicted=predicted, expected=ground_truth)
+-            result = subprocess.run(shlex.split(cmd), capture_output=True, text=True)
++            cmd = command.replace("{predicted}", predicted).replace(
++                "{expected}", ground_truth
++            )
++            try:
++                result = subprocess.run(
++                    shlex.split(cmd),
++                    capture_output=True,
++                    text=True,
++                    timeout=30,
++                )
++            except subprocess.TimeoutExpired:
++                logger.warning("Script scorer timed out after 30s: %s", cmd)
++                return 0.0
+             try:
+                 return float(result.stdout.strip())
+             except ValueError:
++                logger.warning(
++                    "Script scorer returned non-numeric output %r", result.stdout
++                )
+                 return 0.0
+ 
+         return script_scorer
