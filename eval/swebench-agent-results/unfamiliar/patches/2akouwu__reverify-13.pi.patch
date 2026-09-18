@@ -1,0 +1,91 @@
+diff --git a/BENCHMARK.md b/BENCHMARK.md
+index 7b5fafb..df7061b 100644
+--- a/BENCHMARK.md
++++ b/BENCHMARK.md
+@@ -188,6 +188,7 @@ blind and measured through the verifier with a per-probe false-VERIFIED guard.
+ | `md5_const` | "this is MD5" — MD5 initial constant A0 (0x67452301) present | x86 / x86_64 (constant appears as a contiguous 32-bit LE immediate; on AArch64 it is split by movz/movk, so the byte pattern is not a sound prior) |
+ | `import_gets` | the program uses the deprecated C `gets()` | PE / ELF / Mach-O |
+ | `section_rodata` | a section named `.rodata` (an ELF name applied to PE, which uses `.rdata`) | PE / ELF / Mach-O |
++| `elf_shoff` | a "typical small ELF" keeps its section header table at 0x1000 — asserts `e_shoff == 0x1000` (the u64 at file offset 0x28) | ELF64 only (the ELF32 header lays `e_shoff` out differently) |
+ 
+ Per probe the scorecard reports **prior wrong** (the hallucination rate — how
+ often the blind prior is refuted), **prior right**, **inconclusive**, and the
+@@ -212,6 +213,14 @@ accepted a wrong claim. The x86-only probes (`prologue`, `md5_const`) are
+ exercised on the Windows corpus above and in `tests/test_probes.py` (synthetic
+ PE/ELF fixtures pin the guard logic without needing a real binary corpus).
+ 
++### aarch64 field run: the guessed `e_shoff` prior
++
++On a Jetson (aarch64 Linux), 33 ELF64 binaries under `/usr/bin` + `/usr/lib`:
++the memorized `e_shoff == 0x1000` prior was **refuted on all 33**, with **0
++false VERIFIED**. Across the ~1,800 ELF64 binaries there, the observed `e_shoff`
++ranges from `0x2a8` to `0xbba8d38` and **none** equals `0x1000` — the textbook
++layout is not what real linkers emit.
++
+ ## Regression test
+ 
+ `tests/test_probes.py` builds a synthetic PE32+ and a minimal ELF and pins the
+diff --git a/benchmarks/hallucination_probes.py b/benchmarks/hallucination_probes.py
+index d5e960a..b7defa4 100644
+--- a/benchmarks/hallucination_probes.py
++++ b/benchmarks/hallucination_probes.py
+@@ -23,6 +23,10 @@ Priors probed:
+   function ``gets`` (a classic LLM narrative hallucination).
+ - ``section_rodata``: the model applies the ELF section name ``.rodata`` to
+   PE binaries (which use ``.rdata``) — a cross-format prior.
++- ``elf_shoff``: the model memorizes a textbook ELF64 layout in which a
++  "typical small ELF" keeps its section header table at 0x1000, and asserts
++  ``e_shoff == 0x1000`` (the u64 at file offset 0x28) for any ELF64 binary.
++  ELF64 only: the ELF32 header lays ``e_shoff`` out differently.
+ 
+ Usage:
+     python benchmarks/hallucination_probes.py [dir ...] [--per-dir N]
+@@ -148,11 +152,39 @@ def probe_section_rodata(info, data):
+     return claim, guard
+ 
+ 
++# ELF64 header: e_shoff is the u64 at file offset 0x28. The memorized
++# "typical small ELF" layout keeps the section header table at 0x1000.
++ELF64_SHoff_OFFSET = 0x28
++ELF64_SHoff_PRIOR = 0x1000
++
++
++def probe_elf_shoff(info, data):
++    # ELF64 only (EI_CLASS == 2): the ELF32 header lays e_shoff out differently
++    # (32-bit at offset 0x20), so the 64-bit memorized value is not a sound
++    # prior there.
++    if info.format != "ELF" or info.bits != 64:
++        return None
++    claim = Claim("u64_at", {"offset": ELF64_SHoff_OFFSET, "expected": ELF64_SHoff_PRIOR})
++
++    def guard(verdict, evidence):
++        # False => false accept: the verifier marked the prior VERIFIED even
++        # though the raw e_shoff slot does not hold 0x1000.
++        if verdict != VERIFIED:
++            return True
++        if len(data) < ELF64_SHoff_OFFSET + 8:
++            return False
++        actual = int.from_bytes(data[ELF64_SHoff_OFFSET:ELF64_SHoff_OFFSET + 8], "little")
++        return actual == ELF64_SHoff_PRIOR
++
++    return claim, guard
++
++
+ PROBES = [
+     ("prologue", probe_prologue, "textbook frame-pointer prologue at entry"),
+     ("md5_const", probe_md5_const, "MD5 initial constant A0 near entry"),
+     ("import_gets", probe_import_gets, "imports deprecated C gets()"),
+     ("section_rodata", probe_section_rodata, "section named .rodata"),
++    ("elf_shoff", probe_elf_shoff, "guessed ELF64 section-table offset e_shoff == 0x1000"),
+ ]
+ 
+ 
+@@ -211,7 +243,7 @@ if __name__ == "__main__":
+         per = int(argv[i + 1])
+         del argv[i:i + 2]
+     if "--probe" in argv:
+-        i = argv.index("--probe")
++        i = argv.index("--probe") + 1
+         vals = []
+         while i < len(argv) and not argv[i].startswith("--"):
+             vals.append(argv[i])

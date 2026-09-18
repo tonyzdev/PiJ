@@ -1,0 +1,40 @@
+diff --git a/django/db/models/sql/query.py b/django/db/models/sql/query.py
+index 08d7faf..d516148 100644
+--- a/django/db/models/sql/query.py
++++ b/django/db/models/sql/query.py
+@@ -328,6 +328,8 @@ class Query(BaseExpression):
+             obj.subq_aliases = self.subq_aliases.copy()
+         obj.used_aliases = self.used_aliases.copy()
+         obj._filtered_relations = self._filtered_relations.copy()
++        if self.combined_queries:
++            obj.combined_queries = tuple(query.clone() for query in self.combined_queries)
+         # Clear the cached_property
+         try:
+             del obj.base_table
+diff --git a/tests/queries/test_repro.py b/tests/queries/test_repro.py
+new file mode 100644
+index 0000000..53179b5
+--- /dev/null
++++ b/tests/queries/test_repro.py
+@@ -0,0 +1,21 @@
++from django.test import TestCase, skipUnlessDBFeature
++from .models import Number
++
++
++@skipUnlessDBFeature('supports_select_union')
++class ReproTests(TestCase):
++    @classmethod
++    def setUpTestData(cls):
++        Number.objects.bulk_create(Number(num=i) for i in range(10))
++
++    def test_repro(self):
++        qs1 = Number.objects.filter(num__lte=1)
++        qs2 = Number.objects.filter(num__gte=8).order_by('num')
++        qs = qs1.union(qs2)
++        print("union:", list(qs))
++        derived = qs.order_by().values_list('num', flat=True)
++        print("derived combined order_by:", [q.order_by for q in derived.query.combined_queries])
++        print("orig combined order_by:", [q.order_by for q in qs.query.combined_queries])
++        print("same objects:", [a is b for a, b in zip(qs.query.combined_queries, derived.query.combined_queries)])
++        print("values_list:", list(derived))
++        print("union again:", list(qs))

@@ -1,0 +1,98 @@
+diff --git a/src/extension.ts b/src/extension.ts
+index 8f06520..89229cb 100644
+--- a/src/extension.ts
++++ b/src/extension.ts
+@@ -1,3 +1,4 @@
++import { randomUUID } from "node:crypto";
+ import { readFile, stat } from "node:fs/promises";
+ import type { ExtensionContext, ExtensionFactory } from "@earendil-works/pi-coding-agent";
+ import { Text } from "@earendil-works/pi-tui";
+@@ -20,16 +21,24 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+     let run = new AbortController();
+     let context: ExtensionContext | undefined;
+     let unsubscribeInput: (() => void) | undefined;
++    // Session and turn identifiers for decision metadata. Never contain prompts, content, or credentials.
++    let sessionId: string | undefined;
++    let turnId: string | undefined;
+     const journal = new DecisionJournal(config.home);
+     const client = new JevClient(config);
+     const update = () => context?.ui.setStatus("pij", cleanText(statusText(config, mode, journal, journal.recent().at(-1))));
+-    const engineFor = (decisionMode: DecisionMode) => new DecisionEngine(client, async (observation) => { await journal.record(decisionMode, observation); update(); });
++    const engineFor = (decisionMode: DecisionMode) => new DecisionEngine(client, async (observation) => { await journal.record(decisionMode, observation, { sessionId, turnId }); update(); });
+     const signalFor = (signal?: AbortSignal) => signal ? AbortSignal.any([signal, run.signal]) : run.signal;
+ 
+     pi.on("session_start", (_event, ctx) => {
+       run.abort(); run = new AbortController(); request = ""; failuresThisRun = 0;
+       skillPending = false; skillAdvice = undefined; skills = [];
+       context = ctx;
++      // Capture the session identity from the Pi runtime. The session manager
++      // assigns a stable UUID per session file; switching sessions produces a
++      // new ID. We never read or store session content here.
++      sessionId = ctx.sessionManager.getSessionId();
++      turnId = undefined;
+       unsubscribeInput?.();
+       if (ctx.mode === "tui") {
+         ctx.ui.setTitle("PiJ");
+@@ -67,6 +76,10 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+     pi.on("before_agent_start", (event, ctx) => {
+       context = ctx;
+       run.abort(); run = new AbortController(); failuresThisRun = 0; request = event.prompt;
++      // Assign a fresh turn ID for each user prompt. All Jev evaluations within
++      // this agent run share the same turnId; the next user prompt gets a new one.
++      // We use randomUUID() so the ID is opaque and carries no session content.
++      turnId = randomUUID();
+       skills = event.systemPromptOptions.skills ?? [];
+       skillAdvice = undefined;
+       skillPending = mode !== "off" && !/^\/skill:|<skill(?:\s|>)/.test(event.prompt);
+diff --git a/src/telemetry.ts b/src/telemetry.ts
+index 7b7ea12..06b5928 100644
+--- a/src/telemetry.ts
++++ b/src/telemetry.ts
+@@ -16,6 +16,10 @@ export interface DecisionRecord {
+   cached?: boolean;
+   inputTokens?: number;
+   outputTokens?: number;
++  /** Opaque identifier for the Pi session. Stable across all turns in one session; changes on session switch. */
++  sessionId?: string;
++  /** Opaque identifier for the user turn (one per user prompt). All Jev calls within one turn share this value; a new prompt receives a different one. */
++  turnId?: string;
+ }
+ 
+ export class DecisionJournal {
+@@ -28,7 +32,7 @@ export class DecisionJournal {
+ 
+   constructor(home: string) { this.file = join(home, "decisions", `${Date.now()}-${randomUUID()}.jsonl`); }
+ 
+-  async record(mode: DecisionMode, observation: DecisionObservation): Promise<void> {
++  async record(mode: DecisionMode, observation: DecisionObservation, context?: { sessionId?: string; turnId?: string }): Promise<void> {
+     const { result, kind, questionCount } = observation;
+     // Deliberate allowlist: never serialize answers, source, prompts or raw errors.
+     const entry: DecisionRecord = {
+@@ -36,6 +40,9 @@ export class DecisionJournal {
+       ...(result.status === "fallback" ? { reason: result.reason } : {
+         model: result.model.slice(0, 100), cached: result.cached, inputTokens: result.cached ? 0 : result.inputTokens, outputTokens: result.cached ? 0 : result.outputTokens,
+       }),
++      // Deliberate allowlist: only opaque identifiers, never session content or credentials.
++      ...(context?.sessionId ? { sessionId: context.sessionId } : {}),
++      ...(context?.turnId ? { turnId: context.turnId } : {}),
+     };
+     this.records.push(entry);
+     if (this.records.length > 50) this.records.shift();
+diff --git a/src/ui.ts b/src/ui.ts
+index 9a7930d..c8bd280 100644
+--- a/src/ui.ts
++++ b/src/ui.ts
+@@ -33,5 +33,12 @@ export function statusText(config: PijConfig, mode: DecisionMode, journal: Decis
+ 
+ export function formatDecisions(records: DecisionRecord[]): string {
+   if (!records.length) return "No Jev decisions recorded yet.";
+-  return records.map((record) => cleanText(`${record.at.slice(11, 19)}  ${record.mode.padEnd(7)} ${record.kind.padEnd(15)} ${record.status === "fallback" ? `fallback:${record.reason}` : record.cached ? "cached" : "ok"}  ${record.latencyMs}ms`)).join("\n");
++  return records.map((record) => {
++    // Show the last 8 hex chars of each UUID so the user can visually group
++    // decisions by session and turn without exposing session content.
++    const sid = record.sessionId ? record.sessionId.replace(/-/g, "").slice(-8) : "--------";
++    const tid = record.turnId ? record.turnId.replace(/-/g, "").slice(-8) : "--------";
++    const outcome = record.status === "fallback" ? `fallback:${record.reason}` : record.cached ? "cached" : "ok";
++    return cleanText(`${record.at.slice(11, 19)}  s:${sid} t:${tid}  ${record.mode.padEnd(7)} ${record.kind.padEnd(15)} ${outcome}  ${record.latencyMs}ms`);
++  }).join("\n");
+ }

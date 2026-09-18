@@ -1,0 +1,16 @@
+TAP version 13
+# Subtest: mode selection survives a saved SDK session being reopened
+ok 1 - mode selection survives a saved SDK session being reopened
+  ---
+  duration_ms: 59.966375
+  type: 'test'
+  ...
+1..1
+# tests 1
+# suites 0
+# pass 1
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 657.695583

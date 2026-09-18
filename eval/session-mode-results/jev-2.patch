@@ -1,0 +1,74 @@
+diff --git a/src/extension.ts b/src/extension.ts
+index 8f06520..fe02bf2 100644
+--- a/src/extension.ts
++++ b/src/extension.ts
+@@ -8,6 +8,34 @@ import { JevClient } from "./jev.js";
+ import { retrieveCode, type CodeCandidate } from "./search.js";
+ import { DecisionJournal } from "./telemetry.js";
+ import { cleanText, cleanDisplayText, formatDecisions, header, statusText } from "./ui.js";
++const PIJ_MODE_CUSTOM_TYPE = "pij-mode";
++
++interface PijModeData {
++  version: 1;
++  mode: DecisionMode;
++}
++
++/** Scan the active branch (newest-first) for the most recent valid pij-mode entry. */
++function readModeFromBranch(sessionManager: ExtensionContext["sessionManager"]): DecisionMode | undefined {
++  const branch = sessionManager.getBranch();
++  for (const entry of branch) {
++    if (entry.type !== "custom" || entry.customType !== PIJ_MODE_CUSTOM_TYPE) continue;
++    const data = entry.data as unknown;
++    if (
++      data !== null &&
++      typeof data === "object" &&
++      !Array.isArray(data) &&
++      Object.keys(data as object).length === 2 &&
++      (data as Record<string, unknown>)["version"] === 1 &&
++      ((data as Record<string, unknown>)["mode"] === "assist" ||
++        (data as Record<string, unknown>)["mode"] === "observe" ||
++        (data as Record<string, unknown>)["mode"] === "off")
++    ) {
++      return (data as PijModeData).mode;
++    }
++  }
++  return undefined;
++}
+ 
+ export function createPijExtension(config: PijConfig): ExtensionFactory {
+   return (pi) => {
+@@ -30,6 +58,9 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       run.abort(); run = new AbortController(); request = ""; failuresThisRun = 0;
+       skillPending = false; skillAdvice = undefined; skills = [];
+       context = ctx;
++      const savedMode = readModeFromBranch(ctx.sessionManager);
++      if (savedMode !== undefined) mode = savedMode;
++      else mode = config.mode;
+       unsubscribeInput?.();
+       if (ctx.mode === "tui") {
+         ctx.ui.setTitle("PiJ");
+@@ -38,6 +69,13 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       }
+       update();
+     });
++
++    pi.on("session_tree", (_event, ctx) => {
++      run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false;
++      const savedMode = readModeFromBranch(ctx.sessionManager);
++      mode = savedMode !== undefined ? savedMode : config.mode;
++      update();
++    });
+     pi.on("session_shutdown", async () => { run.abort(); unsubscribeInput?.(); unsubscribeInput = undefined; context = undefined; await journal.flush(); });
+ 
+     pi.registerCommand("pij", {
+@@ -46,7 +84,9 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       handler: async (args, ctx) => {
+         const command = args.trim() || "status";
+         if (command === "assist" || command === "observe" || command === "off") {
+-          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command; update();
++          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command;
++          pi.appendEntry<PijModeData>(PIJ_MODE_CUSTOM_TYPE, { version: 1, mode });
++          update();
+           ctx.ui.notify(`PiJ mode: ${mode}. ${mode === "assist" ? "Jev suggestions can assist this session." : mode === "observe" ? "Decisions are recorded without changing recommendations or ranking." : "No Jev requests will be made."}`, "info");
+         } else if (command === "decisions") ctx.ui.notify(formatDecisions(journal.recent().slice(-8)), "info");
+         else if (command === "status") {

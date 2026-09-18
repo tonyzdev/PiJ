@@ -1,0 +1,35 @@
+diff --git a/src/torrra/core/download.py b/src/torrra/core/download.py
+index e0b6c7f..2b2e3bb 100644
+--- a/src/torrra/core/download.py
++++ b/src/torrra/core/download.py
+@@ -24,10 +24,17 @@ class DownloadManager:
+         lt.torrent_status.states.downloading_metadata: ("Fetching", "META"),
+         lt.torrent_status.states.checking_files: ("Checking", "CHCK"),
+         lt.torrent_status.states.checking_resume_data: ("Checking", "CHCK"),
+-        lt.torrent_status.states.queued_for_checking: ("Checking", "CHCK"),
+-        lt.torrent_status.states.allocating: ("Allocating", "ALOC"),
+     }
+ 
++    # ABI-1-only states; absent from ABI-2 bindings (e.g. Homebrew's libtorrent).
++    for _name, _label in (
++        ("queued_for_checking", ("Checking", "CHCK")),
++        ("allocating", ("Allocating", "ALOC")),
++    ):
++        if (_state := getattr(lt.torrent_status.states, _name, None)) is not None:
++            _STATE_MAP[_state] = _label
++    del _name, _label
++
+     def __init__(self) -> None:
+         settings: lt.settings_pack = {
+             "listen_interfaces": "0.0.0.0:6881,[::]:6881,0.0.0.0:0",
+@@ -221,8 +228,8 @@ class DownloadManager:
+         error_msg: str | None = None
+         if s.errc and s.errc.value() != 0:
+             error_msg = s.errc.message()
+-        elif s.error:
+-            error_msg = s.error
++        elif legacy_error := getattr(s, "error", None):
++            error_msg = legacy_error
+ 
+         error_file = getattr(s, "error_file", -1)
+ 

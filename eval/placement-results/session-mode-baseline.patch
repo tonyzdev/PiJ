@@ -1,0 +1,309 @@
+diff --git a/src/extension.ts b/src/extension.ts
+index 8f06520..c72eb24 100644
+--- a/src/extension.ts
++++ b/src/extension.ts
+@@ -9,6 +9,23 @@ import { retrieveCode, type CodeCandidate } from "./search.js";
+ import { DecisionJournal } from "./telemetry.js";
+ import { cleanText, cleanDisplayText, formatDecisions, header, statusText } from "./ui.js";
+ 
++/** Allowlisted, bounded structure stored per mode change. No prompts, excerpts, or credentials. */
++const PIJ_MODE_CUSTOM_TYPE = "pij-mode" as const;
++interface PijModeData { version: 1; mode: DecisionMode; }
++
++/**
++ * Validates that an unknown value is a well-formed pij-mode data record.
++ * Rejects extra fields, unknown versions, unknown modes, and non-objects.
++ */
++export function isValidPijModeData(data: unknown): data is PijModeData {
++  if (data === null || typeof data !== "object") return false;
++  const d = data as Record<string, unknown>;
++  const keys = Object.keys(d);
++  if (keys.length !== 2 || !keys.includes("version") || !keys.includes("mode")) return false;
++  if (d["version"] !== 1) return false;
++  return d["mode"] === "assist" || d["mode"] === "observe" || d["mode"] === "off";
++}
++
+ export function createPijExtension(config: PijConfig): ExtensionFactory {
+   return (pi) => {
+     let mode: DecisionMode = config.mode;
+@@ -31,6 +48,16 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       skillPending = false; skillAdvice = undefined; skills = [];
+       context = ctx;
+       unsubscribeInput?.();
++      // Restore mode from the active branch. config.mode is only the default when
++      // the branch has no valid pij-mode entry. Walk newest-first; the first valid
++      // entry wins. Invalid entries (wrong type, extra fields, bad version/mode)
++      // are skipped so they cannot hide an older valid selection.
++      mode = config.mode;
++      for (const entry of ctx.sessionManager.getBranch()) {
++        if (entry.type === "custom" && entry.customType === PIJ_MODE_CUSTOM_TYPE) {
++          if (isValidPijModeData(entry.data)) { mode = entry.data.mode; break; }
++        }
++      }
+       if (ctx.mode === "tui") {
+         ctx.ui.setTitle("PiJ");
+         ctx.ui.setHeader((_tui, theme) => ({ render: (width) => header(theme, width, config), invalidate() {} }));
+@@ -47,6 +74,10 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+         const command = args.trim() || "status";
+         if (command === "assist" || command === "observe" || command === "off") {
+           run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command; update();
++          // Persist the selection on the active branch so reopened/resumed sessions
++          // restore it. Uses a bounded, allowlisted custom entry with no prompts,
++          // excerpts, or credentials. Does not become a model-context message.
++          pi.appendEntry<PijModeData>(PIJ_MODE_CUSTOM_TYPE, { version: 1, mode: command });
+           ctx.ui.notify(`PiJ mode: ${mode}. ${mode === "assist" ? "Jev suggestions can assist this session." : mode === "observe" ? "Decisions are recorded without changing recommendations or ranking." : "No Jev requests will be made."}`, "info");
+         } else if (command === "decisions") ctx.ui.notify(formatDecisions(journal.recent().slice(-8)), "info");
+         else if (command === "status") {
+diff --git a/test/mode-persistence.test.ts b/test/mode-persistence.test.ts
+new file mode 100644
+index 0000000..d192900
+--- /dev/null
++++ b/test/mode-persistence.test.ts
+@@ -0,0 +1,247 @@
++/**
++ * Unit and lightweight integration tests for the pij-mode session persistence.
++ *
++ * These tests cover:
++ * - isValidPijModeData: schema guard used for backward-walk validation
++ * - mode restoration on session_start (in-process, no network)
++ * - invalid entries do not hide older valid ones (backward-search semantics)
++ * - a new session falls back to config.mode
++ */
++
++import assert from "node:assert/strict";
++import { mkdir, mkdtemp, rm } from "node:fs/promises";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import test from "node:test";
++import {
++  createAgentSession,
++  DefaultResourceLoader,
++  ModelRuntime,
++  SessionManager,
++  SettingsManager,
++} from "@earendil-works/pi-coding-agent";
++import { loadConfig } from "../src/config.js";
++import { createPijExtension } from "../src/extension.js";
++import { isValidPijModeData } from "../src/extension.js";
++
++// ---------------------------------------------------------------------------
++// isValidPijModeData – pure validation guard
++// ---------------------------------------------------------------------------
++
++test("isValidPijModeData accepts well-formed entries for all three modes", () => {
++  assert.ok(isValidPijModeData({ version: 1, mode: "assist" }));
++  assert.ok(isValidPijModeData({ version: 1, mode: "observe" }));
++  assert.ok(isValidPijModeData({ version: 1, mode: "off" }));
++});
++
++test("isValidPijModeData rejects non-objects", () => {
++  for (const v of [null, undefined, 42, "assist", [], true]) {
++    assert.equal(isValidPijModeData(v), false, `should reject ${JSON.stringify(v)}`);
++  }
++});
++
++test("isValidPijModeData rejects unknown modes", () => {
++  assert.equal(isValidPijModeData({ version: 1, mode: "unknown" }), false);
++  assert.equal(isValidPijModeData({ version: 1, mode: "" }), false);
++  assert.equal(isValidPijModeData({ version: 1, mode: 1 }), false);
++});
++
++test("isValidPijModeData rejects unsupported versions", () => {
++  assert.equal(isValidPijModeData({ version: 2, mode: "assist" }), false);
++  assert.equal(isValidPijModeData({ version: 0, mode: "assist" }), false);
++  assert.equal(isValidPijModeData({ version: "1", mode: "assist" }), false);
++});
++
++test("isValidPijModeData rejects extra fields", () => {
++  assert.equal(isValidPijModeData({ version: 1, mode: "assist", extra: true }), false);
++  assert.equal(isValidPijModeData({ version: 1, mode: "off", timestamp: 0 }), false);
++});
++
++test("isValidPijModeData rejects missing fields", () => {
++  assert.equal(isValidPijModeData({ version: 1 }), false);
++  assert.equal(isValidPijModeData({ mode: "assist" }), false);
++  assert.equal(isValidPijModeData({}), false);
++});
++
++// ---------------------------------------------------------------------------
++// Helpers shared by the in-process integration tests
++// ---------------------------------------------------------------------------
++
++/** Minimal model runtime wired to a provider that never needs real auth. */
++async function buildRuntime(home: string): Promise<ModelRuntime> {
++  const rt = await ModelRuntime.create({
++    authPath: join(home, "auth.json"),
++    modelsPath: null,
++    refreshOnCreate: false,
++  });
++  // Register a loopback-only provider so no real credentials are needed.
++  rt.registerProvider("pij-mode-test", {
++    baseUrl: "http://127.0.0.1:0/v1",   // not actually called; commands are command-only
++    api: "openai-completions",
++    apiKey: "fixture",
++    models: [{
++      id: "fixture",
++      name: "fixture",
++      reasoning: false,
++      input: ["text"],
++      cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 },
++      contextWindow: 32000,
++      maxTokens: 128,
++    }],
++  });
++  return rt;
++}
++
++async function openSession(
++  runtime: ModelRuntime,
++  home: string,
++  cwd: string,
++  manager: SessionManager,
++  configMode: "assist" | "observe" | "off" = "assist",
++) {
++  const settings = SettingsManager.inMemory({ retry: { enabled: false }, compaction: { enabled: false } });
++  const resources = new DefaultResourceLoader({
++    cwd,
++    agentDir: home,
++    settingsManager: settings,
++    noExtensions: true,
++    noSkills: true,
++    noThemes: true,
++    noPromptTemplates: true,
++    agentsFilesOverride: () => ({ agentsFiles: [] }),
++    skillsOverride: () => ({ skills: [], diagnostics: [] }),
++    extensionFactories: [createPijExtension(loadConfig({ PIJ_HOME: home, PIJ_MODE: configMode }))],
++  });
++  await resources.reload();
++  const { session } = await createAgentSession({
++    cwd,
++    agentDir: home,
++    modelRuntime: runtime,
++    model: runtime.getModel("pij-mode-test", "fixture"),
++    resourceLoader: resources,
++    settingsManager: settings,
++    sessionManager: manager,
++    tools: [],
++  });
++  const notices: string[] = [];
++  await session.bindExtensions({
++    uiContext: {
++      ...session.extensionRunner.createContext().ui,
++      notify: (message) => notices.push(message),
++    },
++  });
++  return { session, notices };
++}
++
++// ---------------------------------------------------------------------------
++// In-process integration: new session defaults to config.mode
++// ---------------------------------------------------------------------------
++
++test("new session uses config.mode when no pij-mode entry exists", { timeout: 5000 }, async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-mode-new-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  await mkdir(cwd);
++  const rt = await buildRuntime(home);
++  t.after(async () => { await rm(root, { recursive: true, force: true }); });
++
++  for (const configMode of ["assist", "observe", "off"] as const) {
++    const { session, notices } = await openSession(rt, home, cwd, SessionManager.inMemory(cwd), configMode);
++    await session.prompt("/pij status");
++    assert.match(notices.at(-1)!, new RegExp(`Mode: ${configMode}\\b`),
++      `config mode ${configMode} must be the default for a new session`);
++    session.dispose();
++  }
++});
++
++// ---------------------------------------------------------------------------
++// In-process integration: mode command records entry, re-open restores it
++// ---------------------------------------------------------------------------
++
++test("mode command recorded as session entry survives an in-memory branch walk", { timeout: 5000 }, async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-mode-walk-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  await mkdir(cwd);
++  const rt = await buildRuntime(home);
++  t.after(async () => { await rm(root, { recursive: true, force: true }); });
++
++  // Use a persistent session so we can re-open it
++  const sessDir = join(root, "sessions");
++  const manager = SessionManager.create(cwd, sessDir);
++  const { session: first, notices: n1 } = await openSession(rt, home, cwd, manager, "assist");
++
++  // Switch mode to "observe" inside first session (no model request needed)
++  await first.prompt("/pij observe");
++  assert.match(n1.at(-1)!, /PiJ mode: observe/, "notify must confirm the switch");
++
++  // The SessionManager now has the custom entry in-memory; extract the path
++  // to the session manager so we can reconstruct a ReadonlySessionManager view.
++  const entries = manager.getEntries();
++  const modeEntry = entries.find((e) => e.type === "custom" && (e as { customType: string }).customType === "pij-mode");
++  assert.ok(modeEntry, "a pij-mode custom entry must exist after the mode command");
++  assert.deepEqual((modeEntry as { data: unknown }).data, { version: 1, mode: "observe" });
++
++  first.dispose();
++});
++
++// ---------------------------------------------------------------------------
++// In-process integration: invalid entries are skipped, older valid one wins
++// ---------------------------------------------------------------------------
++
++test("invalid pij-mode entries are skipped; backward search finds the last valid selection", { timeout: 5000 }, async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-mode-invalid-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  await mkdir(cwd);
++  const rt = await buildRuntime(home);
++  t.after(async () => { await rm(root, { recursive: true, force: true }); });
++
++  // Build a session that has: valid "off", then invalid entries layered on top.
++  const sessDir = join(root, "sessions");
++  const manager = SessionManager.create(cwd, sessDir);
++  const { session: first } = await openSession(rt, home, cwd, manager, "assist");
++
++  // Record a valid "off" selection.
++  await first.prompt("/pij off");
++  // Manually append invalid pij-mode entries on top of the valid one.
++  // These simulate future/corrupted entries that should NOT hide the valid one.
++  manager.appendCustomEntry("pij-mode");                                       // no data
++  manager.appendCustomEntry("pij-mode", { version: 2, mode: "assist" });       // unsupported version
++  manager.appendCustomEntry("pij-mode", { version: 1, mode: "unknown" });      // unknown mode
++  manager.appendCustomEntry("pij-mode", { version: 1, mode: "off", x: true }); // extra field
++  manager.appendCustomEntry("other-type", { version: 1, mode: "assist" });     // different customType
++
++  first.dispose();
++
++  // Re-open the session; the backward walk should skip all invalid entries
++  // and land on the valid "off" entry.
++  const { session: second, notices } = await openSession(rt, home, cwd, SessionManager.open(manager.getSessionFile()!), "assist");
++  await second.prompt("/pij status");
++  assert.match(notices.at(-1)!, /Mode: off\b/, "must restore the valid off selection despite invalid entries above it");
++  second.dispose();
++});
++
++// ---------------------------------------------------------------------------
++// In-process integration: config.mode overrides nothing if branch is clean
++// ---------------------------------------------------------------------------
++
++test("explicit saved assist overrides a configured off", { timeout: 5000 }, async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-mode-override-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  await mkdir(cwd);
++  const rt = await buildRuntime(home);
++  t.after(async () => { await rm(root, { recursive: true, force: true }); });
++
++  // Session created with config.mode = "off"
++  const sessDir = join(root, "sessions");
++  const manager = SessionManager.create(cwd, sessDir);
++  const { session: first } = await openSession(rt, home, cwd, manager, "off");
++
++  // User explicitly switches to "assist" inside the session
++  await first.prompt("/pij assist");
++  first.dispose();
++
++  // Re-open with config.mode still "off"; the saved entry must win.
++  const { session: second, notices } = await openSession(rt, home, cwd, SessionManager.open(manager.getSessionFile()!), "off");
++  await second.prompt("/pij status");
++  assert.match(notices.at(-1)!, /Mode: assist\b/, "saved assist must override the configured off");
++  second.dispose();
++});

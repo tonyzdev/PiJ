@@ -1,0 +1,32 @@
+diff --git a/rollout_runtime/workers/rollout_worker.py b/rollout_runtime/workers/rollout_worker.py
+index 12efd7b..6181fce 100644
+--- a/rollout_runtime/workers/rollout_worker.py
++++ b/rollout_runtime/workers/rollout_worker.py
+@@ -227,7 +227,13 @@ class RuntimeRolloutWorker:
+         while self._serving:
+             batch = self.scheduler.next_batch(loop.time())
+             if batch:
+-                self._spawn(self._run_batch(batch, response_channel))
++                task = self._spawn(self._run_batch(batch, response_channel))
++                # Wait for the in-flight batch to finish before pulling the next
++                # one. The GPU executes one forward at a time, so spawning a new
++                # batch while the previous one is still running only queues tiny
++                # forwards behind it. Waiting lets requests accumulate during the
++                # forward, so the next batch is larger instead of fragmented.
++                await task
+                 continue
+             self._wake.clear()
+             delay = self.scheduler.time_until_ready(loop.time())
+@@ -251,10 +257,11 @@ class RuntimeRolloutWorker:
+             with contextlib.suppress(asyncio.TimeoutError, asyncio.CancelledError):
+                 await asyncio.wait_for(self._wake.wait(), delay)
+ 
+-    def _spawn(self, coroutine: Any) -> None:
++    def _spawn(self, coroutine: Any) -> asyncio.Task[None]:
+         task = asyncio.get_running_loop().create_task(coroutine)
+         self._tasks.add(task)
+         task.add_done_callback(self._finish_task)
++        return task
+ 
+     async def _run_batch(
+         self, batch: list[PendingRequest], response_channel: Any

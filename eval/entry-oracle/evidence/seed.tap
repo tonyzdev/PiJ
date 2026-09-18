@@ -1,0 +1,49 @@
+TAP version 13
+# ENTRY_OWNERSHIP [{"index":0,"matchesActualUser":false,"referencedRole":null,"cached":false},{"index":1,"matchesActualUser":false,"referencedRole":null,"cached":true}]
+# Subtest: entry oracle: journal IDs exactly identify consumed SDK user entries, including a cache hit
+not ok 1 - entry oracle: journal IDs exactly identify consumed SDK user entries, including a cache hit
+  ---
+  duration_ms: 131.640625
+  type: 'test'
+  location: '<candidate>/.entry-oracle-VBN4es/entry-ownership.test.ts:3:3257'
+  failureType: 'testCodeFailure'
+  error: |-
+    journal IDs must equal the actual consumed user-entry IDs
+    + actual - expected
+
+      [
+    +   '83da147e-4a00-4cd6-b4d5-370009f9b863',
+    +   '83da147e-4a00-4cd6-b4d5-370009f9b863'
+    -   '0d632575',
+    -   '5ace97d8'
+      ]
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: '0d632575'
+    1: '5ace97d8'
+  actual:
+    0: '83da147e-4a00-4cd6-b4d5-370009f9b863'
+    1: '83da147e-4a00-4cd6-b4d5-370009f9b863'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (<candidate>/.entry-oracle-VBN4es/entry-ownership.test.ts:119:10)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+  ...
+# Subtest: entry oracle: newly generated journal rows display their emitted user identity
+ok 2 - entry oracle: newly generated journal rows display their emitted user identity
+  ---
+  duration_ms: 22.689792
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 1
+# fail 1
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1182.794917

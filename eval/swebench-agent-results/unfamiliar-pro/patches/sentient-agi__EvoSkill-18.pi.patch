@@ -1,0 +1,104 @@
+diff --git a/src/cli/shared.py b/src/cli/shared.py
+index fae97a2..fb45f3f 100644
+--- a/src/cli/shared.py
++++ b/src/cli/shared.py
+@@ -3,9 +3,26 @@
+ from __future__ import annotations
+ 
+ import asyncio
++import logging
+ import os
+ from typing import TYPE_CHECKING
+ 
++logger = logging.getLogger(__name__)
++
++
++class _SafeFormatDict(dict):
++    """dict subclass that leaves unknown/brace-heavy placeholders untouched.
++
++    ``str.format_map`` raises ``KeyError``/``ValueError`` when a value contains
++    literal braces (e.g. ``"{}"`` in an answer) or when a placeholder is
++    missing. This mapping returns the original ``{...}`` text for any missing
++    key so formatting never crashes on user-provided answers.
++    """
++
++    def __missing__(self, key: str) -> str:
++        return "{" + key + "}"
++
++
+ import pandas as pd
+ 
+ if TYPE_CHECKING:
+@@ -186,13 +203,30 @@ def make_scorer(cfg: ProjectConfig):
+             try:
+                 text = await call_llm(provider, model, prompt)
+                 return float(text.strip())
+-            except (ValueError, Exception):
++            except ValueError:
++                logger.warning(
++                    "LLM scorer could not parse a numeric score from response %r",
++                    text,
++                )
++                return 0.0
++            except Exception:
++                logger.exception("LLM scorer failed")
+                 return 0.0
+ 
+         def llm_scorer(question: str, predicted: str, ground_truth: str) -> float:
+-            return asyncio.get_event_loop().run_until_complete(
+-                llm_score(question, predicted, ground_truth)
+-            )
++            coro = llm_score(question, predicted, ground_truth)
++            try:
++                asyncio.get_running_loop()
++            except RuntimeError:
++                # No running loop: run directly in this thread.
++                return asyncio.run(coro)
++            # A loop is already running (e.g. inside SelfImprovingLoop), so we
++            # cannot block it with run_until_complete. Run the coroutine on a
++            # fresh loop in a separate thread instead.
++            import concurrent.futures
++
++            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
++                return pool.submit(asyncio.run, coro).result()
+ 
+         return llm_scorer
+ 
+@@ -200,12 +234,35 @@ def make_scorer(cfg: ProjectConfig):
+         import shlex
+         import subprocess
+ 
++        command = cfg.scorer.command
++        if not command or not command.strip():
++            raise ValueError(
++                "scorer.command must be set when scorer.type is 'script'"
++            )
++
+         def script_scorer(question: str, predicted: str, ground_truth: str) -> float:
+-            cmd = cfg.scorer.command.format(predicted=predicted, expected=ground_truth)
+-            result = subprocess.run(shlex.split(cmd), capture_output=True, text=True)
++            cmd = command.format_map(
++                _SafeFormatDict(
++                    predicted=predicted, expected=ground_truth, question=question
++                )
++            )
++            try:
++                result = subprocess.run(
++                    shlex.split(cmd),
++                    capture_output=True,
++                    text=True,
++                    timeout=30,
++                )
++            except subprocess.TimeoutExpired:
++                logger.warning("Script scorer timed out after 30s: %s", cmd)
++                return 0.0
+             try:
+                 return float(result.stdout.strip())
+             except ValueError:
++                logger.warning(
++                    "Script scorer could not parse a numeric score from stdout %r",
++                    result.stdout,
++                )
+                 return 0.0
+ 
+         return script_scorer

@@ -11,9 +11,10 @@ import { loadConfig, type DecisionMode, type JevProvider } from "../src/config.j
 import { readRecentDecisions } from "../src/telemetry.js";
 import type { Question } from "../src/jev.js";
 
+for (const retrieval of ["literal", "question", "briefing"] as const) {
 for (const provider of ["typesafe", "vercel"] satisfies JevProvider[]) {
 for (const mode of ["assist", "observe", "off"] satisfies DecisionMode[]) {
-  test(`real Pi runtime: ${provider}/${mode} preserves tool execution and applies only permitted Jev effects`, async (t) => {
+  test(`real Pi runtime: ${provider}/${mode}/${retrieval} preserves tool execution and applies only permitted Jev effects`, async (t) => {
     const cwd = await mkdtemp(join(tmpdir(), "pij-integration-"));
     t.after(() => rm(cwd, { recursive: true, force: true }));
     await writeFile(join(cwd, "a.ts"), "export const token = 'unrelated';\n");
@@ -47,7 +48,7 @@ for (const mode of ["assist", "observe", "off"] satisfies DecisionMode[]) {
       modelRequests.push(text);
       llmCalls++;
       const calls = [
-        { name: "pij_search", arguments: { query: "Find token refresh implementation", patterns: ["token"] } },
+        { name: "pij_search", arguments: { query: "Find token refresh implementation", ...(retrieval === "literal" ? { patterns: ["token"] } : {}) } },
         { name: "bash", arguments: { command: "exit 2" } },
         { name: "write", arguments: { path: "proof.txt", content: "PiJ tool execution verified\n" } },
       ];
@@ -65,7 +66,7 @@ for (const mode of ["assist", "observe", "off"] satisfies DecisionMode[]) {
     assert.ok(address && typeof address === "object");
     const baseUrl = `http://127.0.0.1:${address.port}/v1`;
     const home = join(cwd, "home");
-    const config = loadConfig({ PIJ_HOME: home, PIJ_MODE: mode, PIJ_JEV_PROVIDER: provider, TYPESAFE_API_KEY: "fixture-key", AI_GATEWAY_API_KEY: "fixture-key", PIJ_JEV_ENDPOINT: provider === "vercel" ? baseUrl : `${baseUrl}/systemone` });
+    const config = loadConfig({ PIJ_HOME: home, PIJ_MODE: mode, PIJ_SOURCE_BRIEFING: retrieval === "briefing" ? "1" : "0", PIJ_JEV_PROVIDER: provider, TYPESAFE_API_KEY: "fixture-key", AI_GATEWAY_API_KEY: "fixture-key", PIJ_JEV_ENDPOINT: provider === "vercel" ? baseUrl : `${baseUrl}/systemone` });
     const runtime = await ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
     runtime.registerProvider("pij-fixture", {
       baseUrl, api: "openai-completions", apiKey: "fixture-key",
@@ -87,18 +88,57 @@ for (const mode of ["assist", "observe", "off"] satisfies DecisionMode[]) {
     await session.prompt("Inspect token refresh code, then write proof.txt.");
     assert.equal(await readFile(join(cwd, "proof.txt"), "utf8"), "PiJ tool execution verified\n");
     assert.equal(llmCalls, 4);
+    assert.equal(modelRequests[0]!.includes("PiJ initial evidence"), retrieval === "briefing");
+    if (retrieval === "briefing") {
+      assert.ok(modelRequests[0]!.includes("refreshToken"));
+      assert.equal(modelRequests[0]!.includes("ranked by a judgement model"), mode === "assist");
+      const conversation = JSON.parse(modelRequests[3]!).messages as { role: string; content: unknown }[];
+      const snapshotIndex = conversation.findIndex((message) => JSON.stringify(message.content).includes("PiJ initial evidence"));
+      assert.ok(snapshotIndex > 0 && snapshotIndex < conversation.findIndex((message) => message.role === "assistant"), "initial evidence must precede subsequent tool observations, not arrive as a fresh user message after every tool");
+    }
     const search = session.messages.find((m) => m.role === "toolResult" && m.toolName === "pij_search");
     const searchText = JSON.stringify(search);
     assert.ok(searchText.includes("a.ts") && searchText.includes("b.ts"));
-    assert.ok(mode === "assist" ? searchText.indexOf("b.ts") < searchText.indexOf("a.ts") : searchText.indexOf("a.ts") < searchText.indexOf("b.ts"));
+    if (retrieval === "literal") assert.ok(mode === "assist" ? searchText.indexOf("b.ts") < searchText.indexOf("a.ts") : searchText.indexOf("a.ts") < searchText.indexOf("b.ts"));
+    else {
+      assert.equal(search?.role === "toolResult" && search.isError, false);
+      assert.ok(searchText.includes("source discovery"));
+      assert.equal(searchText.includes("Jev ranked"), mode === "assist");
+    }
     const failure = session.messages.find((m) => m.role === "toolResult" && m.toolName === "bash");
     assert.ok(failure && failure.role === "toolResult" && failure.isError);
     assert.equal(JSON.stringify(failure).includes("PiJ diagnostic suggestion"), mode === "assist");
     const transcript = modelRequests.join("\n");
     assert.equal(transcript.includes("PiJ skill suggestion"), mode === "assist");
     const records = await readRecentDecisions(home);
+    const userEntry = session.sessionManager.getBranch().findLast((entry) => entry.type === "message" && entry.message.role === "user");
+    assert.ok(userEntry);
+    for (const row of records) {
+      assert.equal(row.sessionId, session.sessionId);
+      assert.equal(row.userMessageId, userEntry.id);
+    }
     if (mode === "off") { assert.equal(jevCalls, 0); assert.equal(records.length, 0); }
-    else { assert.equal(jevCalls, 4); assert.equal(records.length, 4); }
+    else { assert.equal(jevCalls, retrieval === "briefing" ? 5 : 4); assert.equal(records.length, jevCalls); }
+    if (retrieval === "briefing") {
+      await writeFile(join(cwd, "b.ts"), "export const changedSnapshot = true;\n");
+      await session.prompt("Inspect the changed snapshot for this next task.");
+      assert.ok(modelRequests.at(-1)!.includes("changedSnapshot"));
+      const latest = await readRecentDecisions(home);
+      assert.equal(latest.filter((row) => row.kind === "source_briefing").length, mode === "off" ? 0 : 2);
+      if (mode !== "off") assert.notEqual(latest.at(-1)!.userMessageId, userEntry.id);
+      const previousSession = session.sessionId;
+      const { session: switchedSession } = await createAgentSession({ cwd, agentDir: home, model: runtime.getModel("pij-fixture", "fixture"), modelRuntime: runtime, resourceLoader: resources, settingsManager: settings, sessionManager: SessionManager.inMemory() });
+      t.after(() => switchedSession.dispose());
+      await switchedSession.bindExtensions({});
+      assert.notEqual(switchedSession.sessionId, previousSession);
+      await switchedSession.prompt("Inspect token refresh in this new session.");
+      const switched = await readRecentDecisions(home);
+      if (mode !== "off") {
+        assert.equal(switched.at(-1)!.sessionId, switchedSession.sessionId);
+        assert.notEqual(switched.at(-1)!.userMessageId, latest.at(-1)!.userMessageId);
+      }
+    }
   });
+}
 }
 }

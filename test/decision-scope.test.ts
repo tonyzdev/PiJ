@@ -1,0 +1,118 @@
+import assert from "node:assert/strict";
+import { once } from "node:events";
+import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { createServer } from "node:http";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import test from "node:test";
+import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager } from "@earendil-works/pi-coding-agent";
+import { loadConfig } from "../src/config.js";
+import { createPijExtension } from "../src/extension.js";
+import { readRecentDecisions } from "../src/telemetry.js";
+
+const query = "Where does the session token refresh happen?";
+
+async function scopedSession(t: test.TestContext) {
+  const root = await mkdtemp(join(tmpdir(), "pij-decision-scope-"));
+  t.after(() => rm(root, { recursive: true, force: true }));
+  const cwd = join(root, "project");
+  const home = join(root, "agent");
+  await mkdir(cwd);
+  await writeFile(join(cwd, "refresh.ts"), "export function refreshSessionToken() { return 'refreshed'; }\n");
+  await writeFile(join(cwd, "queue.ts"), "export function cancelQueuedRequest() { return 'cancelled'; }\n");
+  let modelCalls = 0;
+  let jevCalls = 0;
+  let entered!: () => void;
+  const rankEntered = new Promise<void>((resolve) => { entered = resolve; });
+  let release = () => {};
+  const http = createServer(async (req, res) => {
+    let body = "";
+    for await (const chunk of req) body += String(chunk);
+    if (req.url === "/v1/systemone") {
+      jevCalls++;
+      const request = JSON.parse(body) as { questions: Record<string, unknown> };
+      const answers = Object.fromEntries(Object.keys(request.questions).map((id) => [id, { type: "noul", noul: 0.8 }]));
+      // Hold the real transport until steering or cancellation has been queued.
+      release = () => {
+        res.writeHead(200, { "Content-Type": "application/json" });
+        res.end(JSON.stringify({ model: "jev-fixture", answers, usage: { input_tokens: 100, output_tokens: 0 } }));
+      };
+      entered();
+      return;
+    }
+    modelCalls++;
+    const delta = modelCalls <= 2
+      ? { role: "assistant", tool_calls: [{ index: 0, id: `search_${modelCalls}`, type: "function", function: { name: "pij_search", arguments: JSON.stringify({ query }) } }] }
+      : { role: "assistant", content: "Search complete." };
+    res.writeHead(200, { "Content-Type": "text/event-stream" });
+    for (const [chunk, finish] of [[delta, null], [{}, modelCalls <= 2 ? "tool_calls" : "stop"]]) {
+      res.write(`data: ${JSON.stringify({ id: `completion_${modelCalls}`, object: "chat.completion.chunk", model: "fixture", choices: [{ index: 0, delta: chunk, finish_reason: finish }] })}\n\n`);
+    }
+    res.end("data: [DONE]\n\n");
+  });
+  http.listen(0, "127.0.0.1");
+  await once(http, "listening");
+  t.after(() => { http.closeAllConnections(); http.close(); });
+  const address = http.address();
+  assert.ok(address && typeof address === "object");
+  const baseUrl = `http://127.0.0.1:${address.port}/v1`;
+  const runtime = await ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
+  runtime.registerProvider("pij-fixture", { baseUrl, api: "openai-completions", apiKey: "fixture", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 32000, maxTokens: 512 }] });
+  const settings = SettingsManager.inMemory({ retry: { enabled: false }, compaction: { enabled: false } });
+  const resources = new DefaultResourceLoader({
+    cwd, agentDir: home, settingsManager: settings, noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true,
+    agentsFilesOverride: () => ({ agentsFiles: [] }), skillsOverride: () => ({ skills: [], diagnostics: [] }),
+    extensionFactories: [createPijExtension(loadConfig({ PIJ_HOME: home, PIJ_MODE: "assist", PIJ_SOURCE_BRIEFING: "0", TYPESAFE_API_KEY: "fixture", PIJ_JEV_ENDPOINT: `${baseUrl}/systemone`, PIJ_JEV_TIMEOUT_MS: "5000" }))],
+  });
+  await resources.reload();
+  assert.deepEqual(resources.getExtensions().errors, []);
+  const { session } = await createAgentSession({ cwd, agentDir: home, modelRuntime: runtime, model: runtime.getModel("pij-fixture", "fixture"), settingsManager: settings, resourceLoader: resources, sessionManager: SessionManager.inMemory() });
+  t.after(() => session.dispose());
+  await session.bindExtensions({});
+  return { session, home, rankEntered, release: () => release(), jevCalls: () => jevCalls, modelCalls: () => modelCalls };
+}
+
+test("consumed steering binds the next cached decision to its actual user entry", { timeout: 10000 }, async (t) => {
+  const fixture = await scopedSession(t);
+  const prompt = fixture.session.prompt(query);
+  await fixture.rankEntered;
+  const initial = fixture.session.sessionManager.getBranch().findLast((entry) => entry.type === "message" && entry.message.role === "user");
+  assert.ok(initial);
+  await fixture.session.steer("Now inspect queue cancellation.");
+  fixture.release();
+  await prompt;
+  const users = fixture.session.sessionManager.getBranch().filter((entry) => entry.type === "message" && entry.message.role === "user");
+  assert.equal(users.length, 2);
+  assert.notEqual(users[1]!.id, initial.id);
+  const records = await readRecentDecisions(fixture.home);
+  assert.equal(records.length, 2);
+  assert.ok(records.every((row) => row.kind === "code_rank" && row.status === "ok" && row.sessionId === fixture.session.sessionId));
+  assert.equal(records[0]!.userMessageId, initial.id);
+  assert.equal(records[1]!.userMessageId, users[1]!.id);
+  assert.equal(records[0]!.cached, false);
+  assert.equal(records[1]!.cached, true);
+  assert.equal(fixture.jevCalls(), 1, "The same cached ranking must still receive a fresh decision scope");
+  assert.equal(fixture.modelCalls(), 3);
+});
+
+test("cancelled decision keeps its original scope when steering is queued during ranking", { timeout: 10000 }, async (t) => {
+  const fixture = await scopedSession(t);
+  const prompt = fixture.session.prompt(query);
+  await fixture.rankEntered;
+  const initial = fixture.session.sessionManager.getBranch().findLast((entry) => entry.type === "message" && entry.message.role === "user");
+  assert.ok(initial);
+  await fixture.session.steer("This queued message must not own the running request.");
+  const usersBeforeAbort = fixture.session.sessionManager.getBranch().filter((entry) => entry.type === "message" && entry.message.role === "user");
+  assert.deepEqual(usersBeforeAbort.map((entry) => entry.id), [initial.id]);
+  await fixture.session.abort();
+  await prompt;
+  const records = await readRecentDecisions(fixture.home);
+  assert.equal(records.length, 1);
+  assert.equal(records[0]!.kind, "code_rank");
+  assert.equal(records[0]!.status, "fallback");
+  assert.equal(records[0]!.reason, "cancelled");
+  assert.equal(records[0]!.sessionId, fixture.session.sessionId);
+  assert.equal(records[0]!.userMessageId, initial.id);
+  assert.equal(fixture.jevCalls(), 1);
+  assert.equal(fixture.modelCalls(), 1);
+});

@@ -1,0 +1,23 @@
+diff --git a/repro_tmp.py b/repro_tmp.py
+new file mode 100644
+index 0000000..992c50c
+--- /dev/null
++++ b/repro_tmp.py
+@@ -0,0 +1,17 @@
++import django
++from django.conf import settings
++settings.configure(
++    DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}},
++    INSTALLED_APPS=['django.contrib.contenttypes', 'django.contrib.auth', 'tests.queries'],
++)
++django.setup()
++from django.db.backends.sqlite3.features import DatabaseFeatures
++DatabaseFeatures.supports_slicing_ordering_in_compound = True
++from tests.queries.models import Number
++qs1 = Number.objects.filter(num__lte=1)
++qs2 = Number.objects.filter(num__gte=2, num__lte=3).order_by('num')
++qs = qs1.union(qs2)
++print("qs SQL:", str(qs.query))
++derived = qs.order_by().values_list('pk', flat=True)
++print("derived SQL:", str(derived.query))
++print("qs SQL after:", str(qs.query))

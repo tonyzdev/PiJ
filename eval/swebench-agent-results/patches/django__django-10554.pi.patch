@@ -1,0 +1,66 @@
+diff --git a/scratch/repro.py b/scratch/repro.py
+new file mode 100644
+index 0000000..0b91d97
+--- /dev/null
++++ b/scratch/repro.py
+@@ -0,0 +1,20 @@
++import django
++from django.conf import settings
++settings.configure(
++    DEBUG=True,
++    DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}},
++    INSTALLED_APPS=['django.contrib.contenttypes', 'django.contrib.auth', 'tests.queries'],
++)
++django.setup()
++from django.db import connection
++from tests.queries.models import Number
++with connection.schema_editor() as se:
++    se.create_model(Number)
++for i in range(10):
++    Number.objects.create(num=i)
++qs1 = Number.objects.filter(num__lte=1)
++qs2 = Number.objects.filter(num__gte=2, num__lte=3)
++qs = qs1.union(qs2.order_by('num'))
++print("qs:", list(qs))
++print("order_by():", list(qs.order_by().values_list('pk', flat=True)))
++print("qs again:", list(qs))
+diff --git a/scratch/repro_test.py b/scratch/repro_test.py
+new file mode 100644
+index 0000000..c3af621
+--- /dev/null
++++ b/scratch/repro_test.py
+@@ -0,0 +1,13 @@
++from django.db.models import F
++from django.test import TestCase
++from .models import Number
++
++
++class ReproTests(TestCase):
++    def test_repro(self):
++        qs1 = Number.objects.filter(num__lte=1)
++        qs2 = Number.objects.filter(num__gte=2, num__lte=3)
++        qs = qs1.union(qs2.order_by('num'))
++        print("qs:", list(qs))
++        print("order_by():", list(qs.order_by().values_list('pk', flat=True)))
++        print("qs again:", list(qs))
+diff --git a/tests/queries/test_repro.py b/tests/queries/test_repro.py
+new file mode 100644
+index 0000000..48dec2c
+--- /dev/null
++++ b/tests/queries/test_repro.py
+@@ -0,0 +1,15 @@
++from django.test import TestCase
++from .models import Number
++
++
++class ReproTests(TestCase):
++    def test_repro(self):
++        from django.db.backends.sqlite3.features import DatabaseFeatures
++        DatabaseFeatures.supports_slicing_ordering_in_compound = True
++        DatabaseFeatures.supports_parentheses_in_compound = True
++        qs1 = Number.objects.filter(num__lte=1)
++        qs2 = Number.objects.filter(num__gte=2, num__lte=3)
++        qs = qs1.union(qs2.order_by('num'))
++        print("qs:", list(qs))
++        print("order_by():", list(qs.order_by().values_list('pk', flat=True)))
++        print("qs again:", list(qs))

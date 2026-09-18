@@ -1,0 +1,110 @@
+diff --git a/connectonion/inbox/store.py b/connectonion/inbox/store.py
+index 7d33c49..401829e 100644
+--- a/connectonion/inbox/store.py
++++ b/connectonion/inbox/store.py
+@@ -244,17 +244,21 @@ class Inbox:
+         sort order is arrival order."""
+         return sorted(p for p in self.new.iterdir() if not p.is_symlink() and p.is_file() and _QUEUE_NAME.match(p.name))
+ 
+-    def receive(self, timeout: Optional[float] = None, poll: float = 0.25) -> Optional[Message]:
++    def receive(self, timeout: Optional[float] = None, poll: float = 0.25,
++                by: Optional[str] = None) -> Optional[Message]:
+         """Block until a message is available, take it, return it.
+ 
+         timeout=None waits forever; timeout=0 looks once. Taking is a rename
+         into cur/, so two consumers on one directory never get the same
+         message: the one whose rename fails just tries the next file.
++
++        `by` names the consumer in the handout record, so a message taken by
++        a shell `receive` and one taken by a `serve` loop are told apart.
+         """
+         deadline = None if timeout is None else time.monotonic() + timeout
+         while True:
+             for path in self.unread():
+-                message = self._claim(path)
++                message = self._claim(path, by=by)
+                 if message is not None:
+                     return message
+             if deadline is not None and time.monotonic() >= deadline:
+@@ -262,7 +266,7 @@ class Inbox:
+             time.sleep(poll)
+ 
+     @_serialized
+-    def _claim(self, path: Path) -> Optional[Message]:
++    def _claim(self, path: Path, *, by: Optional[str] = None) -> Optional[Message]:
+         target = self.cur / path.name
+         try:
+             os.rename(path, target)
+@@ -278,7 +282,8 @@ class Inbox:
+             # Record the handout before returning it: a consumer that dies
+             # while working must still have this attempt counted, or a message
+             # that kills consumers is immortal.
+-            self._append(self.handouts, json.dumps({"id": message.id, "at": _now_iso()}))
++            self._append(self.handouts, json.dumps(_with_by(
++                {"id": message.id, "at": _now_iso()}, by)))
+         return message
+ 
+     def _read_queue_file(self, path: Path) -> Optional[Message]:
+@@ -301,13 +306,17 @@ class Inbox:
+                 if (message := self._read_queue_file(path)) is not None]
+ 
+     @_serialized
+-    def done(self, message_id: str) -> None:
++    def done(self, message_id: str, *, by: Optional[str] = None) -> None:
+         """Forget a message: the reply went out, or the consumer decided there
+         is nothing to say. Clears the queue as well as cur/, so a reply made
+         straight from `ls` without a `receive` does not leave the message
+-        waiting to be handed out again."""
++        waiting to be handed out again.
++
++        `by` names the consumer that finished it. It is a label on work that
++        happened, never an authorization: nothing reads it to decide."""
+         # Persist completion before removal; silence is an outcome, not a send.
+-        self._append(self.completed, json.dumps({"id": message_id, "at": _now_iso()}))
++        self._append(self.completed, json.dumps(_with_by(
++            {"id": message_id, "at": _now_iso()}, by)))
+         wanted = _safe(message_id)
+         for directory in (self.cur, self.new):
+             for path in directory.iterdir():
+@@ -381,8 +390,9 @@ class Inbox:
+         reply_to: Optional[str] = None,
+         provider_id: Optional[str] = None,
+         error: Optional[str] = None,
++        by: Optional[str] = None,
+     ) -> None:
+-        record = {
++        record = _with_by({
+             "at": _now_iso(),
+             "chat": chat,
+             "reply_to": reply_to,
+@@ -390,7 +400,7 @@ class Inbox:
+             "id": provider_id,
+             "ok": error is None,
+             "error": error,
+-        }
++        }, by)
+         self._append(self.sent, json.dumps(record, ensure_ascii=False, separators=(",", ":")))
+ 
+     def already_replied(self, message_id: str) -> bool:
+@@ -516,15 +526,19 @@ class Inbox:
+ 
+     # ---- internals ----------------------------------------------------------
+ 
+-    def serve(self, handler, **options) -> None:
++    def serve(self, handler, by: Optional[str] = None, **options) -> None:
+         """Hand every message to `handler`, one lane per conversation.
+ 
++        `by` names this consumer once, so every record it writes — the
++        handout, the completion — says who did the work without the handler
++        repeating itself at each call site.
++
+         See inbox/consumer.py for the contract. Imported there and not here so
+         that reading a directory never costs a thread module.
+         """
+         from .consumer import serve as run
+ 
+-        return run(self, handler, **options)
++        return run(self, handler, by=by, **options)
+ 
+     @staticmethod
+     def _append(path: Path, line: str) -> None:

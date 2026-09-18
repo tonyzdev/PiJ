@@ -1,0 +1,86 @@
+[
+  {
+    "id": "c01",
+    "expected": "not_exercised",
+    "rationale": "The name and comment describe cancellation, but there is only one reader, no signal or abort, and only a title assertion.",
+    "domain": "document-request-lifecycle"
+  },
+  {
+    "id": "c02",
+    "expected": "exercised",
+    "rationale": "Completion occurs after the start clock. Assertions require a cached read just before completion+TTL and a fresh observable result exactly at expiry.",
+    "domain": "document-request-lifecycle"
+  },
+  {
+    "id": "c03",
+    "expected": "not_exercised",
+    "rationale": "The assertion covers microsecond order, but the compound requirement also needs equal timestamps with unequal priorities; no such rows are supplied.",
+    "domain": "queue-cursor-pagination"
+  },
+  {
+    "id": "c04",
+    "expected": "exercised",
+    "rationale": "A real cursor is obtained, its anchor is removed through the public API, and exact continuation IDs are checked.",
+    "domain": "queue-cursor-pagination"
+  },
+  {
+    "id": "c05",
+    "expected": "insufficient_evidence",
+    "rationale": "The actual setup, calls, and assertions are delegated to checkReaders; its implementation is absent, so the relevant evidence cannot be inspected.",
+    "domain": "document-request-lifecycle"
+  },
+  {
+    "id": "c06",
+    "expected": "not_exercised",
+    "rationale": "Twelve tests check empty pages, summaries, and query validation. None creates or reuses a cursor with an equivalent reordered or duplicated status set.",
+    "domain": "queue-cursor-pagination"
+  },
+  {
+    "id": "c07",
+    "expected": "insufficient_evidence",
+    "rationale": "The omitted data module determines whether a before cursor is used and whether rows and expected IDs discriminate nearest-previous canonical ordering.",
+    "domain": "queue-cursor-pagination"
+  },
+  {
+    "id": "c08",
+    "expected": "exercised",
+    "rationale": "Both public views are requested before the transport resolves, the full identity matches, and one upstream invocation plus both observable outputs are asserted.",
+    "domain": "document-request-lifecycle"
+  },
+  {
+    "id": "c09",
+    "expected": "not_exercised",
+    "rationale": "A successful read and ID assertion cannot detect shared nested objects: there is no mutation and no later cached read to observe isolation.",
+    "domain": "document-request-lifecycle"
+  },
+  {
+    "id": "c10",
+    "expected": "insufficient_evidence",
+    "rationale": "The body has relevant assertions, but whether this test is enabled depends on an omitted module. Under the enabled-source rule its coverage status cannot be determined.",
+    "domain": "queue-cursor-pagination"
+  },
+  {
+    "id": "c11",
+    "expected": "exercised",
+    "rationale": "An otherwise valid cursor from the real API has only its version changed, then the public list call must reject with the specified code.",
+    "domain": "queue-cursor-pagination"
+  },
+  {
+    "id": "c12",
+    "expected": "not_exercised",
+    "rationale": "Only a fabricated mocked client is called; the real factory is unused. Mock call expectations never observe an upstream signal or real subscriber handling.",
+    "domain": "document-request-lifecycle"
+  },
+  {
+    "id": "c13",
+    "expected": "exercised",
+    "rationale": "The supplied helper awaits the first failure, repeats the same public read, and checks both the recovered content and a second transport invocation.",
+    "domain": "document-request-lifecycle"
+  },
+  {
+    "id": "c14",
+    "expected": "not_exercised",
+    "rationale": "The only test is statically skipped. Its body is relevant, but the frozen criterion requires enabled test source; this does not make any claim about execution of other tests.",
+    "domain": "queue-cursor-pagination"
+  }
+]

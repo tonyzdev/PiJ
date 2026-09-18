@@ -1,0 +1,348 @@
+TAP version 13
+# Subtest: session.abort cancels an in-flight skill decision before any coding-model request
+ok 1 - session.abort cancels an in-flight skill decision before any coding-model request
+  ---
+  duration_ms: 128.48025
+  type: 'test'
+  ...
+# Subtest: help and doctor work without model credentials, do not expose keys or create sessions
+ok 2 - help and doctor work without model credentials, do not expose keys or create sessions
+  ---
+  duration_ms: 954.854792
+  type: 'test'
+  ...
+# Subtest: invalid modes fail with an actionable error
+ok 3 - invalid modes fail with an actionable error
+  ---
+  duration_ms: 302.80425
+  type: 'test'
+  ...
+# Subtest: doctor recognizes Gateway credentials for both Jev and the coding model without printing them
+ok 4 - doctor recognizes Gateway credentials for both Jev and the coding model without printing them
+  ---
+  duration_ms: 159.063167
+  type: 'test'
+  ...
+# Subtest: keeps PiJ state separate from Pi and defaults to assist mode
+ok 5 - keeps PiJ state separate from Pi and defaults to assist mode
+  ---
+  duration_ms: 1.308917
+  type: 'test'
+  ...
+# Subtest: validates mode, deadline and HTTPS endpoint without including credential values
+ok 6 - validates mode, deadline and HTTPS endpoint without including credential values
+  ---
+  duration_ms: 1.287958
+  type: 'test'
+  ...
+# Subtest: selects the matching Jev provider, credentials, model and endpoint
+ok 7 - selects the matching Jev provider, credentials, model and endpoint
+  ---
+  duration_ms: 0.191625
+  type: 'test'
+  ...
+# Subtest: skill gate can see the eligible roster without sibling questions
+ok 8 - skill gate can see the eligible roster without sibling questions
+  ---
+  duration_ms: 2.704708
+  type: 'test'
+  ...
+# Subtest: skill advice is drawn from eligible candidates and only after body verification
+ok 9 - skill advice is drawn from eligible candidates and only after body verification
+  ---
+  duration_ms: 0.425542
+  type: 'test'
+  ...
+# Subtest: uncertain or unavailable decisions produce no skill recommendation
+ok 10 - uncertain or unavailable decisions produce no skill recommendation
+  ---
+  duration_ms: 0.125792
+  type: 'test'
+  ...
+# Subtest: ranking preserves all candidate identities and falls back to original order
+ok 11 - ranking preserves all candidate identities and falls back to original order
+  ---
+  duration_ms: 0.27525
+  type: 'test'
+  ...
+# Subtest: uncertain failure classification does not invent a root cause
+ok 12 - uncertain failure classification does not invent a root cause
+  ---
+  duration_ms: 0.240083
+  type: 'test'
+  ...
+# Subtest: Vercel uses the evaluation protocol and normalizes boolean and confidence metadata
+ok 13 - Vercel uses the evaluation protocol and normalizes boolean and confidence metadata
+  ---
+  duration_ms: 155.196083
+  type: 'test'
+  ...
+# Subtest: Vercel rate-limit preserves bounded fallback without retries or raw error leakage
+ok 14 - Vercel rate-limit preserves bounded fallback without retries or raw error leakage
+  ---
+  duration_ms: 35.511
+  type: 'test'
+  ...
+# Subtest: Vercel malformed preserves bounded fallback without retries or raw error leakage
+ok 15 - Vercel malformed preserves bounded fallback without retries or raw error leakage
+  ---
+  duration_ms: 7.7635
+  type: 'test'
+  ...
+# Subtest: Vercel timeout preserves bounded fallback without retries or raw error leakage
+ok 16 - Vercel timeout preserves bounded fallback without retries or raw error leakage
+  ---
+  duration_ms: 54.710208
+  type: 'test'
+  ...
+# Subtest: Vercel oversized preserves bounded fallback without retries or raw error leakage
+ok 17 - Vercel oversized preserves bounded fallback without retries or raw error leakage
+  ---
+  duration_ms: 9.838084
+  type: 'test'
+  ...
+# Subtest: Vercel preserves valid rounded distributions without renormalizing scores
+ok 18 - Vercel preserves valid rounded distributions without renormalizing scores
+  ---
+  duration_ms: 7.082916
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: typesafe/assist preserves tool execution and applies only permitted Jev effects
+ok 19 - real Pi runtime: typesafe/assist preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 174.443292
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: typesafe/observe preserves tool execution and applies only permitted Jev effects
+ok 20 - real Pi runtime: typesafe/observe preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 34.552958
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: typesafe/off preserves tool execution and applies only permitted Jev effects
+ok 21 - real Pi runtime: typesafe/off preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 19.641542
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: vercel/assist preserves tool execution and applies only permitted Jev effects
+ok 22 - real Pi runtime: vercel/assist preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 33.667792
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: vercel/observe preserves tool execution and applies only permitted Jev effects
+ok 23 - real Pi runtime: vercel/observe preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 26.310125
+  type: 'test'
+  ...
+# Subtest: real Pi runtime: vercel/off preserves tool execution and applies only permitted Jev effects
+ok 24 - real Pi runtime: vercel/off preserves tool execution and applies only permitted Jev effects
+  ---
+  duration_ms: 20.495083
+  type: 'test'
+  ...
+# Subtest: evaluates typed questions against the HTTP API and reuses successful results
+ok 25 - evaluates typed questions against the HTTP API and reuses successful results
+  ---
+  duration_ms: 74.522208
+  type: 'test'
+  ...
+# Subtest: rejects an option outside the requested candidate set
+ok 26 - rejects an option outside the requested candidate set
+  ---
+  duration_ms: 7.323583
+  type: 'test'
+  ...
+# Subtest: rejects incomplete, non-normalized and out-of-range probability distributions
+ok 27 - rejects incomplete, non-normalized and out-of-range probability distributions
+  ---
+  duration_ms: 7.008666
+  type: 'test'
+  ...
+# Subtest: missing key never attempts a network request
+ok 28 - missing key never attempts a network request
+  ---
+  duration_ms: 0.146292
+  type: 'test'
+  ...
+# Subtest: enforces a total deadline and user cancellation
+ok 29 - enforces a total deadline and user cancellation
+  ---
+  duration_ms: 89.027959
+  type: 'test'
+  ...
+# Subtest: rate limits fall back without retrying or retaining raw error text
+ok 30 - rate limits fall back without retrying or retaining raw error text
+  ---
+  duration_ms: 2.541833
+  type: 'test'
+  ...
+# Subtest: bounds the request before sending it
+ok 31 - bounds the request before sending it
+  ---
+  duration_ms: 0.247625
+  type: 'test'
+  ...
+# Subtest: isValidPijModeData accepts well-formed entries for all three modes
+ok 32 - isValidPijModeData accepts well-formed entries for all three modes
+  ---
+  duration_ms: 1.090792
+  type: 'test'
+  ...
+# Subtest: isValidPijModeData rejects non-objects
+ok 33 - isValidPijModeData rejects non-objects
+  ---
+  duration_ms: 0.159792
+  type: 'test'
+  ...
+# Subtest: isValidPijModeData rejects unknown modes
+ok 34 - isValidPijModeData rejects unknown modes
+  ---
+  duration_ms: 0.095
+  type: 'test'
+  ...
+# Subtest: isValidPijModeData rejects unsupported versions
+ok 35 - isValidPijModeData rejects unsupported versions
+  ---
+  duration_ms: 0.084917
+  type: 'test'
+  ...
+# Subtest: isValidPijModeData rejects extra fields
+ok 36 - isValidPijModeData rejects extra fields
+  ---
+  duration_ms: 0.086083
+  type: 'test'
+  ...
+# Subtest: isValidPijModeData rejects missing fields
+ok 37 - isValidPijModeData rejects missing fields
+  ---
+  duration_ms: 0.072625
+  type: 'test'
+  ...
+# Subtest: new session uses config.mode when no pij-mode entry exists
+ok 38 - new session uses config.mode when no pij-mode entry exists
+  ---
+  duration_ms: 32.199375
+  type: 'test'
+  ...
+# Subtest: mode command recorded as session entry survives an in-memory branch walk
+ok 39 - mode command recorded as session entry survives an in-memory branch walk
+  ---
+  duration_ms: 17.958042
+  type: 'test'
+  ...
+# Subtest: invalid pij-mode entries are skipped; backward search finds the last valid selection
+not ok 40 - invalid pij-mode entries are skipped; backward search finds the last valid selection
+  ---
+  duration_ms: 9.089042
+  type: 'test'
+  location: '<candidate>/test/mode-persistence.test.ts:1:4907'
+  failureType: 'testCodeFailure'
+  error: 'must restore the valid off selection despite invalid entries above it'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    PiJ · Jev decisions + Pi execution
+    Mode: assist · Provider: typesafe · Jev: not connected
+    Capabilities: skill suggestions · pij_search ranking · failure triage
+    Decisions: 0 · cache hits: 0 · fallbacks: 0
+    Jev input tokens: 0 · total decision wait: 0ms
+    Local decision metadata: <candidate>/.tmp/pij-mode-invalid-C9yNSP/agent/decisions
+    Use /pij assist, /pij observe, /pij off, or /pij decisions.
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (<candidate>/test/mode-persistence.test.ts:218:10)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+  ...
+# Subtest: explicit saved assist overrides a configured off
+not ok 41 - explicit saved assist overrides a configured off
+  ---
+  duration_ms: 7.467916
+  type: 'test'
+  location: '<candidate>/test/mode-persistence.test.ts:1:6040'
+  failureType: 'testCodeFailure'
+  error: 'saved assist must override the configured off'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    PiJ · Jev decisions + Pi execution
+    Mode: off · Provider: typesafe · Jev: not connected
+    Capabilities: skill suggestions · pij_search ranking · failure triage
+    Decisions: 0 · cache hits: 0 · fallbacks: 0
+    Jev input tokens: 0 · total decision wait: 0ms
+    Local decision metadata: <candidate>/.tmp/pij-mode-override-jma2jd/agent/decisions
+    Use /pij assist, /pij observe, /pij off, or /pij decisions.
+  operator: 'match'
+  stack: |-
+    TestContext.<anonymous> (<candidate>/test/mode-persistence.test.ts:245:10)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+  ...
+# Subtest: retrieves exact file/line excerpts while excluding hidden credentials and dependencies
+ok 42 - retrieves exact file/line excerpts while excluding hidden credentials and dependencies
+  ---
+  duration_ms: 102.055875
+  type: 'test'
+  ...
+# Subtest: option-like queries are literal search data and never executed
+ok 43 - option-like queries are literal search data and never executed
+  ---
+  duration_ms: 48.863917
+  type: 'test'
+  ...
+# Subtest: rejects outside paths, including symlinks, and empty patterns
+ok 44 - rejects outside paths, including symlinks, and empty patterns
+  ---
+  duration_ms: 41.0415
+  type: 'test'
+  ...
+# Subtest: caps candidate output and explicitly reports truncation
+ok 45 - caps candidate output and explicitly reports truncation
+  ---
+  duration_ms: 13.969083
+  type: 'test'
+  ...
+# Subtest: no matches are a successful empty result, and cancellation aborts retrieval
+ok 46 - no matches are a successful empty result, and cancellation aborts retrieval
+  ---
+  duration_ms: 45.222542
+  type: 'test'
+  ...
+# Subtest: caller globs and explicit paths cannot override exclusions or ignore files
+ok 47 - caller globs and explicit paths cannot override exclusions or ignore files
+  ---
+  duration_ms: 121.526333
+  type: 'test'
+  ...
+# Subtest: ambient ripgrep configuration cannot enable hidden files or disable ignore rules
+ok 48 - ambient ripgrep configuration cannot enable hidden files or disable ignore rules
+  ---
+  duration_ms: 14.41575
+  type: 'test'
+  ...
+# Subtest: journals only decision metadata, including cache and fallback state
+ok 49 - journals only decision metadata, including cache and fallback state
+  ---
+  duration_ms: 22.060792
+  type: 'test'
+  ...
+# Subtest: expanded search rendering removes terminal commands while retaining readable lines
+ok 50 - expanded search rendering removes terminal commands while retaining readable lines
+  ---
+  duration_ms: 5.594542
+  type: 'test'
+  ...
+1..50
+# tests 50
+# suites 0
+# pass 48
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 2847.714375

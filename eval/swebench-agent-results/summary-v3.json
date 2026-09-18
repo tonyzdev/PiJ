@@ -1,0 +1,506 @@
+{
+ "pi": {
+  "n": 20,
+  "resolved": 15,
+  "first_gold": 5,
+  "pij_search_calls": 0,
+  "pij_search_runs": 0,
+  "search": {
+   "mean": 4.6,
+   "median": 3.0
+  },
+  "tools": {
+   "mean": 17.1,
+   "median": 11.0
+  },
+  "tokens": {
+   "mean": 192373.55,
+   "median": 47274.5
+  },
+  "seconds": {
+   "mean": 41.5035,
+   "median": 20.417
+  },
+  "usd": 0.00312685324,
+  "jev_seconds": 0.0,
+  "jev_calls": 0,
+  "per_instance": [
+   {
+    "id": "10554",
+    "tokens": 619160,
+    "resolved": false,
+    "search": 9,
+    "seconds": 85.446
+   },
+   {
+    "id": "10880",
+    "tokens": 47245,
+    "resolved": true,
+    "search": 3,
+    "seconds": 18.115
+   },
+   {
+    "id": "10914",
+    "tokens": 186053,
+    "resolved": true,
+    "search": 7,
+    "seconds": 41.59
+   },
+   {
+    "id": "10973",
+    "tokens": 34923,
+    "resolved": true,
+    "search": 1,
+    "seconds": 13.685
+   },
+   {
+    "id": "10999",
+    "tokens": 15836,
+    "resolved": false,
+    "search": 1,
+    "seconds": 8.653
+   },
+   {
+    "id": "11066",
+    "tokens": 12940,
+    "resolved": true,
+    "search": 0,
+    "seconds": 5.687
+   },
+   {
+    "id": "11087",
+    "tokens": 377678,
+    "resolved": true,
+    "search": 5,
+    "seconds": 54.913
+   },
+   {
+    "id": "11095",
+    "tokens": 49807,
+    "resolved": true,
+    "search": 3,
+    "seconds": 49.411
+   },
+   {
+    "id": "11099",
+    "tokens": 9403,
+    "resolved": true,
+    "search": 0,
+    "seconds": 4.645
+   },
+   {
+    "id": "11119",
+    "tokens": 13044,
+    "resolved": true,
+    "search": 2,
+    "seconds": 10.811
+   },
+   {
+    "id": "11133",
+    "tokens": 46649,
+    "resolved": true,
+    "search": 2,
+    "seconds": 16.053
+   },
+   {
+    "id": "11138",
+    "tokens": 604527,
+    "resolved": false,
+    "search": 20,
+    "seconds": 102.653
+   },
+   {
+    "id": "11141",
+    "tokens": 47050,
+    "resolved": false,
+    "search": 3,
+    "seconds": 22.719
+   },
+   {
+    "id": "11149",
+    "tokens": 590714,
+    "resolved": true,
+    "search": 15,
+    "seconds": 134.074
+   },
+   {
+    "id": "11163",
+    "tokens": 15710,
+    "resolved": true,
+    "search": 1,
+    "seconds": 8.565
+   },
+   {
+    "id": "11179",
+    "tokens": 27540,
+    "resolved": true,
+    "search": 0,
+    "seconds": 13.324
+   },
+   {
+    "id": "11206",
+    "tokens": 413887,
+    "resolved": true,
+    "search": 2,
+    "seconds": 70.091
+   },
+   {
+    "id": "11211",
+    "tokens": 73610,
+    "resolved": true,
+    "search": 4,
+    "seconds": 38.755
+   },
+   {
+    "id": "11239",
+    "tokens": 47304,
+    "resolved": true,
+    "search": 5,
+    "seconds": 13.821
+   },
+   {
+    "id": "11265",
+    "tokens": 614391,
+    "resolved": false,
+    "search": 9,
+    "seconds": 117.059
+   }
+  ]
+ },
+ "pij-off": {
+  "n": 20,
+  "resolved": 14,
+  "first_gold": 7,
+  "pij_search_calls": 9,
+  "pij_search_runs": 8,
+  "search": {
+   "mean": 5.2,
+   "median": 2.0
+  },
+  "tools": {
+   "mean": 16.35,
+   "median": 9.0
+  },
+  "tokens": {
+   "mean": 215880.3,
+   "median": 55439.0
+  },
+  "seconds": {
+   "mean": 50.29795,
+   "median": 20.5365
+  },
+  "usd": 0.0035128525600000003,
+  "jev_seconds": 0.0,
+  "jev_calls": 0,
+  "per_instance": [
+   {
+    "id": "10554",
+    "tokens": 616753,
+    "resolved": false,
+    "search": 9,
+    "seconds": 124.288
+   },
+   {
+    "id": "10880",
+    "tokens": 52909,
+    "resolved": true,
+    "search": 2,
+    "seconds": 18.983
+   },
+   {
+    "id": "10914",
+    "tokens": 197959,
+    "resolved": true,
+    "search": 7,
+    "seconds": 37.403
+   },
+   {
+    "id": "10973",
+    "tokens": 43053,
+    "resolved": true,
+    "search": 2,
+    "seconds": 18.331
+   },
+   {
+    "id": "10999",
+    "tokens": 28040,
+    "resolved": false,
+    "search": 0,
+    "seconds": 12.563
+   },
+   {
+    "id": "11066",
+    "tokens": 22151,
+    "resolved": true,
+    "search": 0,
+    "seconds": 11.928
+   },
+   {
+    "id": "11087",
+    "tokens": 611909,
+    "resolved": false,
+    "search": 15,
+    "seconds": 200.538
+   },
+   {
+    "id": "11095",
+    "tokens": 41020,
+    "resolved": true,
+    "search": 2,
+    "seconds": 31.663
+   },
+   {
+    "id": "11099",
+    "tokens": 17441,
+    "resolved": true,
+    "search": 0,
+    "seconds": 10.821
+   },
+   {
+    "id": "11119",
+    "tokens": 21229,
+    "resolved": true,
+    "search": 1,
+    "seconds": 13.953
+   },
+   {
+    "id": "11133",
+    "tokens": 69387,
+    "resolved": true,
+    "search": 2,
+    "seconds": 18.785
+   },
+   {
+    "id": "11138",
+    "tokens": 517050,
+    "resolved": true,
+    "search": 14,
+    "seconds": 62.334
+   },
+   {
+    "id": "11141",
+    "tokens": 55799,
+    "resolved": false,
+    "search": 1,
+    "seconds": 22.09
+   },
+   {
+    "id": "11149",
+    "tokens": 606878,
+    "resolved": true,
+    "search": 15,
+    "seconds": 84.442
+   },
+   {
+    "id": "11163",
+    "tokens": 29209,
+    "resolved": true,
+    "search": 1,
+    "seconds": 11.73
+   },
+   {
+    "id": "11179",
+    "tokens": 34596,
+    "resolved": true,
+    "search": 0,
+    "seconds": 17.232
+   },
+   {
+    "id": "11206",
+    "tokens": 483392,
+    "resolved": true,
+    "search": 8,
+    "seconds": 182.661
+   },
+   {
+    "id": "11211",
+    "tokens": 218249,
+    "resolved": true,
+    "search": 9,
+    "seconds": 52.898
+   },
+   {
+    "id": "11239",
+    "tokens": 55079,
+    "resolved": false,
+    "search": 3,
+    "seconds": 15.926
+   },
+   {
+    "id": "11265",
+    "tokens": 595503,
+    "resolved": false,
+    "search": 13,
+    "seconds": 57.39
+   }
+  ]
+ },
+ "pij-jev": {
+  "n": 20,
+  "resolved": 16,
+  "first_gold": 14,
+  "pij_search_calls": 7,
+  "pij_search_runs": 5,
+  "search": {
+   "mean": 4,
+   "median": 2.0
+  },
+  "tools": {
+   "mean": 14.75,
+   "median": 10.0
+  },
+  "tokens": {
+   "mean": 168826.95,
+   "median": 61874.5
+  },
+  "seconds": {
+   "mean": 72.50045,
+   "median": 39.605000000000004
+  },
+  "usd": 0.0027814340400000004,
+  "jev_seconds": 6.11,
+  "jev_calls": 78,
+  "per_instance": [
+   {
+    "id": "10554",
+    "tokens": 616749,
+    "resolved": false,
+    "search": 11,
+    "seconds": 197.118
+   },
+   {
+    "id": "10880",
+    "tokens": 60473,
+    "resolved": true,
+    "search": 3,
+    "seconds": 68.331
+   },
+   {
+    "id": "10914",
+    "tokens": 109095,
+    "resolved": true,
+    "search": 4,
+    "seconds": 91.613
+   },
+   {
+    "id": "10973",
+    "tokens": 37704,
+    "resolved": true,
+    "search": 1,
+    "seconds": 34.481
+   },
+   {
+    "id": "10999",
+    "tokens": 20159,
+    "resolved": false,
+    "search": 0,
+    "seconds": 33.288
+   },
+   {
+    "id": "11066",
+    "tokens": 18401,
+    "resolved": true,
+    "search": 0,
+    "seconds": 24.452
+   },
+   {
+    "id": "11087",
+    "tokens": 439018,
+    "resolved": true,
+    "search": 12,
+    "seconds": 226.364
+   },
+   {
+    "id": "11095",
+    "tokens": 63276,
+    "resolved": true,
+    "search": 3,
+    "seconds": 36.555
+   },
+   {
+    "id": "11099",
+    "tokens": 14611,
+    "resolved": true,
+    "search": 0,
+    "seconds": 21.997
+   },
+   {
+    "id": "11119",
+    "tokens": 29412,
+    "resolved": true,
+    "search": 0,
+    "seconds": 30.484
+   },
+   {
+    "id": "11133",
+    "tokens": 44320,
+    "resolved": true,
+    "search": 1,
+    "seconds": 29.511
+   },
+   {
+    "id": "11138",
+    "tokens": 593756,
+    "resolved": false,
+    "search": 12,
+    "seconds": 149.483
+   },
+   {
+    "id": "11141",
+    "tokens": 122128,
+    "resolved": true,
+    "search": 2,
+    "seconds": 55.799
+   },
+   {
+    "id": "11149",
+    "tokens": 264459,
+    "resolved": true,
+    "search": 8,
+    "seconds": 59.294
+   },
+   {
+    "id": "11163",
+    "tokens": 36693,
+    "resolved": true,
+    "search": 2,
+    "seconds": 23.966
+   },
+   {
+    "id": "11179",
+    "tokens": 30984,
+    "resolved": true,
+    "search": 0,
+    "seconds": 32.605
+   },
+   {
+    "id": "11206",
+    "tokens": 124715,
+    "resolved": true,
+    "search": 2,
+    "seconds": 130.575
+   },
+   {
+    "id": "11211",
+    "tokens": 77293,
+    "resolved": true,
+    "search": 4,
+    "seconds": 42.655
+   },
+   {
+    "id": "11239",
+    "tokens": 56357,
+    "resolved": true,
+    "search": 2,
+    "seconds": 35.342
+   },
+   {
+    "id": "11265",
+    "tokens": 616936,
+    "resolved": false,
+    "search": 13,
+    "seconds": 126.096
+   }
+  ]
+ }
+}

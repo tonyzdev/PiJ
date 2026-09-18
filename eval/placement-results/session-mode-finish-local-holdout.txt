@@ -1,0 +1,255 @@
+TAP version 13
+# Subtest: session mode: disk reopen restores all explicit selections over a different configured default
+not ok 1 - session mode: disk reopen restores all explicit selections over a different configured default
+  ---
+  duration_ms: 93.602084
+  type: 'test'
+  location: '<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:3:3999'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly deep-equal:
+    + actual - expected
+
+    + undefined
+    - {
+    -   mode: 'observe',
+    -   version: 1
+    - }
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    version: 1
+    mode: 'observe'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:123:12)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+  ...
+# Subtest: session mode: tree navigation restores ancestors and divergent branches immediately
+not ok 2 - session mode: tree navigation restores ancestors and divergent branches immediately
+  ---
+  duration_ms: 44.994125
+  type: 'test'
+  location: '<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:3:4606'
+  failureType: 'testCodeFailure'
+  error: |-
+    tree navigation must make off effective before the next command/status read
+
+    2 !== 0
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 0
+  actual: 2
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:137:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+  ...
+# Subtest: session mode: public runtime fork inherits selected ancestry and keeps parent/fork/new sessions independent
+not ok 3 - session mode: public runtime fork inherits selected ancestry and keeps parent/fork/new sessions independent
+  ---
+  duration_ms: 21.900458
+  type: 'test'
+  location: '<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:3:6101'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Mode: observe\b/. Input:
+
+    'PiJ · Jev decisions + Pi execution\n' +
+      'Mode: assist · Provider: typesafe · Jev: jev-latest\n' +
+      'Capabilities: skill suggestions · pij_search ranking · failure triage\n' +
+      'Decisions: 0 · cache hits: 0 · fallbacks: 0\n' +
+      'Jev input tokens: 0 · total decision wait: 0ms\n' +
+      'Local decision metadata: <candidate>/.tmp/pij-sm-fixture-w8rHnG/agent/decisions\n' +
+      'Use /pij assist, /pij observe, /pij off, or /pij decisions.'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    PiJ · Jev decisions + Pi execution
+    Mode: assist · Provider: typesafe · Jev: jev-latest
+    Capabilities: skill suggestions · pij_search ranking · failure triage
+    Decisions: 0 · cache hits: 0 · fallbacks: 0
+    Jev input tokens: 0 · total decision wait: 0ms
+    Local decision metadata: <candidate>/.tmp/pij-sm-fixture-w8rHnG/agent/decisions
+    Use /pij assist, /pij observe, /pij off, or /pij decisions.
+  operator: 'match'
+  stack: |-
+    Object.assertMode (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:107:96)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async TestContext.<anonymous> (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:157:89)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+  ...
+# Subtest: session mode: SDK resource reuse never leaks an outgoing selection into an unrelated session
+not ok 4 - session mode: SDK resource reuse never leaks an outgoing selection into an unrelated session
+  ---
+  duration_ms: 14.306375
+  type: 'test'
+  location: '<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:3:6938'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Mode: observe\b/. Input:
+
+    'PiJ · Jev decisions + Pi execution\n' +
+      'Mode: off · Provider: typesafe · Jev: jev-latest\n' +
+      'Capabilities: skill suggestions · pij_search ranking · failure triage\n' +
+      'Decisions: 0 · cache hits: 0 · fallbacks: 0\n' +
+      'Jev input tokens: 0 · total decision wait: 0ms\n' +
+      'Local decision metadata: <candidate>/.tmp/pij-sm-fixture-mgnxfF/agent/decisions\n' +
+      'Use /pij assist, /pij observe, /pij off, or /pij decisions.'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    PiJ · Jev decisions + Pi execution
+    Mode: off · Provider: typesafe · Jev: jev-latest
+    Capabilities: skill suggestions · pij_search ranking · failure triage
+    Decisions: 0 · cache hits: 0 · fallbacks: 0
+    Jev input tokens: 0 · total decision wait: 0ms
+    Local decision metadata: <candidate>/.tmp/pij-sm-fixture-mgnxfF/agent/decisions
+    Use /pij assist, /pij observe, /pij off, or /pij decisions.
+  operator: 'match'
+  stack: |-
+    Object.assertMode (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:107:96)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async TestContext.<anonymous> (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:169:33)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+  ...
+# Subtest: session mode: malformed, extra-field, unknown and future entries are ignored without hiding older valid state
+not ok 5 - session mode: malformed, extra-field, unknown and future entries are ignored without hiding older valid state
+  ---
+  duration_ms: 17.859708
+  type: 'test'
+  location: '<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:3:7362'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Mode: observe\b/. Input:
+
+    'PiJ · Jev decisions + Pi execution\n' +
+      'Mode: assist · Provider: typesafe · Jev: jev-latest\n' +
+      'Capabilities: skill suggestions · pij_search ranking · failure triage\n' +
+      'Decisions: 0 · cache hits: 0 · fallbacks: 0\n' +
+      'Jev input tokens: 0 · total decision wait: 0ms\n' +
+      'Local decision metadata: <candidate>/.tmp/pij-sm-fixture-IShXf1/agent/decisions\n' +
+      'Use /pij assist, /pij observe, /pij off, or /pij decisions.'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    PiJ · Jev decisions + Pi execution
+    Mode: assist · Provider: typesafe · Jev: jev-latest
+    Capabilities: skill suggestions · pij_search ranking · failure triage
+    Decisions: 0 · cache hits: 0 · fallbacks: 0
+    Jev input tokens: 0 · total decision wait: 0ms
+    Local decision metadata: <candidate>/.tmp/pij-sm-fixture-IShXf1/agent/decisions
+    Use /pij assist, /pij observe, /pij off, or /pij decisions.
+  operator: 'match'
+  stack: |-
+    Object.assertMode (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:107:96)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async TestContext.<anonymous> (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:183:21)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+  ...
+# Subtest: session mode: allowlisted custom metadata never enters the model context or captures private input
+not ok 6 - session mode: allowlisted custom metadata never enters the model context or captures private input
+  ---
+  duration_ms: 13.365916
+  type: 'test'
+  location: '<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:3:8299'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    0 !== 3
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: 3
+  actual: 0
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:191:10)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+  ...
+# Subtest: session mode: restored modes preserve ranking, skill advice and triage effects; restored off makes zero Jev calls
+not ok 7 - session mode: restored modes preserve ranking, skill advice and triage effects; restored off makes zero Jev calls
+  ---
+  duration_ms: 28.544042
+  type: 'test'
+  location: '<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:3:9804'
+  failureType: 'testCodeFailure'
+  error: |-
+    Expected values to be strictly equal:
+
+    false !== true
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: 'strictEqual'
+  stack: |-
+    TestContext.<anonymous> (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:221:12)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+  ...
+# Subtest: session mode: a real mode command aborts an in-flight decision and keeps off effective after reopen
+not ok 8 - session mode: a real mode command aborts an in-flight decision and keeps off effective after reopen
+  ---
+  duration_ms: 18.08275
+  type: 'test'
+  location: '<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:3:11333'
+  failureType: 'testCodeFailure'
+  error: |-
+    The input did not match the regular expression /Mode: off\b/. Input:
+
+    'PiJ · Jev decisions + Pi execution\n' +
+      'Mode: assist · Provider: typesafe · Jev: jev-latest\n' +
+      'Capabilities: skill suggestions · pij_search ranking · failure triage\n' +
+      'Decisions: 0 · cache hits: 0 · fallbacks: 0\n' +
+      'Jev input tokens: 0 · total decision wait: 0ms\n' +
+      'Local decision metadata: <candidate>/.tmp/pij-sm-fixture-XWRvH4/agent/decisions\n' +
+      'Use /pij assist, /pij observe, /pij off, or /pij decisions.'
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+  actual: |-
+    PiJ · Jev decisions + Pi execution
+    Mode: assist · Provider: typesafe · Jev: jev-latest
+    Capabilities: skill suggestions · pij_search ranking · failure triage
+    Decisions: 0 · cache hits: 0 · fallbacks: 0
+    Jev input tokens: 0 · total decision wait: 0ms
+    Local decision metadata: <candidate>/.tmp/pij-sm-fixture-XWRvH4/agent/decisions
+    Use /pij assist, /pij observe, /pij off, or /pij decisions.
+  operator: 'match'
+  stack: |-
+    Object.assertMode (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:107:96)
+    process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    async TestContext.<anonymous> (<candidate>/.session-mode-check-t3xku7/session-mode-holdout.test.ts:245:48)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async Test.processPendingSubtests (node:internal/test_runner/test:831:7)
+  ...
+1..8
+# tests 8
+# suites 0
+# pass 0
+# fail 8
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 1006.249666

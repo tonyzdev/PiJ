@@ -1,0 +1,28 @@
+diff --git a/scripts/lib_grading.py b/scripts/lib_grading.py
+index 60746ec..9c45151 100644
+--- a/scripts/lib_grading.py
++++ b/scripts/lib_grading.py
+@@ -25,6 +25,12 @@ DEFAULT_JUDGE_MODEL = "openrouter/anthropic/claude-haiku-4.5"
+ DEFAULT_JUDGE_AGENT_PREFIX = "bench-judge"
+ DEFAULT_JUDGE_TIMEOUT_SECONDS = 300
+ 
++# Maximum characters of each workspace file included in the judge prompt.
++# A value of 0 disables truncation entirely.
++JUDGE_WORKSPACE_FILE_MAX_CHARS = int(
++    os.environ.get("PINCHBENCH_JUDGE_WORKSPACE_FILE_MAX_CHARS", "0")
++)
++
+ # Judge result cache: maps cache_key -> GradeResult dict
+ # Cache key = hash of (task_id, transcript_summary, rubric, judge_model)
+ _judge_cache: Dict[str, Dict[str, Any]] = {}
+@@ -534,7 +540,9 @@ def _read_workspace_files(workspace_path: str) -> str:
+             continue
+         try:
+             content = f.read_text(encoding="utf-8")
+-            file_contents.append(f"### File: {rel}\n{content[:3000]}")
++            if JUDGE_WORKSPACE_FILE_MAX_CHARS > 0:
++                content = content[:JUDGE_WORKSPACE_FILE_MAX_CHARS]
++            file_contents.append(f"### File: {rel}\n{content}")
+         except (OSError, UnicodeDecodeError):
+             pass
+     return "\n\n".join(file_contents)

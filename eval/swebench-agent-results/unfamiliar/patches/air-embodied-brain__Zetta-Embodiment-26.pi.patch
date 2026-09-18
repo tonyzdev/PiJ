@@ -1,0 +1,92 @@
+diff --git a/robots/libero/critic_runtime.py b/robots/libero/critic_runtime.py
+index 660993a..75f3c78 100644
+--- a/robots/libero/critic_runtime.py
++++ b/robots/libero/critic_runtime.py
+@@ -85,19 +85,32 @@ def extract_libero_critic_features(
+         features["command.translation.norm"] = command_norm
+         features["command.rotation.norm"] = float(np.linalg.norm(command[3:6]))
+         features["command.gripper"] = float(command[6])
++        # The realization features must always be present once a command is
++        # available, even on the first physics step where there is no
++        # ``previous_eef`` to compare against.  Otherwise a rule whose main
++        # feature is ``command.realization.eef_motion_m`` (e.g.
++        # ``close-while-stalled``) would raise ``KeyError`` on that step and
++        # abort the rollout as ``infra_invalid``.  With no prior reference the
++        # realized displacement is unknown, so it is reported as zero and the
++        # step is never considered stalled.
+         if previous_eef is not None:
+             realized = states[:3] - np.asarray(previous_eef, dtype=np.float64)
+             realized_norm = float(np.linalg.norm(realized))
+-            directional = command_norm > 1e-9 and realized_norm > 1e-9
+-            features["command.realization.direction_available"] = directional
+-            features["command.realization.eef_motion_m"] = realized_norm
+-            features["command.realization.stalled"] = (
+-                command_norm >= 0.05 and realized_norm <= 0.0005
++        else:
++            realized = np.zeros(3, dtype=np.float64)
++            realized_norm = 0.0
++        directional = command_norm > 1e-9 and realized_norm > 1e-9
++        features["command.realization.direction_available"] = directional
++        features["command.realization.eef_motion_m"] = realized_norm
++        features["command.realization.stalled"] = (
++            previous_eef is not None
++            and command_norm >= 0.05
++            and realized_norm <= 0.0005
++        )
++        if directional:
++            features["command.realization.direction_cosine"] = float(
++                np.dot(command[:3], realized) / (command_norm * realized_norm)
+             )
+-            if directional:
+-                features["command.realization.direction_cosine"] = float(
+-                    np.dot(command[:3], realized) / (command_norm * realized_norm)
+-                )
+ 
+     for key, value in (privileged_state or {}).items():
+         name = str(key)
+diff --git a/rollout_runtime/backends/libero_critic.py b/rollout_runtime/backends/libero_critic.py
+index 35104f9..b7ed2cf 100644
+--- a/rollout_runtime/backends/libero_critic.py
++++ b/rollout_runtime/backends/libero_critic.py
+@@ -495,19 +495,32 @@ def extract_libero_critic_features(
+         features["command.translation.norm"] = command_norm
+         features["command.rotation.norm"] = float(np.linalg.norm(command[3:6]))
+         features["command.gripper"] = float(command[6])
++        # The realization features must always be present once a command is
++        # available, even on the first physics step where there is no
++        # ``previous_eef`` to compare against.  Otherwise a rule whose main
++        # feature is ``command.realization.eef_motion_m`` (e.g.
++        # ``close-while-stalled``) would raise ``KeyError`` on that step and
++        # abort the rollout as ``infra_invalid``.  With no prior reference the
++        # realized displacement is unknown, so it is reported as zero and the
++        # step is never considered stalled.
+         if previous_eef is not None:
+             realized = states[:3] - np.asarray(previous_eef, dtype=np.float64)
+             realized_norm = float(np.linalg.norm(realized))
+-            directional = command_norm > 1e-9 and realized_norm > 1e-9
+-            features["command.realization.direction_available"] = directional
+-            features["command.realization.eef_motion_m"] = realized_norm
+-            features["command.realization.stalled"] = (
+-                command_norm >= 0.05 and realized_norm <= 0.0005
++        else:
++            realized = np.zeros(3, dtype=np.float64)
++            realized_norm = 0.0
++        directional = command_norm > 1e-9 and realized_norm > 1e-9
++        features["command.realization.direction_available"] = directional
++        features["command.realization.eef_motion_m"] = realized_norm
++        features["command.realization.stalled"] = (
++            previous_eef is not None
++            and command_norm >= 0.05
++            and realized_norm <= 0.0005
++        )
++        if directional:
++            features["command.realization.direction_cosine"] = float(
++                np.dot(command[:3], realized) / (command_norm * realized_norm)
+             )
+-            if directional:
+-                features["command.realization.direction_cosine"] = float(
+-                    np.dot(command[:3], realized) / (command_norm * realized_norm)
+-                )
+ 
+     for key, value in (privileged_state or {}).items():
+         name = str(key)

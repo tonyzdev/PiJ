@@ -1,0 +1,380 @@
+{
+ "pi": {
+  "n": 13,
+  "resolved": 4,
+  "first_gold": 0,
+  "pij_search_calls": 0,
+  "pij_search_runs": 0,
+  "search": {
+   "mean": 10.307692307692308,
+   "median": 10
+  },
+  "tools": {
+   "mean": 25.384615384615383,
+   "median": 29
+  },
+  "tokens": {
+   "mean": 371350.76923076925,
+   "median": 436668
+  },
+  "seconds": {
+   "mean": 73.2053076923077,
+   "median": 42.048
+  },
+  "usd": 0.005899822276923077,
+  "jev_seconds": 0.0,
+  "jev_calls": 0,
+  "per_instance": [
+   {
+    "id": "13",
+    "tokens": 336528,
+    "resolved": false,
+    "search": 6,
+    "seconds": 41.085
+   },
+   {
+    "id": "23",
+    "tokens": 588328,
+    "resolved": false,
+    "search": 10,
+    "seconds": 77.018
+   },
+   {
+    "id": "26",
+    "tokens": 570534,
+    "resolved": false,
+    "search": 11,
+    "seconds": 119.092
+   },
+   {
+    "id": "31",
+    "tokens": 594457,
+    "resolved": false,
+    "search": 26,
+    "seconds": 217.66
+   },
+   {
+    "id": "449",
+    "tokens": 92446,
+    "resolved": true,
+    "search": 5,
+    "seconds": 21.513
+   },
+   {
+    "id": "1556",
+    "tokens": 610929,
+    "resolved": true,
+    "search": 17,
+    "seconds": 53.4
+   },
+   {
+    "id": "1588",
+    "tokens": 35523,
+    "resolved": true,
+    "search": 7,
+    "seconds": 19.927
+   },
+   {
+    "id": "385",
+    "tokens": 436668,
+    "resolved": false,
+    "search": 10,
+    "seconds": 27.46
+   },
+   {
+    "id": "18",
+    "tokens": 217850,
+    "resolved": false,
+    "search": 18,
+    "seconds": 114.532
+   },
+   {
+    "id": "38",
+    "tokens": 530834,
+    "resolved": false,
+    "search": 8,
+    "seconds": 158.882
+   },
+   {
+    "id": "51",
+    "tokens": 77176,
+    "resolved": true,
+    "search": 1,
+    "seconds": 31.782
+   },
+   {
+    "id": "323",
+    "tokens": 117667,
+    "resolved": false,
+    "search": 3,
+    "seconds": 27.27
+   },
+   {
+    "id": "336",
+    "tokens": 618620,
+    "resolved": false,
+    "search": 12,
+    "seconds": 42.048
+   }
+  ]
+ },
+ "pij-off": {
+  "n": 13,
+  "resolved": 3,
+  "first_gold": 2,
+  "pij_search_calls": 10,
+  "pij_search_runs": 10,
+  "search": {
+   "mean": 9.384615384615385,
+   "median": 8
+  },
+  "tools": {
+   "mean": 22.153846153846153,
+   "median": 21
+  },
+  "tokens": {
+   "mean": 340359.1538461539,
+   "median": 320430
+  },
+  "seconds": {
+   "mean": 66.28084615384616,
+   "median": 44.629
+  },
+  "usd": 0.005182011261538461,
+  "jev_seconds": 0.0,
+  "jev_calls": 0,
+  "per_instance": [
+   {
+    "id": "13",
+    "tokens": 491606,
+    "resolved": false,
+    "search": 11,
+    "seconds": 44.629
+   },
+   {
+    "id": "23",
+    "tokens": 532185,
+    "resolved": false,
+    "search": 2,
+    "seconds": 157.331
+   },
+   {
+    "id": "26",
+    "tokens": 614727,
+    "resolved": false,
+    "search": 20,
+    "seconds": 65.844
+   },
+   {
+    "id": "31",
+    "tokens": 607840,
+    "resolved": false,
+    "search": 28,
+    "seconds": 146.647
+   },
+   {
+    "id": "449",
+    "tokens": 64881,
+    "resolved": true,
+    "search": 3,
+    "seconds": 12.797
+   },
+   {
+    "id": "1556",
+    "tokens": 629788,
+    "resolved": false,
+    "search": 16,
+    "seconds": 99.212
+   },
+   {
+    "id": "1588",
+    "tokens": 36709,
+    "resolved": true,
+    "search": 3,
+    "seconds": 13.358
+   },
+   {
+    "id": "385",
+    "tokens": 215904,
+    "resolved": false,
+    "search": 11,
+    "seconds": 27.817
+   },
+   {
+    "id": "18",
+    "tokens": 152525,
+    "resolved": false,
+    "search": 10,
+    "seconds": 83.127
+   },
+   {
+    "id": "38",
+    "tokens": 320430,
+    "resolved": false,
+    "search": 6,
+    "seconds": 137.313
+   },
+   {
+    "id": "51",
+    "tokens": 91157,
+    "resolved": true,
+    "search": 3,
+    "seconds": 17.133
+   },
+   {
+    "id": "323",
+    "tokens": 50446,
+    "resolved": false,
+    "search": 1,
+    "seconds": 11.889
+   },
+   {
+    "id": "336",
+    "tokens": 616471,
+    "resolved": false,
+    "search": 8,
+    "seconds": 44.554
+   }
+  ]
+ },
+ "pij-jev": {
+  "n": 13,
+  "resolved": 4,
+  "first_gold": 6,
+  "pij_search_calls": 5,
+  "pij_search_runs": 5,
+  "search": {
+   "mean": 7,
+   "median": 7
+  },
+  "tools": {
+   "mean": 20.846153846153847,
+   "median": 24
+  },
+  "tokens": {
+   "mean": 371716,
+   "median": 457262
+  },
+  "seconds": {
+   "mean": 73.53815384615385,
+   "median": 50.754
+  },
+  "usd": 0.0058073223384615385,
+  "jev_seconds": 8.653846153846153,
+  "jev_calls": 42,
+  "per_instance": [
+   {
+    "id": "13",
+    "tokens": 384194,
+    "resolved": false,
+    "search": 7,
+    "seconds": 32.282
+   },
+   {
+    "id": "23",
+    "tokens": 610435,
+    "resolved": false,
+    "search": 4,
+    "seconds": 131.162
+   },
+   {
+    "id": "26",
+    "tokens": 600462,
+    "resolved": false,
+    "search": 12,
+    "seconds": 71.435
+   },
+   {
+    "id": "31",
+    "tokens": 590802,
+    "resolved": false,
+    "search": 16,
+    "seconds": 255.025
+   },
+   {
+    "id": "449",
+    "tokens": 86354,
+    "resolved": true,
+    "search": 3,
+    "seconds": 18.714
+   },
+   {
+    "id": "1556",
+    "tokens": 593631,
+    "resolved": true,
+    "search": 7,
+    "seconds": 49.709
+   },
+   {
+    "id": "1588",
+    "tokens": 16176,
+    "resolved": true,
+    "search": 1,
+    "seconds": 14.608
+   },
+   {
+    "id": "385",
+    "tokens": 457262,
+    "resolved": false,
+    "search": 12,
+    "seconds": 53.635
+   },
+   {
+    "id": "18",
+    "tokens": 237423,
+    "resolved": false,
+    "search": 13,
+    "seconds": 105.413
+   },
+   {
+    "id": "38",
+    "tokens": 541877,
+    "resolved": false,
+    "search": 9,
+    "seconds": 146.863
+   },
+   {
+    "id": "51",
+    "tokens": 59768,
+    "resolved": true,
+    "search": 1,
+    "seconds": 13.726
+   },
+   {
+    "id": "323",
+    "tokens": 45467,
+    "resolved": false,
+    "search": 0,
+    "seconds": 12.67
+   },
+   {
+    "id": "336",
+    "tokens": 608457,
+    "resolved": false,
+    "search": 6,
+    "seconds": 50.754
+   }
+  ]
+ },
+ "_meta": {
+  "title": "13 \u4e2a 2025 \u5e74\u4e2d\u540e\u521b\u5efa\u7684\u4ed3\u5e93\uff087 \u4e2a\uff0c6k\u2013150k \u884c\uff09\u00b7 \u771f\u5b9e bug-fix PR \u00b7 \u4e3b\u6a21\u578b DeepSeek v4-flash\uff1a\u5b8c\u6210\u7387 vs \u6bcf\u4efb\u52a1\u4e0a\u4e0b\u6587 token",
+  "xmin": 200000,
+  "xmax": 600000,
+  "xticks": [
+   200000,
+   300000,
+   400000,
+   500000,
+   600000
+  ],
+  "ymin": 0.1,
+  "ymax": 0.5,
+  "yticks": [
+   0.2,
+   0.3,
+   0.4,
+   0.5
+  ],
+  "footnote": "\u67f1 = \u5747\u503c \u00b7 \u767d\u7ebf = \u4e2d\u4f4d\u6570 \u00b7 \u5b8c\u6210 = PR \u7684\u6d4b\u8bd5\u8865\u4e01\u4e0b FAIL_TO_PASS \u5168\u8fc7\u4e14\u65e0\u56de\u5f52 \u00b7 \u9884\u7b97 600k token / 40 \u8f6e / 9 \u5206\u949f \u00b7 \u4e3b\u6a21\u578b $0.22 / 39 run \u00b7 Jev \u5e73\u5747\u6bcf\u4efb\u52a1 +8.7s \u00b7 13 \u4e2a\u5b9e\u4f8b\u91cc 5 \u4e2a\u4e09\u6761 arm \u90fd\u6ca1\u89e3\u51b3"
+ }
+}

@@ -1,0 +1,23 @@
+TAP version 13
+# ENTRY_OWNERSHIP [{"index":0,"matchesActualUser":true,"referencedRole":"user","cached":false},{"index":1,"matchesActualUser":true,"referencedRole":"user","cached":true}]
+# Subtest: entry oracle: journal IDs exactly identify consumed SDK user entries, including a cache hit
+ok 1 - entry oracle: journal IDs exactly identify consumed SDK user entries, including a cache hit
+  ---
+  duration_ms: 82.180667
+  type: 'test'
+  ...
+# Subtest: entry oracle: newly generated journal rows display their emitted user identity
+ok 2 - entry oracle: newly generated journal rows display their emitted user identity
+  ---
+  duration_ms: 21.237916
+  type: 'test'
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 2
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 800.954125

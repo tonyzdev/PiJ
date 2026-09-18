@@ -25,6 +25,7 @@
     "build": "tsc -p tsconfig.build.json",
     "check": "tsc --noEmit",
     "test": "tsx --test test/*.test.ts",
+    "eval": "tsx eval/run.ts",
     "start": "node bin/pij.mjs",
     "dev": "tsx src/cli.ts",
     "prepack": "npm run build"

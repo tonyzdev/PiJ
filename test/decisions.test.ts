@@ -69,3 +69,42 @@ test("uncertain failure classification does not invent a root cause", async () =
   const engine = new DecisionEngine({ evaluate: async () => ok({ category: { type: "choice", choice: "unknown", probabilities: { unknown: 0.55, network: 0.45 }, confidence: 0.1 } }) });
   assert.equal(await engine.triage("bash", "failed", "fix tests"), undefined);
 });
+
+test("a wide shortlist is ranked across bounded requests, scoring outlines not excerpts", async () => {
+  const candidates = Array.from({ length: 100 }, (_, i) => ({
+    id: `c${i}`, path: `src/f${i}.ts`, line: 1, startLine: 1,
+    excerpt: `excerpt ${i} ${"x".repeat(1500)}`, outline: `# src/f${i}.ts\n## definitions\n${"d".repeat(1000)}`,
+  }));
+  const requests: { bytes: number; ids: string[]; sent: unknown }[] = [];
+  const engine = new DecisionEngine({ evaluate: async (state, questions) => {
+    requests.push({ bytes: Buffer.byteLength(JSON.stringify({ state, questions })), ids: Object.keys(questions), sent: state });
+    return ok(Object.fromEntries(Object.keys(questions).map((id) => [id, { type: "noul", noul: Number(id.slice(1)) / 100 }])));
+  } });
+  const ranked = await engine.rankCode("find it", candidates);
+  assert.ok(requests.length > 1, "a 100-file shortlist must not be sent as one request");
+  for (const request of requests) assert.ok(request.bytes <= 70_000, `request of ${request.bytes} bytes exceeds the transport bound`);
+  // Every candidate is asked about exactly once, and none is silently dropped.
+  assert.deepEqual(requests.flatMap((r) => r.ids).sort(), candidates.map((c) => c.id).sort());
+  assert.deepEqual(ranked.map((x) => x.id), [...candidates].reverse().map((x) => x.id));
+  // Ranking reads the whole-file outline; the real excerpt still reaches the model.
+  const sent = requests[0]!.sent as { candidates: Record<string, { outline?: string; excerpt?: string }> };
+  assert.ok(Object.values(sent.candidates).every((entry) => entry.outline !== undefined && entry.excerpt === undefined));
+  assert.equal(ranked[0]!.excerpt, candidates[99]!.excerpt);
+});
+
+test("a failed or incomplete batch discards the whole ranking instead of a partial order", async () => {
+  const candidates = Array.from({ length: 100 }, (_, i) => ({
+    id: `c${i}`, path: `src/f${i}.ts`, line: 1, startLine: 1, excerpt: "e", outline: `# src/f${i}.ts\n${"d".repeat(1200)}`,
+  }));
+  let call = 0;
+  const failsLate = new DecisionEngine({ evaluate: async (_state, questions) => ++call === 1
+    ? ok(Object.fromEntries(Object.keys(questions).map((id) => [id, { type: "noul", noul: 0.9 }])))
+    : { status: "fallback", reason: "timeout", latencyMs: 10 } });
+  assert.deepEqual(await failsLate.rankCode("find it", candidates), candidates);
+  assert.ok(call > 1);
+  const omits = new DecisionEngine({ evaluate: async (_state, questions) => {
+    const [first, ...rest] = Object.keys(questions);
+    return ok(Object.fromEntries(rest.map((id) => [id, { type: "noul", noul: 0.5 }])));
+  } });
+  assert.deepEqual(await omits.rankCode("find it", candidates), candidates);
+});

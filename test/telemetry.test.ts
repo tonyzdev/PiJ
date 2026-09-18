@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 import { DecisionJournal, readRecentDecisions } from "../src/telemetry.js";
+import { formatDecisions } from "../src/ui.js";
 
 test("journals only decision metadata, including cache and fallback state", async (t) => {
   const home = await mkdtemp(join(tmpdir(), "pij-journal-"));
@@ -22,4 +23,25 @@ test("journals only decision metadata, including cache and fallback state", asyn
   assert.ok(!content.includes("secret_source"));
   assert.equal(journal.summary().inputTokens, 200);
   assert.equal(journal.summary().fallbacks, 1);
+  assert.equal(entries[0]?.sessionId, undefined);
+  assert.equal(formatDecisions(entries).includes("session="), false);
+});
+
+test("decision scopes retain only runtime identifiers and are readable beside legacy records", async (t) => {
+  const home = await mkdtemp(join(tmpdir(), "pij-scoped-journal-"));
+  t.after(() => rm(home, { recursive: true, force: true }));
+  const journal = new DecisionJournal(home);
+  const observation = { kind: "code_rank" as const, questionCount: 2, result: { status: "fallback" as const, reason: "timeout" as const, latencyMs: 1 } };
+  await journal.record("assist", observation);
+  const scope = { sessionId: "session-fixture", userMessageId: "user-fixture", prompt: "PRIVATE_PROMPT_MUST_NOT_BE_SAVED" };
+  await journal.record("assist", observation, scope);
+  const records = await readRecentDecisions(home);
+  assert.equal(records.length, 2);
+  assert.equal(records[0]?.sessionId, undefined);
+  assert.equal(records[1]?.sessionId, scope.sessionId);
+  assert.equal(records[1]?.userMessageId, scope.userMessageId);
+  const text = formatDecisions(records);
+  assert.ok(text.includes("session=session-fixture") && text.includes("user=user-fixture"));
+  const files = await readdir(join(home, "decisions"));
+  assert.ok(!(await readFile(join(home, "decisions", files[0]!), "utf8")).includes(scope.prompt));
 });

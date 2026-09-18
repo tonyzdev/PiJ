@@ -1,0 +1,28 @@
+diff --git a/tests/queries/test_repro.py b/tests/queries/test_repro.py
+new file mode 100644
+index 0000000..2412e30
+--- /dev/null
++++ b/tests/queries/test_repro.py
+@@ -0,0 +1,22 @@
++from django.test import TestCase
++from django.db import connection
++from .models import Number
++
++
++class ReproTest(TestCase):
++    def test_repro(self):
++        for i in range(10):
++            Number.objects.create(num=i)
++        qs1 = Number.objects.filter(num__lte=1)
++        qs2 = Number.objects.filter(num__gte=2, num__lte=3).order_by('num')
++        qs = qs1.union(qs2)
++        print("qs1.query.order_by:", qs1.query.order_by)
++        print("qs2.query.order_by:", qs2.query.order_by)
++        print("qs.query.order_by:", qs.query.order_by)
++        print("qs.query.combined_queries:", qs.query.combined_queries)
++        derived = qs.order_by().values_list('num', flat=True)
++        print("derived combined:", derived.query.combined_queries)
++        print("same inner qs2?", derived.query.combined_queries[1] is qs2.query)
++        print("qs2 order_by after derived:", qs2.query.order_by)
++        print("qs.query.order_by after derived:", qs.query.order_by)
++        print("qs2 values_select after derived:", qs2.query.values_select)

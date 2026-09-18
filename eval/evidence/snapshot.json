@@ -1,0 +1,677 @@
+{
+  "protocolHash": "bac16aae4ea03ab616694dce208e4e8908c37c1b997acf60ca7fa84f09889ec8",
+  "rows": [
+    {
+      "id": "c01",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "not_exercised",
+            "confidence": 0.99,
+            "probabilities": {
+              "exercised": 0,
+              "not_exercised": 0.99,
+              "insufficient_evidence": 0.01
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 729,
+        "outputTokens": 52,
+        "latencyMs": 830,
+        "cached": false
+      }
+    },
+    {
+      "id": "c02",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.95,
+            "probabilities": {
+              "exercised": 0.97,
+              "not_exercised": 0.03,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 859,
+        "outputTokens": 51,
+        "latencyMs": 381,
+        "cached": false
+      }
+    },
+    {
+      "id": "c03",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.48,
+            "probabilities": {
+              "exercised": 0.65,
+              "not_exercised": 0.34,
+              "insufficient_evidence": 0.01
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 771,
+        "outputTokens": 51,
+        "latencyMs": 403,
+        "cached": false
+      }
+    },
+    {
+      "id": "c04",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.86,
+            "probabilities": {
+              "exercised": 0.91,
+              "not_exercised": 0.09,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 824,
+        "outputTokens": 51,
+        "latencyMs": 398,
+        "cached": false
+      }
+    },
+    {
+      "id": "c05",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "insufficient_evidence",
+            "confidence": 0.98,
+            "probabilities": {
+              "exercised": 0.01,
+              "not_exercised": 0,
+              "insufficient_evidence": 0.99
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 643,
+        "outputTokens": 55,
+        "latencyMs": 369,
+        "cached": false
+      }
+    },
+    {
+      "id": "c06",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "not_exercised",
+            "confidence": 1,
+            "probabilities": {
+              "exercised": 0,
+              "not_exercised": 1,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 870,
+        "outputTokens": 52,
+        "latencyMs": 382,
+        "cached": false
+      }
+    },
+    {
+      "id": "c07",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "not_exercised",
+            "confidence": 0.71,
+            "probabilities": {
+              "exercised": 0.01,
+              "not_exercised": 0.81,
+              "insufficient_evidence": 0.18
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 659,
+        "outputTokens": 52,
+        "latencyMs": 369,
+        "cached": false
+      }
+    },
+    {
+      "id": "c08",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.96,
+            "probabilities": {
+              "exercised": 0.97,
+              "not_exercised": 0.03,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 864,
+        "outputTokens": 51,
+        "latencyMs": 424,
+        "cached": false
+      }
+    },
+    {
+      "id": "c09",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "not_exercised",
+            "confidence": 0.99,
+            "probabilities": {
+              "exercised": 0,
+              "not_exercised": 0.99,
+              "insufficient_evidence": 0.01
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 706,
+        "outputTokens": 52,
+        "latencyMs": 578,
+        "cached": false
+      }
+    },
+    {
+      "id": "c10",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.94,
+            "probabilities": {
+              "exercised": 0.96,
+              "not_exercised": 0.03,
+              "insufficient_evidence": 0.01
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 773,
+        "outputTokens": 51,
+        "latencyMs": 366,
+        "cached": false
+      }
+    },
+    {
+      "id": "c11",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.99,
+            "probabilities": {
+              "exercised": 1,
+              "not_exercised": 0,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 807,
+        "outputTokens": 51,
+        "latencyMs": 423,
+        "cached": false
+      }
+    },
+    {
+      "id": "c12",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.25,
+            "probabilities": {
+              "exercised": 0.5,
+              "not_exercised": 0.48,
+              "insufficient_evidence": 0.02
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 760,
+        "outputTokens": 51,
+        "latencyMs": 410,
+        "cached": false
+      }
+    },
+    {
+      "id": "c13",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.99,
+            "probabilities": {
+              "exercised": 0.99,
+              "not_exercised": 0.01,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 824,
+        "outputTokens": 51,
+        "latencyMs": 417,
+        "cached": false
+      }
+    },
+    {
+      "id": "c14",
+      "repetition": 0,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "not_exercised",
+            "confidence": 0.97,
+            "probabilities": {
+              "exercised": 0.02,
+              "not_exercised": 0.98,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 773,
+        "outputTokens": 52,
+        "latencyMs": 785,
+        "cached": false
+      }
+    },
+    {
+      "id": "c01",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "not_exercised",
+            "confidence": 0.99,
+            "probabilities": {
+              "exercised": 0,
+              "not_exercised": 0.99,
+              "insufficient_evidence": 0.01
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 729,
+        "outputTokens": 52,
+        "latencyMs": 496,
+        "cached": false
+      }
+    },
+    {
+      "id": "c02",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.95,
+            "probabilities": {
+              "exercised": 0.97,
+              "not_exercised": 0.03,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 859,
+        "outputTokens": 51,
+        "latencyMs": 573,
+        "cached": false
+      }
+    },
+    {
+      "id": "c03",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.63,
+            "probabilities": {
+              "exercised": 0.75,
+              "not_exercised": 0.24,
+              "insufficient_evidence": 0.01
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 771,
+        "outputTokens": 51,
+        "latencyMs": 556,
+        "cached": false
+      }
+    },
+    {
+      "id": "c04",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.81,
+            "probabilities": {
+              "exercised": 0.87,
+              "not_exercised": 0.12,
+              "insufficient_evidence": 0.01
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 824,
+        "outputTokens": 51,
+        "latencyMs": 590,
+        "cached": false
+      }
+    },
+    {
+      "id": "c05",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "insufficient_evidence",
+            "confidence": 0.98,
+            "probabilities": {
+              "exercised": 0.01,
+              "not_exercised": 0,
+              "insufficient_evidence": 0.99
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 643,
+        "outputTokens": 55,
+        "latencyMs": 429,
+        "cached": false
+      }
+    },
+    {
+      "id": "c06",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "not_exercised",
+            "confidence": 0.99,
+            "probabilities": {
+              "exercised": 0,
+              "not_exercised": 1,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 870,
+        "outputTokens": 52,
+        "latencyMs": 404,
+        "cached": false
+      }
+    },
+    {
+      "id": "c07",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "not_exercised",
+            "confidence": 0.51,
+            "probabilities": {
+              "exercised": 0.02,
+              "not_exercised": 0.67,
+              "insufficient_evidence": 0.31
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 659,
+        "outputTokens": 52,
+        "latencyMs": 417,
+        "cached": false
+      }
+    },
+    {
+      "id": "c08",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.94,
+            "probabilities": {
+              "exercised": 0.97,
+              "not_exercised": 0.03,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 864,
+        "outputTokens": 51,
+        "latencyMs": 456,
+        "cached": false
+      }
+    },
+    {
+      "id": "c09",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "not_exercised",
+            "confidence": 0.99,
+            "probabilities": {
+              "exercised": 0,
+              "not_exercised": 1,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 706,
+        "outputTokens": 52,
+        "latencyMs": 358,
+        "cached": false
+      }
+    },
+    {
+      "id": "c10",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.92,
+            "probabilities": {
+              "exercised": 0.95,
+              "not_exercised": 0.04,
+              "insufficient_evidence": 0.01
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 773,
+        "outputTokens": 51,
+        "latencyMs": 426,
+        "cached": false
+      }
+    },
+    {
+      "id": "c11",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.99,
+            "probabilities": {
+              "exercised": 1,
+              "not_exercised": 0,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 807,
+        "outputTokens": 51,
+        "latencyMs": 589,
+        "cached": false
+      }
+    },
+    {
+      "id": "c12",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "not_exercised",
+            "confidence": 0.37,
+            "probabilities": {
+              "exercised": 0.4,
+              "not_exercised": 0.58,
+              "insufficient_evidence": 0.02
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 760,
+        "outputTokens": 52,
+        "latencyMs": 373,
+        "cached": false
+      }
+    },
+    {
+      "id": "c13",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "exercised",
+            "confidence": 0.99,
+            "probabilities": {
+              "exercised": 1,
+              "not_exercised": 0,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 824,
+        "outputTokens": 51,
+        "latencyMs": 479,
+        "cached": false
+      }
+    },
+    {
+      "id": "c14",
+      "repetition": 1,
+      "result": {
+        "status": "ok",
+        "answers": {
+          "coverage": {
+            "type": "choice",
+            "choice": "not_exercised",
+            "confidence": 0.98,
+            "probabilities": {
+              "exercised": 0.01,
+              "not_exercised": 0.99,
+              "insufficient_evidence": 0
+            }
+          }
+        },
+        "model": "typesafe-ai/jev",
+        "inputTokens": 773,
+        "outputTokens": 52,
+        "latencyMs": 369,
+        "cached": false
+      }
+    }
+  ]
+}

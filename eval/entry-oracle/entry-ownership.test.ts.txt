@@ -1,0 +1,131 @@
+import assert from "node:assert/strict";
+import { once } from "node:events";
+import { mkdir, mkdtemp, readFile, readdir, rm, writeFile } from "node:fs/promises";
+import { createServer } from "node:http";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import test from "node:test";
+import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager } from "@earendil-works/pi-coding-agent";
+import { loadConfig } from "../src/config.js";
+import { createPijExtension } from "../src/extension.js";
+import { readRecentDecisions, type DecisionRecord } from "../src/telemetry.js";
+import { formatDecisions } from "../src/ui.js";
+
+const first = "Find token refresh: ENTRY_ORACLE_PRIVATE_PROMPT";
+const second = "Now inspect queue cancellation: ENTRY_ORACLE_PRIVATE_STEERING";
+const identity = (row: DecisionRecord): string => {
+  const record = row as DecisionRecord & { turnId?: string; userMessageId?: string };
+  const id = record.userMessageId ?? record.turnId;
+  assert.ok(typeof id === "string" && id.length > 0, "a generated row needs a user-entry identity");
+  return id;
+};
+
+// Each test creates its own real SDK session and freshly persisted journal rows.
+// No lifecycle callbacks, session entries, or attribution fields are fabricated.
+async function generateRows(t: test.TestContext) {
+  const root = await mkdtemp(join(tmpdir(), "pij-entry-oracle-"));
+  const cwd = join(root, "project");
+  const home = join(root, "agent");
+  let session: Awaited<ReturnType<typeof createAgentSession>>["session"] | undefined;
+  let protocolError: unknown;
+  let modelCalls = 0, jevCalls = 0;
+  let entered!: () => void;
+  const rankEntered = new Promise<void>((resolve) => { entered = resolve; });
+  let release!: () => void;
+  const http = createServer(async (req, res) => {
+    try {
+      let raw = "";
+      for await (const chunk of req) raw += String(chunk);
+      const body = JSON.parse(raw) as { questions: Record<string, unknown> };
+      if (req.url === "/v1/systemone") {
+        assert.equal(++jevCalls, 1, "the repeated search must hit the cache");
+        const answers = Object.fromEntries(Object.keys(body.questions).map((id) => [id, { type: "noul", noul: 0.8 }]));
+        release = () => {
+          res.writeHead(200, { "Content-Type": "application/json" });
+          res.end(JSON.stringify({ model: "entry-oracle-local", answers, usage: { input_tokens: 19, output_tokens: 0 } }));
+        };
+        entered();
+        return;
+      }
+      assert.equal(req.url, "/v1/chat/completions");
+      assert.ok(++modelCalls <= 3, "model made an unplanned request");
+      const searching = modelCalls <= 2;
+      const delta = searching ? {
+        role: "assistant", tool_calls: [{ index: 0, id: `search_${modelCalls}`, type: "function", function: { name: "pij_search", arguments: JSON.stringify({ query: first, patterns: ["function"] }) } }],
+      } : { role: "assistant", content: "complete" };
+      res.writeHead(200, { "Content-Type": "text/event-stream" });
+      for (const [part, finish] of [[delta, null], [{}, searching ? "tool_calls" : "stop"]]) {
+        res.write(`data: ${JSON.stringify({ id: `local_${modelCalls}`, object: "chat.completion.chunk", model: "fixture", choices: [{ index: 0, delta: part, finish_reason: finish }] })}\n\n`);
+      }
+      res.end("data: [DONE]\n\n");
+    } catch (error) {
+      protocolError = error;
+      res.writeHead(500); res.end("fixture protocol error");
+    }
+  });
+  t.after(async () => {
+    http.closeAllConnections();
+    await session?.abort();
+    session?.dispose();
+    await new Promise<void>((resolve) => http.close(() => resolve()));
+    await rm(root, { recursive: true, force: true });
+    assert.ifError(protocolError);
+  });
+  await mkdir(cwd);
+  await writeFile(join(cwd, "refresh.ts"), "export function refresh() { return 'ENTRY_ORACLE_PRIVATE_SOURCE'; }\n");
+  await writeFile(join(cwd, "queue.ts"), "export function cancelQueuedRequest() { return 'cancelled'; }\n");
+  http.listen(0, "127.0.0.1");
+  await once(http, "listening");
+  const address = http.address();
+  assert.ok(address && typeof address === "object");
+  const baseUrl = `http://127.0.0.1:${address.port}/v1`;
+  const runtime = await ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
+  runtime.registerProvider("entry-oracle-local", { baseUrl, api: "openai-completions", apiKey: "ENTRY_ORACLE_LOCAL_MODEL_KEY", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 32000, maxTokens: 512 }] });
+  const settings = SettingsManager.inMemory({ retry: { enabled: false }, compaction: { enabled: false } });
+  const resources = new DefaultResourceLoader({
+    cwd, agentDir: home, settingsManager: settings, noExtensions: true, noSkills: true, noPromptTemplates: true, noThemes: true,
+    agentsFilesOverride: () => ({ agentsFiles: [] }), skillsOverride: () => ({ skills: [], diagnostics: [] }),
+    extensionFactories: [createPijExtension(loadConfig({ PIJ_HOME: home, PIJ_MODE: "assist", PIJ_SOURCE_BRIEFING: "0", TYPESAFE_API_KEY: "ENTRY_ORACLE_LOCAL_JEV_KEY", PIJ_JEV_ENDPOINT: `${baseUrl}/systemone`, PIJ_JEV_TIMEOUT_MS: "5000" }))],
+  });
+  await resources.reload();
+  assert.deepEqual(resources.getExtensions().errors, []);
+  ({ session } = await createAgentSession({ cwd, agentDir: home, modelRuntime: runtime, model: runtime.getModel("entry-oracle-local", "fixture"), settingsManager: settings, resourceLoader: resources, sessionManager: SessionManager.inMemory(cwd), tools: ["pij_search"] }));
+  await session.bindExtensions({});
+  const running = session.prompt(first);
+  await rankEntered;
+  await session.steer(second);
+  assert.equal(session.sessionManager.getBranch().filter((entry) => entry.type === "message" && entry.message.role === "user").length, 1, "queued steering must not yet be persisted");
+  release();
+  await running;
+  const branch = session.sessionManager.getBranch();
+  const users = branch.filter((entry) => entry.type === "message" && entry.message.role === "user");
+  const rows = await readRecentDecisions(home);
+  assert.equal(users.length, 2);
+  assert.equal(rows.length, 2);
+  assert.deepEqual({ modelCalls, jevCalls }, { modelCalls: 3, jevCalls: 1 });
+  assert.deepEqual(rows.map((row) => row.cached), [false, true]);
+  assert.ok(rows.every((row) => row.kind === "code_rank" && row.status === "ok" && row.sessionId === session!.sessionId));
+  const raw = (await Promise.all((await readdir(join(home, "decisions"))).map((name) => readFile(join(home, "decisions", name), "utf8")))).join("");
+  for (const sentinel of [first, second, "ENTRY_ORACLE_PRIVATE_SOURCE", "ENTRY_ORACLE_LOCAL_MODEL_KEY", "ENTRY_ORACLE_LOCAL_JEV_KEY"]) assert.ok(!raw.includes(sentinel), "journal must omit private fixture content");
+  return { branch, users, rows };
+}
+
+test("entry oracle: journal IDs exactly identify consumed SDK user entries, including a cache hit", { timeout: 10000 }, async (t) => {
+  const { branch, users, rows } = await generateRows(t);
+  console.log("ENTRY_OWNERSHIP " + JSON.stringify(rows.map((row, index) => {
+    const owner = branch.find((entry) => entry.id === identity(row));
+    return { index, matchesActualUser: identity(row) === users[index]!.id, referencedRole: owner?.type === "message" ? owner.message.role : null, cached: row.cached };
+  })));
+  assert.deepEqual(rows.map(identity), users.map((entry) => entry.id), "journal IDs must equal the actual consumed user-entry IDs");
+});
+
+test("entry oracle: newly generated journal rows display their emitted user identity", { timeout: 10000 }, async (t) => {
+  const { rows } = await generateRows(t);
+  for (const row of rows) {
+    const id = identity(row);
+    const rendered = formatDecisions([row]);
+    // The original UI deliberately abbreviated opaque IDs to their last eight
+    // non-hyphen characters. Accept it as well as a full identifier display.
+    assert.ok(rendered.includes(id) || rendered.includes(id.replaceAll("-", "").slice(-8)), "the actual generated row's user identity must be visible");
+  }
+});

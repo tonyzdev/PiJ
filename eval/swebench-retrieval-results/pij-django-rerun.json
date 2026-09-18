@@ -1,0 +1,83 @@
+{
+ "rows": [
+  {
+   "id": "django__django-10097",
+   "scanned": 5851,
+   "gold": [
+    "django/core/validators.py"
+   ],
+   "bm25": [
+    44
+   ],
+   "jev": [
+    1
+   ],
+   "inPool": 1,
+   "top8": 1,
+   "n": 1,
+   "tDisc": 3938,
+   "tRank": 2746
+  },
+  {
+   "id": "django__django-10554",
+   "scanned": 5994,
+   "gold": [
+    "django/db/models/sql/compiler.py",
+    "django/db/models/sql/query.py"
+   ],
+   "bm25": [
+    2,
+    5
+   ],
+   "jev": [
+    1,
+    3
+   ],
+   "inPool": 2,
+   "top8": 2,
+   "n": 2,
+   "tDisc": 3906,
+   "tRank": 2930
+  },
+  {
+   "id": "django__django-10880",
+   "scanned": 5965,
+   "gold": [
+    "django/db/models/aggregates.py"
+   ],
+   "bm25": [
+    11
+   ],
+   "jev": [
+    1
+   ],
+   "inPool": 1,
+   "top8": 1,
+   "n": 1,
+   "tDisc": 3462,
+   "tRank": 2304
+  },
+  {
+   "id": "django__django-10914",
+   "scanned": 5969,
+   "gold": [
+    "django/conf/global_settings.py"
+   ],
+   "bm25": [
+    2
+   ],
+   "jev": [
+    2
+   ],
+   "inPool": 1,
+   "top8": 1,
+   "n": 1,
+   "tDisc": 3927,
+   "tRank": 2761
+  }
+ ],
+ "calls": 12,
+ "inTok": 171020,
+ "outTok": 7208,
+ "fallbacks": 0
+}

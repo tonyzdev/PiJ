@@ -1,0 +1,98 @@
+diff --git a/src/cli/shared.py b/src/cli/shared.py
+index fae97a2..5d24abd 100644
+--- a/src/cli/shared.py
++++ b/src/cli/shared.py
+@@ -3,11 +3,14 @@
+ from __future__ import annotations
+ 
+ import asyncio
++import logging
+ import os
+ from typing import TYPE_CHECKING
+ 
+ import pandas as pd
+ 
++logger = logging.getLogger(__name__)
++
+ if TYPE_CHECKING:
+     from src.cli.config import ProjectConfig
+ 
+@@ -186,13 +189,30 @@ def make_scorer(cfg: ProjectConfig):
+             try:
+                 text = await call_llm(provider, model, prompt)
+                 return float(text.strip())
+-            except (ValueError, Exception):
++            except Exception:
++                logger.exception(
++                    "LLM scorer failed for question %r (provider=%s, model=%s)",
++                    question,
++                    provider,
++                    model,
++                )
+                 return 0.0
+ 
+         def llm_scorer(question: str, predicted: str, ground_truth: str) -> float:
+-            return asyncio.get_event_loop().run_until_complete(
+-                llm_score(question, predicted, ground_truth)
+-            )
++            coro = llm_score(question, predicted, ground_truth)
++            try:
++                asyncio.get_running_loop()
++            except RuntimeError:
++                # No running loop: safe to drive the coroutine directly.
++                return asyncio.run(coro)
++
++            # A loop is already running (e.g. inside SelfImprovingLoop), so we
++            # cannot block on it. Run the coroutine in a dedicated thread with
++            # its own event loop instead.
++            import concurrent.futures
++
++            with concurrent.futures.ThreadPoolExecutor(max_workers=1) as pool:
++                return pool.submit(asyncio.run, coro).result()
+ 
+         return llm_scorer
+ 
+@@ -200,12 +220,41 @@ def make_scorer(cfg: ProjectConfig):
+         import shlex
+         import subprocess
+ 
++        command = cfg.scorer.command
++        if not command or not command.strip():
++            raise ValueError(
++                "scorer.type is 'script' but scorer.command is not set. "
++                "Provide a command containing {predicted} and/or {expected}."
++            )
++
+         def script_scorer(question: str, predicted: str, ground_truth: str) -> float:
+-            cmd = cfg.scorer.command.format(predicted=predicted, expected=ground_truth)
+-            result = subprocess.run(shlex.split(cmd), capture_output=True, text=True)
++            # Substitute placeholders directly instead of using str.format so
++            # that literal braces (e.g. "{}") in the command or in the answers
++            # do not raise KeyError/IndexError.
++            cmd = command.replace("{predicted}", str(predicted)).replace(
++                "{expected}", str(ground_truth)
++            )
++            try:
++                result = subprocess.run(
++                    shlex.split(cmd),
++                    capture_output=True,
++                    text=True,
++                    timeout=30,
++                )
++            except subprocess.TimeoutExpired:
++                logger.error("Script scorer timed out after 30s: %s", cmd)
++                return 0.0
++            except (OSError, ValueError):
++                logger.exception("Script scorer failed to run: %s", cmd)
++                return 0.0
+             try:
+                 return float(result.stdout.strip())
+             except ValueError:
++                logger.error(
++                    "Script scorer produced non-numeric output %r (stderr: %r)",
++                    result.stdout.strip(),
++                    result.stderr.strip(),
++                )
+                 return 0.0
+ 
+         return script_scorer

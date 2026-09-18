@@ -1,0 +1,91 @@
+diff --git a/src/remote/daytona.py b/src/remote/daytona.py
+index 90bf06e..a8dc24f 100644
+--- a/src/remote/daytona.py
++++ b/src/remote/daytona.py
+@@ -21,6 +21,7 @@ from src.remote.sync import (
+ )
+ 
+ SESSION_ID = "evoskill-run"
++UPLOAD_SESSION_ID = "evoskill-upload"
+ 
+ 
+ def _make_client(api_key: str):
+@@ -87,6 +88,42 @@ class DaytonaBackend(RemoteBackend):
+             self._client = _make_client(daytona_cfg.api_key)
+         return self._client
+ 
++    def _exec_async(self, command: str, *, cwd: str | None = None,
++                    timeout: int | None = None, poll_interval: float = 2.0):
++        """Run a command via the session API and block until it completes.
++
++        Heavy commands (cat/tar) can take minutes. A blocking process.exec()
++        holds a single HTTP connection open for that whole time, which the
++        Daytona server may reset before the command finishes. Instead we
++        submit the command with run_async=True (returning a cmd_id
++        immediately) and poll get_session_command until exit_code is set.
++        Each HTTP call is short, so connection resets are no longer possible.
++        """
++        from daytona import SessionExecuteRequest
++
++        sandbox = self._sandbox
++        try:
++            sandbox.process.create_session(UPLOAD_SESSION_ID)
++        except Exception:
++            # Session already exists from a previous call.
++            pass
++
++        full_cmd = f"cd {cwd} && {command}" if cwd else command
++        req = SessionExecuteRequest(command=full_cmd, run_async=True)
++        response = sandbox.process.execute_session_command(UPLOAD_SESSION_ID, req)
++        cmd_id = response.cmd_id
++
++        deadline = time.monotonic() + timeout if timeout else None
++        while True:
++            cmd_info = sandbox.process.get_session_command(UPLOAD_SESSION_ID, cmd_id)
++            if cmd_info.exit_code is not None:
++                return cmd_info
++            if deadline is not None and time.monotonic() >= deadline:
++                raise TimeoutError(
++                    f"Command timed out after {timeout}s: {command}"
++                )
++            time.sleep(poll_interval)
++
+     def setup(self, cfg: ProjectConfig) -> None:
+         self._ensure_client(cfg)
+         daytona_cfg = cfg.remote.daytona
+@@ -130,8 +167,8 @@ class DaytonaBackend(RemoteBackend):
+ 
+         bundle_bytes = Path(bundle_path).read_bytes()
+         sandbox.fs.upload_file(bundle_bytes, "/workspace/repo.bundle")
+-        sandbox.process.exec(
+-            "cd /workspace && git init && git bundle unbundle repo.bundle && rm repo.bundle",
++        self._exec_async(
++            "git init && git bundle unbundle repo.bundle && rm repo.bundle",
+             cwd="/workspace",
+         )
+ 
+@@ -192,7 +229,7 @@ class DaytonaBackend(RemoteBackend):
+                     remote_tar = f"/tmp/{mapping.host_path.name}.tar.gz"
+                     sandbox.fs.upload_file(tar_bytes, remote_tar)
+                     log(f"extracting {mapping.host_path.name}...")
+-                    sandbox.process.exec(
++                    self._exec_async(
+                         f"mkdir -p {mapping.container_path} && "
+                         f"tar xzf {remote_tar} -C /mnt/data/ && "
+                         f"rm {remote_tar}",
+@@ -206,13 +243,13 @@ class DaytonaBackend(RemoteBackend):
+                         sandbox.fs.upload_file(chunk, f"/tmp/chunks/part_{i:010d}")
+                         log(f"  chunk {idx + 1}/{n_chunks}")
+                     log(f"reassembling chunks...")
+-                    sandbox.process.exec(
++                    self._exec_async(
+                         f"cat /tmp/chunks/part_* > /tmp/combined.tar.gz && "
+                         f"rm -rf /tmp/chunks",
+                         timeout=1200,
+                     )
+                     log(f"extracting {mapping.host_path.name}...")
+-                    sandbox.process.exec(
++                    self._exec_async(
+                         f"mkdir -p {mapping.container_path} && "
+                         f"tar xzf /tmp/combined.tar.gz -C /mnt/data/ && "
+                         f"rm -f /tmp/combined.tar.gz",

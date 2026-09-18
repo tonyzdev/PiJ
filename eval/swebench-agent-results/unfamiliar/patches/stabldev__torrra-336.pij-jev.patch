@@ -1,0 +1,153 @@
+diff --git a/src/torrra/app.py b/src/torrra/app.py
+index 7129dbf..33527d7 100644
+--- a/src/torrra/app.py
++++ b/src/torrra/app.py
+@@ -90,6 +90,12 @@ class TorrraApp(App[None]):
+     def action_switch_theme(self) -> None:
+         self.push_screen(ThemeSelectorScreen())
+ 
++    def on_unmount(self) -> None:
++        # persist DHT/session state so peers survive the next launch
++        from torrra.core.download import get_download_manager
++
++        get_download_manager().save_session_state()
++
+     @override
+     def check_action(self, action: str, parameters: tuple[object, ...]) -> bool | None:
+         # "?" is bound with priority so it works from any list, but it is also a
+diff --git a/src/torrra/core/download.py b/src/torrra/core/download.py
+index d654313..ea6d46c 100644
+--- a/src/torrra/core/download.py
++++ b/src/torrra/core/download.py
+@@ -2,9 +2,11 @@ from __future__ import annotations
+ 
+ import os
+ from functools import lru_cache
++from pathlib import Path
+ from typing import ClassVar
+ 
+ import libtorrent as lt
++from platformdirs import user_data_dir
+ 
+ from torrra._types import SessionStats, TorrentFileInfo, TorrentStatus
+ from torrra.core.config import get_config
+@@ -17,6 +19,10 @@ from torrra.core.paths import normalize_download_path, prepare_download_path
+ from torrra.utils.helpers import coerce_speed_limit
+ from torrra.utils.magnet import enhance_magnet_uri, fix_magnet_uri
+ 
++# libtorrent session/DHT state is persisted here so peers and DHT nodes
++# survive application restarts
++SESSION_STATE_FILE = Path(user_data_dir("torrra")) / "session_state.dat"
++
+ 
+ @lru_cache
+ def get_download_manager() -> DownloadManager:
+@@ -44,6 +50,16 @@ class DownloadManager:
+             "announce_to_all_trackers": True,
+             "announce_to_all_tiers": True,
+             "prefer_udp_trackers": True,
++            # connection tuning: keep a healthy peer pool and rotate through
++            # half-open connections quickly so metadata/peers are found faster
++            "connections_limit": 500,
++            "active_downloads": 8,
++            "active_seeds": 8,
++            "active_limit": 20,
++            "peer_connect_timeout": 5,
++            "request_timeout": 10,
++            "aio_threads": 4,
++            "checking_mem_usage": 2048,
+         }
+         self.session: lt.session = lt.session(settings)
+         self.torrents: dict[str, lt.torrent_handle] = {}
+@@ -53,9 +69,12 @@ class DownloadManager:
+         self._metadata_updated: set[str] = (
+             set()
+         )  # Track torrents whose metadata has been updated
++        # restore persisted DHT/session state before applying limits
++        self.load_session_state()
+         # apply session-wide speed limits from config ("turtle mode"),
+-        # a no-op when disabled or unset
+-        self.apply_global_limits()
++        # but only when the user has actually enabled them
++        if self.is_speed_limit_enabled():
++            self.apply_global_limits()
+ 
+     def add_torrent(
+         self,
+@@ -197,6 +216,14 @@ class DownloadManager:
+         self.torrents[magnet_uri] = handle
+         if metadata_only:
+             self._metadata_only_torrents.add(magnet_uri)
++            # metadata-only handles are short-lived; give them the top queue
++            # position and force an immediate announce so metadata arrives ASAP
++            try:
++                handle.set_flags(lt.torrent_flags.auto_managed)
++                handle.queue_position_top()
++                handle.force_reannounce()
++            except (AttributeError, RuntimeError):
++                pass
+ 
+         # apply any stored per-torrent speed limits
+         self._apply_stored_limits(handle, magnet_uri)
+@@ -292,6 +319,27 @@ class DownloadManager:
+     def is_speed_limit_enabled(self) -> bool:
+         return bool(get_config().get("speed_limit.enabled", False))
+ 
++    def save_session_state(self) -> None:
++        """Persist libtorrent session/DHT state so it survives restarts."""
++        try:
++            state = self.session.save_state()
++            SESSION_STATE_FILE.parent.mkdir(parents=True, exist_ok=True)
++            SESSION_STATE_FILE.write_bytes(lt.bencode(state))
++        except (AttributeError, OSError, RuntimeError):
++            pass
++
++    def load_session_state(self) -> None:
++        """Restore previously persisted libtorrent session/DHT state."""
++        if not SESSION_STATE_FILE.exists():
++            return
++        try:
++            data = SESSION_STATE_FILE.read_bytes()
++            if not data:
++                return
++            self.session.load_state(lt.bdecode(data))
++        except (AttributeError, OSError, RuntimeError, ValueError):
++            pass
++
+     def set_speed_limit_enabled(self, enabled: bool) -> None:
+         get_config().set("speed_limit.enabled", str(enabled).lower())
+         if enabled:
+diff --git a/src/torrra/utils/magnet.py b/src/torrra/utils/magnet.py
+index 7b69aa0..66b5282 100644
+--- a/src/torrra/utils/magnet.py
++++ b/src/torrra/utils/magnet.py
+@@ -9,10 +9,28 @@ DEFAULT_TRACKERS: list[str] = [
+     "udp://tracker.opentrackr.org:1337/announce",
+     "udp://open.stealth.si:80/announce",
+     "udp://tracker.torrent.eu.org:451/announce",
++    "udp://tracker.bittor.pw:1337/announce",
++    "udp://tracker.dler.org:6969/announce",
++    "udp://opentracker.io:6969/announce",
++    "udp://open.demonii.com:1337/announce",
++    "udp://exodus.desync.com:6969/announce",
+     "udp://explodie.org:6969/announce",
+     "udp://tracker.openbittorrent.com:6969/announce",
+-    "udp://tracker.cyberia.is:6969/announce",
++    "udp://tracker.tiny-vps.com:6969/announce",
++    "udp://tracker1.bt.moack.co.kr:80/announce",
++    "udp://tracker.qu.ax:6969/announce",
++    "udp://tracker.therarbg.to:6969/announce",
++    "udp://tracker.0x7c0.com:6969/announce",
++    "udp://tracker.ololosh.space:6969/announce",
++    "udp://tracker.skyts.net:6969/announce",
++    "udp://tracker.waaa.moe:6969/announce",
++    "udp://tracker2.dler.org:80/announce",
++    "udp://tracker.leech.ie:1337/announce",
+     "http://tracker.openbittorrent.com:80/announce",
++    "http://tracker.opentrackr.org:1337/announce",
++    "https://tracker.tamersunion.org:443/announce",
++    "https://tracker.gbitt.info:443/announce",
++    "https://tracker1.bt.moack.co.kr:443/announce",
+ ]
+ 
+ 

@@ -4,6 +4,8 @@ import { join } from "node:path";
 import type { DecisionMode } from "./config.js";
 import type { DecisionKind, DecisionObservation } from "./decisions.js";
 
+export interface DecisionScope { sessionId?: string; userMessageId?: string }
+
 export interface DecisionRecord {
   at: string;
   mode: DecisionMode;
@@ -16,6 +18,8 @@ export interface DecisionRecord {
   cached?: boolean;
   inputTokens?: number;
   outputTokens?: number;
+  sessionId?: string;
+  userMessageId?: string;
 }
 
 export class DecisionJournal {
@@ -28,11 +32,13 @@ export class DecisionJournal {
 
   constructor(home: string) { this.file = join(home, "decisions", `${Date.now()}-${randomUUID()}.jsonl`); }
 
-  async record(mode: DecisionMode, observation: DecisionObservation): Promise<void> {
+  async record(mode: DecisionMode, observation: DecisionObservation, scope: DecisionScope = {}): Promise<void> {
     const { result, kind, questionCount } = observation;
     // Deliberate allowlist: never serialize answers, source, prompts or raw errors.
     const entry: DecisionRecord = {
       at: new Date().toISOString(), mode, kind, status: result.status, latencyMs: result.latencyMs, questionCount,
+      ...(scope.sessionId ? { sessionId: scope.sessionId } : {}),
+      ...(scope.userMessageId ? { userMessageId: scope.userMessageId } : {}),
       ...(result.status === "fallback" ? { reason: result.reason } : {
         model: result.model.slice(0, 100), cached: result.cached, inputTokens: result.cached ? 0 : result.inputTokens, outputTokens: result.cached ? 0 : result.outputTokens,
       }),

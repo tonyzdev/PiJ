@@ -1,0 +1,52 @@
+TAP version 13
+# Subtest: holdout: a queued follow-up owns all of its later decisions, including cache hits
+ok 1 - holdout: a queued follow-up owns all of its later decisions, including cache hits
+  ---
+  duration_ms: 101.941875
+  type: 'test'
+  ...
+# Subtest: holdout: cancellation after consumed steering retains that message, not a queued follow-up
+ok 2 - holdout: cancellation after consumed steering retains that message, not a queued follow-up
+  ---
+  duration_ms: 23.870083
+  type: 'test'
+  ...
+# Subtest: holdout: runtime replacement settles an old pending decision under its original session
+ok 3 - holdout: runtime replacement settles an old pending decision under its original session
+  ---
+  duration_ms: 25.370125
+  type: 'test'
+  ...
+# Subtest: holdout: assist preserves decision mode and metadata privacy
+ok 4 - holdout: assist preserves decision mode and metadata privacy
+  ---
+  duration_ms: 14.941459
+  type: 'test'
+  ...
+# Subtest: holdout: observe preserves decision mode and metadata privacy
+ok 5 - holdout: observe preserves decision mode and metadata privacy
+  ---
+  duration_ms: 14.959625
+  type: 'test'
+  ...
+# Subtest: holdout: off preserves decision mode and metadata privacy
+ok 6 - holdout: off preserves decision mode and metadata privacy
+  ---
+  duration_ms: 14.244709
+  type: 'test'
+  ...
+# Subtest: holdout: old journal records without identity fields remain readable and renderable
+ok 7 - holdout: old journal records without identity fields remain readable and renderable
+  ---
+  duration_ms: 1.005375
+  type: 'test'
+  ...
+1..7
+# tests 7
+# suites 0
+# pass 7
+# fail 0
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 840.583541

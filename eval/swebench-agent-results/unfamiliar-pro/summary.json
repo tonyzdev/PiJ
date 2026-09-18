@@ -1,0 +1,288 @@
+{
+ "pi": {
+  "n": 13,
+  "resolved": 4,
+  "first_gold": 0,
+  "pij_search_calls": 0,
+  "pij_search_runs": 0,
+  "search": {
+   "mean": 8.538461538461538,
+   "median": 7
+  },
+  "tools": {
+   "mean": 23.153846153846153,
+   "median": 27
+  },
+  "tokens": {
+   "mean": 423835.76923076925,
+   "median": 503000
+  },
+  "seconds": {
+   "mean": 102.43323076923078,
+   "median": 85.022
+  },
+  "usd": 0.021027384692307693,
+  "jev_seconds": 0.0,
+  "jev_calls": 0,
+  "per_instance": [
+   {
+    "id": "13",
+    "tokens": 526262,
+    "resolved": false,
+    "search": 7,
+    "seconds": 85.022
+   },
+   {
+    "id": "23",
+    "tokens": 282703,
+    "resolved": true,
+    "search": 3,
+    "seconds": 82.085
+   },
+   {
+    "id": "26",
+    "tokens": 503000,
+    "resolved": false,
+    "search": 16,
+    "seconds": 95.221
+   },
+   {
+    "id": "31",
+    "tokens": 582707,
+    "resolved": false,
+    "search": 19,
+    "seconds": 330.011
+   },
+   {
+    "id": "449",
+    "tokens": 424454,
+    "resolved": true,
+    "search": 18,
+    "seconds": 66.183
+   },
+   {
+    "id": "1556",
+    "tokens": 594685,
+    "resolved": false,
+    "search": 8,
+    "seconds": 97.799
+   },
+   {
+    "id": "1588",
+    "tokens": 72758,
+    "resolved": true,
+    "search": 3,
+    "seconds": 21.372
+   },
+   {
+    "id": "385",
+    "tokens": 641931,
+    "resolved": false,
+    "search": 7,
+    "seconds": 33.135
+   },
+   {
+    "id": "18",
+    "tokens": 461792,
+    "resolved": false,
+    "search": 9,
+    "seconds": 133.881
+   },
+   {
+    "id": "38",
+    "tokens": 596241,
+    "resolved": false,
+    "search": 11,
+    "seconds": 199.79
+   },
+   {
+    "id": "51",
+    "tokens": 180132,
+    "resolved": true,
+    "search": 5,
+    "seconds": 105.55
+   },
+   {
+    "id": "323",
+    "tokens": 45001,
+    "resolved": false,
+    "search": 1,
+    "seconds": 19.035
+   },
+   {
+    "id": "336",
+    "tokens": 598199,
+    "resolved": false,
+    "search": 4,
+    "seconds": 62.548
+   }
+  ]
+ },
+ "pij-jev": {
+  "n": 13,
+  "resolved": 4,
+  "first_gold": 6,
+  "pij_search_calls": 4,
+  "pij_search_runs": 3,
+  "search": {
+   "mean": 5.230769230769231,
+   "median": 3
+  },
+  "tools": {
+   "mean": 17.307692307692307,
+   "median": 19
+  },
+  "tokens": {
+   "mean": 329081.3076923077,
+   "median": 370115
+  },
+  "seconds": {
+   "mean": 98.57507692307692,
+   "median": 86.397
+  },
+  "usd": 0.01813080223076923,
+  "jev_seconds": 3.5636153846153844,
+  "jev_calls": 47,
+  "per_instance": [
+   {
+    "id": "13",
+    "tokens": 454495,
+    "resolved": false,
+    "search": 8,
+    "seconds": 93.01
+   },
+   {
+    "id": "23",
+    "tokens": 160851,
+    "resolved": false,
+    "search": 2,
+    "seconds": 37.493
+   },
+   {
+    "id": "26",
+    "tokens": 461933,
+    "resolved": false,
+    "search": 8,
+    "seconds": 86.397
+   },
+   {
+    "id": "31",
+    "tokens": 588233,
+    "resolved": false,
+    "search": 16,
+    "seconds": 279.404
+   },
+   {
+    "id": "449",
+    "tokens": 247036,
+    "resolved": true,
+    "search": 9,
+    "seconds": 46.429
+   },
+   {
+    "id": "1556",
+    "tokens": 625933,
+    "resolved": true,
+    "search": 6,
+    "seconds": 193.243
+   },
+   {
+    "id": "1588",
+    "tokens": 16506,
+    "resolved": true,
+    "search": 0,
+    "seconds": 16.688
+   },
+   {
+    "id": "385",
+    "tokens": 170767,
+    "resolved": false,
+    "search": 3,
+    "seconds": 26.592
+   },
+   {
+    "id": "18",
+    "tokens": 474815,
+    "resolved": false,
+    "search": 10,
+    "seconds": 184.288
+   },
+   {
+    "id": "38",
+    "tokens": 370115,
+    "resolved": false,
+    "search": 3,
+    "seconds": 126.093
+   },
+   {
+    "id": "51",
+    "tokens": 47027,
+    "resolved": true,
+    "search": 1,
+    "seconds": 25.256
+   },
+   {
+    "id": "323",
+    "tokens": 55530,
+    "resolved": false,
+    "search": 0,
+    "seconds": 20.318
+   },
+   {
+    "id": "336",
+    "tokens": 604816,
+    "resolved": false,
+    "search": 2,
+    "seconds": 146.265
+   }
+  ]
+ },
+ "pij-off": {
+  "n": 0,
+  "resolved": 0,
+  "first_gold": 0,
+  "pij_search_calls": 0,
+  "pij_search_runs": 0,
+  "search": {
+   "mean": 8.538461538461538,
+   "median": 7
+  },
+  "tools": {
+   "mean": 23.153846153846153,
+   "median": 27
+  },
+  "tokens": {
+   "mean": 423835.76923076925,
+   "median": 503000
+  },
+  "seconds": {
+   "mean": 102.43323076923078,
+   "median": 85.022
+  },
+  "usd": 0.021027384692307693,
+  "jev_seconds": 0.0,
+  "jev_calls": 0,
+  "per_instance": []
+ },
+ "_meta": {
+  "title": "\u540c\u4e00\u6279 13 \u4e2a\u964c\u751f\u4ed3\u5e93\u4efb\u52a1 \u00b7 \u4e3b\u6a21\u578b\u6362\u6210 DeepSeek v4-pro\uff1a\u5b8c\u6210\u7387 vs \u6bcf\u4efb\u52a1\u4e0a\u4e0b\u6587 token\uff08\u4ec5 Pi \u4e0e PiJ+Jev \u4e24\u6761 arm\uff09",
+  "xmin": 200000,
+  "xmax": 600000,
+  "xticks": [
+   200000,
+   300000,
+   400000,
+   500000,
+   600000
+  ],
+  "ymin": 0.1,
+  "ymax": 0.5,
+  "yticks": [
+   0.2,
+   0.3,
+   0.4,
+   0.5
+  ],
+  "footnote": "\u67f1 = \u5747\u503c \u00b7 \u767d\u7ebf = \u4e2d\u4f4d\u6570 \u00b7 \u5b8c\u6210 = PR \u6d4b\u8bd5\u8865\u4e01\u4e0b FAIL_TO_PASS \u5168\u8fc7\u4e14\u65e0\u56de\u5f52 \u00b7 \u9884\u7b97 600k token / 40 \u8f6e / 9 \u5206\u949f \u00b7 \u4e3b\u6a21\u578b $0.51 / 26 run \u00b7 Jev \u5e73\u5747\u6bcf\u4efb\u52a1 +3.6s \u00b7 8 \u4e2a\u4efb\u52a1\u4e24\u6761 arm \u90fd\u6ca1\u89e3\u51b3"
+ }
+}

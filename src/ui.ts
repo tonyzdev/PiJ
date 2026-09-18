@@ -33,5 +33,13 @@ export function statusText(config: PijConfig, mode: DecisionMode, journal: Decis
 
 export function formatDecisions(records: DecisionRecord[]): string {
   if (!records.length) return "No Jev decisions recorded yet.";
-  return records.map((record) => cleanText(`${record.at.slice(11, 19)}  ${record.mode.padEnd(7)} ${record.kind.padEnd(15)} ${record.status === "fallback" ? `fallback:${record.reason}` : record.cached ? "cached" : "ok"}  ${record.latencyMs}ms`)).join("\n");
+  return records.map((record) => cleanText(`${record.at.slice(11, 19)}  ${record.mode.padEnd(7)} ${record.kind.padEnd(15)} ${record.status === "fallback" ? `fallback:${record.reason}` : record.cached ? "cached" : "ok"}  ${record.latencyMs}ms${record.sessionId ? `  session=${record.sessionId}` : ""}${record.userMessageId ? `  user=${record.userMessageId}` : ""}`)).join("\n");
+}
+
+/** Pi's default prompt tells the model to search with bash rg before it ever sees pij_search.
+ * Rewrite only those exact lines; an unrecognised prompt is left untouched. */
+export function preferPijSearch(systemPrompt: string): string {
+  return systemPrompt
+    .replace("- bash: Execute bash commands (ls, grep, find, etc.)", "- bash: Execute bash commands (ls, find, running tests, etc.)")
+    .replace("- Use bash for file operations like ls, rg, find", "- To find code, call pij_search first with a concrete question; use bash rg/grep only to verify or expand what it returned");
 }

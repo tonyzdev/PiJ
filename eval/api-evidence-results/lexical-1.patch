@@ -1,0 +1,98 @@
+diff --git a/src/extension.ts b/src/extension.ts
+index 8f06520..df857a1 100644
+--- a/src/extension.ts
++++ b/src/extension.ts
+@@ -1,5 +1,6 @@
+ import { readFile, stat } from "node:fs/promises";
+ import type { ExtensionContext, ExtensionFactory } from "@earendil-works/pi-coding-agent";
++import type { SessionEntry } from "@earendil-works/pi-coding-agent";
+ import { Text } from "@earendil-works/pi-tui";
+ import { Type } from "typebox";
+ import type { DecisionMode, PijConfig } from "./config.js";
+@@ -9,6 +10,45 @@ import { retrieveCode, type CodeCandidate } from "./search.js";
+ import { DecisionJournal } from "./telemetry.js";
+ import { cleanText, cleanDisplayText, formatDecisions, header, statusText } from "./ui.js";
+ 
++/** Custom type identifier used for persisting mode selections in the session. */
++const PIJ_MODE_CUSTOM_TYPE = "pij-mode";
++
++/** Data stored in a pij-mode custom entry. */
++interface PijModeData {
++  version: 1;
++  mode: DecisionMode;
++}
++
++/**
++ * Walk the branch entries (root → leaf order, as returned by getBranch()) from
++ * newest to oldest and return the first valid pij-mode selection, or undefined
++ * when no valid entry exists on this branch.
++ *
++ * Validation rules:
++ * - entry.type === "custom" and entry.customType === PIJ_MODE_CUSTOM_TYPE
++ * - data must be a plain object with exactly the keys "version" and "mode"
++ * - version must be 1
++ * - mode must be "assist" | "observe" | "off"
++ * Invalid newer records are skipped so an older valid entry is still found.
++ */
++function readModeFromBranch(entries: SessionEntry[]): DecisionMode | undefined {
++  // getBranch() returns root → leaf; iterate reversed to check newest first.
++  for (let i = entries.length - 1; i >= 0; i--) {
++    const entry = entries[i];
++    if (!entry || entry.type !== "custom" || entry.customType !== PIJ_MODE_CUSTOM_TYPE) continue;
++    const d = entry.data;
++    if (d === null || d === undefined || typeof d !== "object" || Array.isArray(d)) continue;
++    const record = d as Record<string, unknown>;
++    const keys = Object.keys(record);
++    if (keys.length !== 2 || !keys.includes("version") || !keys.includes("mode")) continue;
++    if (record["version"] !== 1) continue;
++    const m = record["mode"];
++    if (m !== "assist" && m !== "observe" && m !== "off") continue;
++    return m;
++  }
++  return undefined;
++}
++
+ export function createPijExtension(config: PijConfig): ExtensionFactory {
+   return (pi) => {
+     let mode: DecisionMode = config.mode;
+@@ -30,6 +70,10 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       run.abort(); run = new AbortController(); request = ""; failuresThisRun = 0;
+       skillPending = false; skillAdvice = undefined; skills = [];
+       context = ctx;
++      // Restore mode from the most recent valid pij-mode entry on the active branch.
++      // Falls back to config.mode when the branch has no valid entry.
++      const savedMode = readModeFromBranch(ctx.sessionManager.getBranch());
++      mode = savedMode ?? config.mode;
+       unsubscribeInput?.();
+       if (ctx.mode === "tui") {
+         ctx.ui.setTitle("PiJ");
+@@ -40,13 +84,28 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+     });
+     pi.on("session_shutdown", async () => { run.abort(); unsubscribeInput?.(); unsubscribeInput = undefined; context = undefined; await journal.flush(); });
+ 
++    // Restore mode when the user navigates the session tree (branch switch).
++    // The leaf has already moved by the time this event fires.
++    pi.on("session_tree", (_event, ctx) => {
++      const savedMode = readModeFromBranch(ctx.sessionManager.getBranch());
++      mode = savedMode ?? config.mode;
++      run.abort(); run = new AbortController();
++      skillAdvice = undefined; skillPending = false;
++      update();
++    });
++
+     pi.registerCommand("pij", {
+       description: "PiJ status, decisions, and Jev modes: assist | observe | off",
+       getArgumentCompletions: (prefix) => ["status", "decisions", "assist", "observe", "off"].filter((item) => item.startsWith(prefix)).map((value) => ({ value, label: value })),
+       handler: async (args, ctx) => {
+         const command = args.trim() || "status";
+         if (command === "assist" || command === "observe" || command === "off") {
+-          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command; update();
++          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command;
++          // Persist the selection in the session as an allowlisted metadata entry.
++          // Does not participate in LLM context (type "custom", not "custom_message").
++          const data: PijModeData = { version: 1, mode: command };
++          pi.appendEntry(PIJ_MODE_CUSTOM_TYPE, data);
++          update();
+           ctx.ui.notify(`PiJ mode: ${mode}. ${mode === "assist" ? "Jev suggestions can assist this session." : mode === "observe" ? "Decisions are recorded without changing recommendations or ranking." : "No Jev requests will be made."}`, "info");
+         } else if (command === "decisions") ctx.ui.notify(formatDecisions(journal.recent().slice(-8)), "info");
+         else if (command === "status") {

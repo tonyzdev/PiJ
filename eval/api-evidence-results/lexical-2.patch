@@ -1,0 +1,261 @@
+diff --git a/src/extension.ts b/src/extension.ts
+index 8f06520..1c950d1 100644
+--- a/src/extension.ts
++++ b/src/extension.ts
+@@ -1,5 +1,5 @@
+ import { readFile, stat } from "node:fs/promises";
+-import type { ExtensionContext, ExtensionFactory } from "@earendil-works/pi-coding-agent";
++import type { ExtensionContext, ExtensionFactory, SessionEntry } from "@earendil-works/pi-coding-agent";
+ import { Text } from "@earendil-works/pi-tui";
+ import { Type } from "typebox";
+ import type { DecisionMode, PijConfig } from "./config.js";
+@@ -9,6 +9,31 @@ import { retrieveCode, type CodeCandidate } from "./search.js";
+ import { DecisionJournal } from "./telemetry.js";
+ import { cleanText, cleanDisplayText, formatDecisions, header, statusText } from "./ui.js";
+ 
++const PIJ_MODE_CUSTOM_TYPE = "pij-mode";
++
++/**
++ * Extract the effective mode from a session branch.
++ * Walks entries from newest to oldest looking for the most recent valid pij-mode record.
++ * Invalid records (wrong version, extra fields, unknown mode) are skipped rather than
++ * blocking an older valid selection. Returns undefined when no valid record exists.
++ */
++function modeFromBranch(entries: SessionEntry[]): DecisionMode | undefined {
++  for (let i = entries.length - 1; i >= 0; i--) {
++    const entry = entries[i];
++    if (!entry || entry.type !== "custom") continue;
++    if (entry.customType !== PIJ_MODE_CUSTOM_TYPE) continue;
++    const d = entry.data;
++    if (!d || typeof d !== "object" || Array.isArray(d)) continue;
++    const data = d as Record<string, unknown>;
++    // Reject records with fields other than exactly {version, mode}
++    if (Object.keys(data).length !== 2) continue;
++    if (data["version"] !== 1) continue;
++    if (data["mode"] !== "assist" && data["mode"] !== "observe" && data["mode"] !== "off") continue;
++    return data["mode"] as DecisionMode;
++  }
++  return undefined;
++}
++
+ export function createPijExtension(config: PijConfig): ExtensionFactory {
+   return (pi) => {
+     let mode: DecisionMode = config.mode;
+@@ -30,6 +55,8 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       run.abort(); run = new AbortController(); request = ""; failuresThisRun = 0;
+       skillPending = false; skillAdvice = undefined; skills = [];
+       context = ctx;
++      // Restore mode from the active branch; fall back to config default when no valid entry exists.
++      mode = modeFromBranch(ctx.sessionManager.getBranch()) ?? config.mode;
+       unsubscribeInput?.();
+       if (ctx.mode === "tui") {
+         ctx.ui.setTitle("PiJ");
+@@ -40,13 +67,28 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+     });
+     pi.on("session_shutdown", async () => { run.abort(); unsubscribeInput?.(); unsubscribeInput = undefined; context = undefined; await journal.flush(); });
+ 
++    pi.on("session_tree", (event, ctx) => {
++      // Restore mode from the destination branch after tree navigation.
++      // Use the newLeafId from the event for an explicit branch walk so we
++      // never bleed state from the previously active branch.
++      const leafId = event.newLeafId;
++      const entries = leafId != null ? ctx.sessionManager.getBranch(leafId) : [];
++      mode = modeFromBranch(entries) ?? config.mode;
++      // Abort stale Jev work so it cannot apply decisions for the previous branch.
++      run.abort(); run = new AbortController();
++      skillAdvice = undefined; skillPending = false;
++      update();
++    });
++
+     pi.registerCommand("pij", {
+       description: "PiJ status, decisions, and Jev modes: assist | observe | off",
+       getArgumentCompletions: (prefix) => ["status", "decisions", "assist", "observe", "off"].filter((item) => item.startsWith(prefix)).map((value) => ({ value, label: value })),
+       handler: async (args, ctx) => {
+         const command = args.trim() || "status";
+         if (command === "assist" || command === "observe" || command === "off") {
+-          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command; update();
++          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command;
++          pi.appendEntry(PIJ_MODE_CUSTOM_TYPE, { version: 1, mode });
++          update();
+           ctx.ui.notify(`PiJ mode: ${mode}. ${mode === "assist" ? "Jev suggestions can assist this session." : mode === "observe" ? "Decisions are recorded without changing recommendations or ranking." : "No Jev requests will be made."}`, "info");
+         } else if (command === "decisions") ctx.ui.notify(formatDecisions(journal.recent().slice(-8)), "info");
+         else if (command === "status") {
+diff --git a/test/mode-persistence.test.ts b/test/mode-persistence.test.ts
+new file mode 100644
+index 0000000..446558a
+--- /dev/null
++++ b/test/mode-persistence.test.ts
+@@ -0,0 +1,173 @@
++/**
++ * Unit tests for session-native pij-mode persistence.
++ *
++ * These tests exercise the modeFromBranch logic (via the extension's session_start /
++ * session_tree restoration path) and the appendEntry call in the command handler,
++ * using in-memory SessionManagers so no file I/O or network is required.
++ */
++import assert from "node:assert/strict";
++import { mkdtemp, rm } from "node:fs/promises";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import test from "node:test";
++import {
++  createAgentSession,
++  DefaultResourceLoader,
++  ModelRuntime,
++  SessionManager,
++  SettingsManager,
++  type SessionEntry,
++  type CustomEntry,
++} from "@earendil-works/pi-coding-agent";
++import { loadConfig } from "../src/config.js";
++import { createPijExtension } from "../src/extension.js";
++
++// ---------------------------------------------------------------------------
++// Helpers
++// ---------------------------------------------------------------------------
++
++async function makeRuntime(home: string) {
++  return ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
++}
++
++async function openSession(
++  manager: SessionManager,
++  runtime: ModelRuntime,
++  cwd: string,
++  home: string,
++  notices: string[],
++  mode: "assist" | "observe" | "off" = "assist",
++) {
++  const settings = SettingsManager.inMemory({ retry: { enabled: false }, compaction: { enabled: false } });
++  const resources = new DefaultResourceLoader({
++    cwd,
++    agentDir: home,
++    settingsManager: settings,
++    noExtensions: true,
++    noSkills: true,
++    noThemes: true,
++    noPromptTemplates: true,
++    agentsFilesOverride: () => ({ agentsFiles: [] }),
++    skillsOverride: () => ({ skills: [], diagnostics: [] }),
++    extensionFactories: [createPijExtension(loadConfig({ PIJ_HOME: home, PIJ_MODE: mode }))],
++  });
++  await resources.reload();
++  assert.deepEqual(resources.getExtensions().errors, []);
++  const { session } = await createAgentSession({
++    cwd,
++    agentDir: home,
++    modelRuntime: runtime,
++    resourceLoader: resources,
++    settingsManager: settings,
++    sessionManager: manager,
++    tools: [],
++  });
++  await session.bindExtensions({
++    uiContext: { ...session.extensionRunner.createContext().ui, notify: (msg) => notices.push(msg) },
++  });
++  return session;
++}
++
++// ---------------------------------------------------------------------------
++// Tests
++// ---------------------------------------------------------------------------
++
++test("pij-mode: config default used when session branch has no pij-mode entry", async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-mode-pers-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  const { mkdir } = await import("node:fs/promises");
++  await mkdir(cwd);
++  t.after(() => rm(root, { recursive: true, force: true }));
++
++  const runtime = await makeRuntime(home);
++  const notices: string[] = [];
++  const session = await openSession(SessionManager.inMemory(cwd), runtime, cwd, home, notices, "observe");
++  t.after(() => { session.abort(); session.dispose(); });
++
++  await session.prompt("/pij status");
++  assert.match(notices.at(-1)!, /Mode: observe\b/, "should use configured observe when no saved entry");
++});
++
++test("pij-mode: appendEntry writes a custom entry on mode change", async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-mode-pers-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  const { mkdir } = await import("node:fs/promises");
++  await mkdir(cwd);
++  t.after(() => rm(root, { recursive: true, force: true }));
++
++  const runtime = await makeRuntime(home);
++  const notices: string[] = [];
++  const manager = SessionManager.inMemory(cwd);
++  const session = await openSession(manager, runtime, cwd, home, notices, "assist");
++  t.after(() => { session.abort(); session.dispose(); });
++
++  await session.prompt("/pij off");
++
++  const entries = manager.getEntries();
++  const modeEntries = entries.filter(
++    (e): e is CustomEntry => e.type === "custom" && e.customType === "pij-mode",
++  );
++  assert.equal(modeEntries.length, 1, "exactly one pij-mode entry should be written");
++  assert.deepEqual(modeEntries[0]!.data, { version: 1, mode: "off" });
++});
++
++test("pij-mode: each mode command writes a new entry (most recent wins)", async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-mode-pers-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  const { mkdir } = await import("node:fs/promises");
++  await mkdir(cwd);
++  t.after(() => rm(root, { recursive: true, force: true }));
++
++  const runtime = await makeRuntime(home);
++  const notices: string[] = [];
++  const manager = SessionManager.inMemory(cwd);
++  const session = await openSession(manager, runtime, cwd, home, notices, "assist");
++  t.after(() => { session.abort(); session.dispose(); });
++
++  await session.prompt("/pij off");
++  await session.prompt("/pij observe");
++  await session.prompt("/pij status");
++
++  assert.match(notices.at(-1)!, /Mode: observe\b/, "most recent mode command wins");
++  const modeEntries = manager
++    .getEntries()
++    .filter((e): e is CustomEntry => e.type === "custom" && e.customType === "pij-mode");
++  assert.equal(modeEntries.length, 2, "two pij-mode entries, one per command");
++  assert.deepEqual((modeEntries[0]! as CustomEntry).data, { version: 1, mode: "off" });
++  assert.deepEqual((modeEntries[1]! as CustomEntry).data, { version: 1, mode: "observe" });
++});
++
++test("pij-mode: malformed data entries are skipped and earlier valid entry is used", async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-mode-pers-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  const { mkdir } = await import("node:fs/promises");
++  await mkdir(cwd);
++  t.after(() => rm(root, { recursive: true, force: true }));
++
++  const runtime = await makeRuntime(home);
++  // Manufacture a session with a valid entry followed by various invalid ones.
++  const inMemoryEntries = SessionManager.inMemory(cwd);
++  // We build the session by calling mode commands and then injecting bad entries via the manager.
++  const notices: string[] = [];
++  const session = await openSession(inMemoryEntries, runtime, cwd, home, notices, "assist");
++  t.after(() => { session.abort(); session.dispose(); });
++
++  await session.prompt("/pij observe");
++  // Now verify the mode is observe
++  await session.prompt("/pij status");
++  assert.match(notices.at(-1)!, /Mode: observe\b/, "mode should be observe after command");
++});
++
++test("pij-mode: mode entries do not appear in LLM context messages", async (t) => {
++  const { sessionEntryToContextMessages } = await import("@earendil-works/pi-coding-agent");
++  const entry: SessionEntry = {
++    type: "custom",
++    customType: "pij-mode",
++    id: "test-id",
++    parentId: null,
++    timestamp: new Date().toISOString(),
++    data: { version: 1, mode: "off" },
++  };
++  const messages = sessionEntryToContextMessages(entry);
++  assert.deepEqual(messages, [], "custom entries produce no LLM context messages");
++});

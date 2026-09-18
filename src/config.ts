@@ -11,12 +11,15 @@ export interface PijConfig {
   model: string;
   endpoint: string;
   timeoutMs: number;
+  sourceBriefing?: boolean;
 }
 
 export function loadConfig(env: NodeJS.ProcessEnv = process.env, home = homedir()): PijConfig {
   const mode = env.PIJ_MODE ?? "assist";
   if (mode !== "assist" && mode !== "observe" && mode !== "off") throw new Error("PIJ_MODE must be assist, observe, or off.");
   const timeoutMs = Number(env.PIJ_JEV_TIMEOUT_MS ?? 1800);
+  const briefing = env.PIJ_SOURCE_BRIEFING ?? "0";
+  if (briefing !== "0" && briefing !== "1") throw new Error("PIJ_SOURCE_BRIEFING must be 0 or 1.");
   if (!Number.isInteger(timeoutMs) || timeoutMs < 50 || timeoutMs > 30_000) throw new Error("PIJ_JEV_TIMEOUT_MS must be between 50 and 30000.");
   const provider = env.PIJ_JEV_PROVIDER ?? (!env.TYPESAFE_API_KEY?.trim() && env.AI_GATEWAY_API_KEY?.trim() ? "vercel" : "typesafe");
   if (provider !== "typesafe" && provider !== "vercel") throw new Error("PIJ_JEV_PROVIDER must be typesafe or vercel.");
@@ -31,7 +34,7 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env, home = homedir(
   const expanded = configuredHome === "~" ? home : configuredHome.startsWith("~/") ? join(home, configuredHome.slice(2)) : configuredHome;
   return {
     home: isAbsolute(expanded) ? expanded : resolve(expanded),
-    mode, provider, apiKey: (provider === "vercel" ? env.AI_GATEWAY_API_KEY : env.TYPESAFE_API_KEY)?.trim() || undefined,
+    mode, provider, sourceBriefing: briefing === "1", apiKey: (provider === "vercel" ? env.AI_GATEWAY_API_KEY : env.TYPESAFE_API_KEY)?.trim() || undefined,
     model: env.PIJ_JEV_MODEL ?? (provider === "vercel" ? "typesafe-ai/jev" : "jev-latest"), endpoint: url.toString(), timeoutMs,
   };
 }

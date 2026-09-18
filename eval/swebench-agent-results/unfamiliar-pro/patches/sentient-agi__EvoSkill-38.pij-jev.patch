@@ -1,0 +1,95 @@
+diff --git a/src/remote/daytona.py b/src/remote/daytona.py
+index 90bf06e..264dabf 100644
+--- a/src/remote/daytona.py
++++ b/src/remote/daytona.py
+@@ -21,6 +21,7 @@ from src.remote.sync import (
+ )
+ 
+ SESSION_ID = "evoskill-run"
++UPLOAD_SESSION_ID = "evoskill-upload"
+ 
+ 
+ def _make_client(api_key: str):
+@@ -74,6 +75,7 @@ class DaytonaBackend(RemoteBackend):
+         self._client = None
+         self._sandbox = None
+         self._path_overrides: dict[str, str] = {}
++        self._upload_session_ready = False
+ 
+     def _ensure_client(self, cfg: ProjectConfig):
+         """Lazily initialize the Daytona client from config."""
+@@ -114,6 +116,38 @@ class DaytonaBackend(RemoteBackend):
+         )
+         self._sandbox = self._client.create(params)
+ 
++    def _exec_async(self, command: str, *, timeout: int | None = None):
++        """Run a command via the session API, polling until it completes.
++
++        Submits the command with run_async=True so the HTTP call returns a
++        cmd_id immediately, then polls get_session_command until exit_code is
++        set. Each HTTP call is short, avoiding connection resets on long
++        cat/tar operations. The caller still blocks until completion.
++        """
++        from daytona import SessionExecuteRequest
++
++        sandbox = self._sandbox
++        if not self._upload_session_ready:
++            sandbox.process.create_session(UPLOAD_SESSION_ID)
++            self._upload_session_ready = True
++
++        req = SessionExecuteRequest(command=command, run_async=True)
++        response = sandbox.process.execute_session_command(UPLOAD_SESSION_ID, req)
++        cmd_id = response.cmd_id
++
++        deadline = time.monotonic() + timeout if timeout else None
++        while True:
++            cmd_info = sandbox.process.get_session_command(UPLOAD_SESSION_ID, cmd_id)
++            if cmd_info.exit_code is not None:
++                if cmd_info.exit_code != 0:
++                    raise RuntimeError(
++                        f"Command failed (exit_code={cmd_info.exit_code}): {command}"
++                    )
++                return cmd_info
++            if deadline is not None and time.monotonic() > deadline:
++                raise TimeoutError(f"Command timed out after {timeout}s: {command}")
++            time.sleep(1)
++
+     def upload(self, cfg: ProjectConfig, log=None) -> None:
+         sandbox = self._sandbox
+         project_root = cfg.project_root
+@@ -130,9 +164,8 @@ class DaytonaBackend(RemoteBackend):
+ 
+         bundle_bytes = Path(bundle_path).read_bytes()
+         sandbox.fs.upload_file(bundle_bytes, "/workspace/repo.bundle")
+-        sandbox.process.exec(
++        self._exec_async(
+             "cd /workspace && git init && git bundle unbundle repo.bundle && rm repo.bundle",
+-            cwd="/workspace",
+         )
+ 
+         # 2. Upload project files (skip .git — handled by bundle)
+@@ -192,7 +225,7 @@ class DaytonaBackend(RemoteBackend):
+                     remote_tar = f"/tmp/{mapping.host_path.name}.tar.gz"
+                     sandbox.fs.upload_file(tar_bytes, remote_tar)
+                     log(f"extracting {mapping.host_path.name}...")
+-                    sandbox.process.exec(
++                    self._exec_async(
+                         f"mkdir -p {mapping.container_path} && "
+                         f"tar xzf {remote_tar} -C /mnt/data/ && "
+                         f"rm {remote_tar}",
+@@ -206,13 +239,13 @@ class DaytonaBackend(RemoteBackend):
+                         sandbox.fs.upload_file(chunk, f"/tmp/chunks/part_{i:010d}")
+                         log(f"  chunk {idx + 1}/{n_chunks}")
+                     log(f"reassembling chunks...")
+-                    sandbox.process.exec(
++                    self._exec_async(
+                         f"cat /tmp/chunks/part_* > /tmp/combined.tar.gz && "
+                         f"rm -rf /tmp/chunks",
+                         timeout=1200,
+                     )
+                     log(f"extracting {mapping.host_path.name}...")
+-                    sandbox.process.exec(
++                    self._exec_async(
+                         f"mkdir -p {mapping.container_path} && "
+                         f"tar xzf /tmp/combined.tar.gz -C /mnt/data/ && "
+                         f"rm -f /tmp/combined.tar.gz",

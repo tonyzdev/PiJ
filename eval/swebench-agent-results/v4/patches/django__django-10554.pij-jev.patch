@@ -1,0 +1,41 @@
+diff --git a/repro_tmp.py b/repro_tmp.py
+new file mode 100644
+index 0000000..260123a
+--- /dev/null
++++ b/repro_tmp.py
+@@ -0,0 +1,35 @@
++import django
++from django.conf import settings
++settings.configure(
++    DATABASES={'default': {'ENGINE': 'django.db.backends.sqlite3', 'NAME': ':memory:'}},
++    INSTALLED_APPS=['django.contrib.contenttypes', 'django.contrib.auth', 'tests.queries'],
++)
++django.setup()
++from django.test.utils import setup_test_environment
++setup_test_environment()
++from django.test.runner import DiscoverRunner
++runner = DiscoverRunner(verbosity=0)
++old_config = runner.setup_databases()
++from tests.queries.models import Number
++Number.objects.bulk_create(Number(num=i) for i in range(10))
++
++from django.db import connection
++connection.features.supports_slicing_ordering_in_compound = True
++
++qs1 = Number.objects.filter(num__lte=1)
++qs2 = Number.objects.filter(num__gte=8)
++qs = qs1.union(qs2.order_by('num'))
++print("BEFORE: qs.query.order_by =", qs.query.order_by, "default_ordering =", qs.query.default_ordering)
++print("BEFORE: qs.query.combined_queries[0].order_by =", qs.query.combined_queries[0].order_by)
++print("BEFORE: qs.query.combined_queries[1].order_by =", qs.query.combined_queries[1].order_by)
++derived = qs.order_by().values_list('pk', flat=True)
++print("derived.query.order_by =", derived.query.order_by, "default_ordering =", derived.query.default_ordering)
++try:
++    list(derived)
++except Exception as e:
++    print("derived eval error:", type(e).__name__, e)
++print("AFTER: qs.query.order_by =", qs.query.order_by, "default_ordering =", qs.query.default_ordering)
++print("AFTER: qs.query.combined_queries[0].order_by =", qs.query.combined_queries[0].order_by)
++print("AFTER: qs.query.combined_queries[1].order_by =", qs.query.combined_queries[1].order_by)
++print("AFTER: qs.query.combined_queries[0] is qs1.query?", qs.query.combined_queries[0] is qs1.query)
++runner.teardown_databases(old_config)

@@ -1,0 +1,336 @@
+diff --git a/docs/implementation-plan.md b/docs/implementation-plan.md
+index 67bacc6..a5cc711 100644
+--- a/docs/implementation-plan.md
++++ b/docs/implementation-plan.md
+@@ -42,7 +42,18 @@ Files: `bin/pij.mjs`, `src/cli.ts`, `src/config.ts`, `src/extension.ts`, `src/ui
+ - [x] In assist mode inject skill advice, rank search results and append fixed failure hints; observe logs only; off performs no requests.
+ - [x] Ensure cancel/session switch clears run-scoped state and failures never corrupt tool results.
+ 
+-## 4. Delivery and verification
++## 5. Session-native mode persistence
++
++Files: `src/session-mode.ts`, `src/extension.ts`, `test/session-mode-persist.test.ts`, `test/session-mode-visible.test.ts`.
++
++- [x] Implement `isValidModeData` and `readModeFromBranch` helpers in `src/session-mode.ts`. Allowlist-only validation: exactly two keys (`version: 1`, `mode: "assist"|"observe"|"off"`); extra fields, unknown modes, unsupported versions and non-objects all return false.
++- [x] On `session_start` and `session_tree` events, call `readModeFromBranch(ctx.sessionManager.getBranch(), config.mode)` and set `mode` from it. Unknown/no-entry branches fall back to `config.mode`.
++- [x] On a successful mode command (`/pij assist|observe|off`), call `pi.appendEntry("pij-mode", { version: 1, mode })` to persist the selection as a custom session entry. The entry is written to the Pi session tree and survives disk persistence via Pi's normal lifecycle.
++- [x] Add unit tests for `isValidModeData` (edge cases: extra fields, wrong version, unknown mode, non-objects) and `readModeFromBranch` (empty branch, all-invalid, most-recent-valid, other customTypes).
++- [x] Add integration test for tree navigation: ancestor with no entry restores config default; later branch with `off` restores `off`.
++- [x] The reproduction in `test/session-mode-visible.test.ts` passes unchanged.
++
++## 6. Delivery and verification
+ 
+ Files: `README.md`, `LICENSE`, `THIRD_PARTY_NOTICES.md`, `.env.example`, `docs/verification.md`.
+ 
+diff --git a/src/extension.ts b/src/extension.ts
+index 8f06520..8d3c0ff 100644
+--- a/src/extension.ts
++++ b/src/extension.ts
+@@ -6,6 +6,7 @@ import type { DecisionMode, PijConfig } from "./config.js";
+ import { DecisionEngine, type SkillCandidate } from "./decisions.js";
+ import { JevClient } from "./jev.js";
+ import { retrieveCode, type CodeCandidate } from "./search.js";
++import { PIJ_MODE_CUSTOM_TYPE, type PijModeData, readModeFromBranch } from "./session-mode.js";
+ import { DecisionJournal } from "./telemetry.js";
+ import { cleanText, cleanDisplayText, formatDecisions, header, statusText } from "./ui.js";
+ 
+@@ -30,6 +31,7 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+       run.abort(); run = new AbortController(); request = ""; failuresThisRun = 0;
+       skillPending = false; skillAdvice = undefined; skills = [];
+       context = ctx;
++      mode = readModeFromBranch(ctx.sessionManager.getBranch(), config.mode);
+       unsubscribeInput?.();
+       if (ctx.mode === "tui") {
+         ctx.ui.setTitle("PiJ");
+@@ -40,13 +42,21 @@ export function createPijExtension(config: PijConfig): ExtensionFactory {
+     });
+     pi.on("session_shutdown", async () => { run.abort(); unsubscribeInput?.(); unsubscribeInput = undefined; context = undefined; await journal.flush(); });
+ 
++    pi.on("session_tree", (_event, ctx) => {
++      run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false;
++      mode = readModeFromBranch(ctx.sessionManager.getBranch(), config.mode);
++      update();
++    });
++
+     pi.registerCommand("pij", {
+       description: "PiJ status, decisions, and Jev modes: assist | observe | off",
+       getArgumentCompletions: (prefix) => ["status", "decisions", "assist", "observe", "off"].filter((item) => item.startsWith(prefix)).map((value) => ({ value, label: value })),
+       handler: async (args, ctx) => {
+         const command = args.trim() || "status";
+         if (command === "assist" || command === "observe" || command === "off") {
+-          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command; update();
++          run.abort(); run = new AbortController(); skillAdvice = undefined; skillPending = false; mode = command;
++          pi.appendEntry<PijModeData>(PIJ_MODE_CUSTOM_TYPE, { version: 1, mode: command });
++          update();
+           ctx.ui.notify(`PiJ mode: ${mode}. ${mode === "assist" ? "Jev suggestions can assist this session." : mode === "observe" ? "Decisions are recorded without changing recommendations or ranking." : "No Jev requests will be made."}`, "info");
+         } else if (command === "decisions") ctx.ui.notify(formatDecisions(journal.recent().slice(-8)), "info");
+         else if (command === "status") {
+diff --git a/src/session-mode.ts b/src/session-mode.ts
+new file mode 100644
+index 0000000..97af59e
+--- /dev/null
++++ b/src/session-mode.ts
+@@ -0,0 +1,43 @@
++import type { SessionEntry } from "@earendil-works/pi-coding-agent";
++import type { DecisionMode } from "./config.js";
++
++/** Shape of a valid pij-mode custom entry's data payload. */
++export type PijModeData = { version: 1; mode: DecisionMode };
++
++/** The customType string used for pij-mode session entries. */
++export const PIJ_MODE_CUSTOM_TYPE = "pij-mode";
++
++/**
++ * Allowlist-only validation: version must be 1, mode must be a known value,
++ * data must contain exactly the two expected keys with no extras.
++ * Returns false for any malformed, over-specified, or unknown records.
++ */
++export function isValidModeData(data: unknown): data is PijModeData {
++  if (typeof data !== "object" || data === null) return false;
++  const keys = Object.keys(data as object);
++  if (keys.length !== 2 || !keys.includes("version") || !keys.includes("mode")) return false;
++  const d = data as Record<string, unknown>;
++  return d["version"] === 1 && (d["mode"] === "assist" || d["mode"] === "observe" || d["mode"] === "off");
++}
++
++/**
++ * Scan a session branch (root-first order) for the most recent valid pij-mode entry.
++ * Searches backward from the leaf so the newest valid record wins.
++ * Invalid entries (wrong customType, bad data, extra fields, unknown mode, unsupported
++ * version) are skipped and never hide an older valid entry.
++ * Falls back to defaultMode when no valid entry is found.
++ */
++export function readModeFromBranch(branch: SessionEntry[], defaultMode: DecisionMode): DecisionMode {
++  for (let i = branch.length - 1; i >= 0; i--) {
++    const entry = branch[i];
++    if (
++      entry !== undefined &&
++      entry.type === "custom" &&
++      entry.customType === PIJ_MODE_CUSTOM_TYPE &&
++      isValidModeData(entry.data)
++    ) {
++      return (entry.data as PijModeData).mode;
++    }
++  }
++  return defaultMode;
++}
+diff --git a/test/session-mode-persist.test.ts b/test/session-mode-persist.test.ts
+new file mode 100644
+index 0000000..c615471
+--- /dev/null
++++ b/test/session-mode-persist.test.ts
+@@ -0,0 +1,214 @@
++/**
++ * Tests for pij-mode session persistence.
++ *
++ * Covers:
++ *  - isValidModeData: allowlist-only validation (extra fields, bad version, unknown mode, non-objects)
++ *  - readModeFromBranch: most-recent-valid wins; invalid newer entries never hide older valid entries;
++ *    falls back to configured default on empty or all-invalid branches
++ *  - Integration: tree navigation restores the mode at the destination branch; config default is used
++ *    when the destination has no pij-mode entry; saved `off` overrides configured `assist` on reload
++ */
++
++import assert from "node:assert/strict";
++import { once } from "node:events";
++import { mkdir, mkdtemp, rm } from "node:fs/promises";
++import { createServer } from "node:http";
++import { tmpdir } from "node:os";
++import { join } from "node:path";
++import test from "node:test";
++import type { SessionEntry } from "@earendil-works/pi-coding-agent";
++import { createAgentSession, DefaultResourceLoader, ModelRuntime, SessionManager, SettingsManager } from "@earendil-works/pi-coding-agent";
++import { loadConfig } from "../src/config.js";
++import { createPijExtension } from "../src/extension.js";
++import { isValidModeData, readModeFromBranch } from "../src/session-mode.js";
++
++// ---------------------------------------------------------------------------
++// Unit tests: isValidModeData
++// ---------------------------------------------------------------------------
++
++test("isValidModeData accepts exactly the three known modes at version 1", () => {
++  assert.ok(isValidModeData({ version: 1, mode: "assist" }));
++  assert.ok(isValidModeData({ version: 1, mode: "observe" }));
++  assert.ok(isValidModeData({ version: 1, mode: "off" }));
++});
++
++test("isValidModeData rejects unknown modes", () => {
++  assert.equal(isValidModeData({ version: 1, mode: "on" }), false);
++  assert.equal(isValidModeData({ version: 1, mode: "" }), false);
++  assert.equal(isValidModeData({ version: 1, mode: "ASSIST" }), false);
++});
++
++test("isValidModeData rejects unsupported versions", () => {
++  assert.equal(isValidModeData({ version: 2, mode: "assist" }), false);
++  assert.equal(isValidModeData({ version: 0, mode: "assist" }), false);
++  assert.equal(isValidModeData({ version: "1", mode: "assist" }), false);
++});
++
++test("isValidModeData rejects extra fields", () => {
++  assert.equal(isValidModeData({ version: 1, mode: "assist", extra: true }), false);
++  assert.equal(isValidModeData({ version: 1, mode: "off", timestamp: 0 }), false);
++});
++
++test("isValidModeData rejects missing fields", () => {
++  assert.equal(isValidModeData({ version: 1 }), false);
++  assert.equal(isValidModeData({ mode: "assist" }), false);
++  assert.equal(isValidModeData({}), false);
++});
++
++test("isValidModeData rejects non-object values", () => {
++  assert.equal(isValidModeData(null), false);
++  assert.equal(isValidModeData(undefined), false);
++  assert.equal(isValidModeData("assist"), false);
++  assert.equal(isValidModeData(42), false);
++  assert.equal(isValidModeData([{ version: 1, mode: "assist" }]), false);
++});
++
++// ---------------------------------------------------------------------------
++// Unit tests: readModeFromBranch
++// ---------------------------------------------------------------------------
++
++function makeCustomEntry(customType: string, data: unknown, id = "x"): SessionEntry {
++  return { type: "custom", customType, data, id, parentId: null, timestamp: new Date().toISOString() } as SessionEntry;
++}
++
++function makeMessageEntry(id = "m"): SessionEntry {
++  return { type: "message", id, parentId: null, timestamp: new Date().toISOString(), message: { role: "user", content: [] } } as unknown as SessionEntry;
++}
++
++test("readModeFromBranch returns defaultMode for an empty branch", () => {
++  assert.equal(readModeFromBranch([], "assist"), "assist");
++  assert.equal(readModeFromBranch([], "off"), "off");
++});
++
++test("readModeFromBranch returns defaultMode when no pij-mode entries exist", () => {
++  const branch: SessionEntry[] = [makeMessageEntry("a"), makeMessageEntry("b")];
++  assert.equal(readModeFromBranch(branch, "observe"), "observe");
++});
++
++test("readModeFromBranch returns mode from a single valid entry", () => {
++  const branch: SessionEntry[] = [makeCustomEntry("pij-mode", { version: 1, mode: "off" })];
++  assert.equal(readModeFromBranch(branch, "assist"), "off");
++});
++
++test("readModeFromBranch picks the most recent valid entry (last in branch order)", () => {
++  const branch: SessionEntry[] = [
++    makeCustomEntry("pij-mode", { version: 1, mode: "off" }, "first"),
++    makeCustomEntry("pij-mode", { version: 1, mode: "observe" }, "second"),
++  ];
++  assert.equal(readModeFromBranch(branch, "assist"), "observe");
++});
++
++test("readModeFromBranch skips invalid entries and finds the most recent valid one behind them", () => {
++  const branch: SessionEntry[] = [
++    makeCustomEntry("pij-mode", { version: 1, mode: "off" }, "valid"),
++    // Invalid: extra field
++    makeCustomEntry("pij-mode", { version: 1, mode: "assist", extra: true }, "invalid-extra"),
++    // Invalid: unknown mode
++    makeCustomEntry("pij-mode", { version: 1, mode: "unknown" }, "invalid-mode"),
++  ];
++  assert.equal(readModeFromBranch(branch, "assist"), "off");
++});
++
++test("readModeFromBranch ignores entries with a different customType", () => {
++  const branch: SessionEntry[] = [
++    makeCustomEntry("other-extension", { version: 1, mode: "observe" }),
++    makeCustomEntry("pij-mode", { version: 1, mode: "off" }),
++  ];
++  assert.equal(readModeFromBranch(branch, "assist"), "off");
++});
++
++test("readModeFromBranch: saved assist overrides configured off default", () => {
++  const branch: SessionEntry[] = [makeCustomEntry("pij-mode", { version: 1, mode: "assist" })];
++  assert.equal(readModeFromBranch(branch, "off"), "assist");
++});
++
++test("readModeFromBranch ignores malformed data (null, string, array)", () => {
++  const branch: SessionEntry[] = [
++    makeCustomEntry("pij-mode", null),
++    makeCustomEntry("pij-mode", "assist"),
++    makeCustomEntry("pij-mode", [{ version: 1, mode: "observe" }]),
++  ];
++  assert.equal(readModeFromBranch(branch, "off"), "off");
++});
++
++// ---------------------------------------------------------------------------
++// Integration: tree navigation and mode isolation
++// ---------------------------------------------------------------------------
++
++/** Create a minimal loopback model HTTP server and return cleanup + port helpers. */
++async function makeLoopbackServer(t: { after: (fn: () => Promise<void>) => void }) {
++  let callCount = 0;
++  const http = createServer(async (req, res) => {
++    for await (const _ of req) { /* drain */ }
++    callCount++;
++    res.writeHead(200, { "Content-Type": "text/event-stream" });
++    res.write(`data: ${JSON.stringify({ id: "l", object: "chat.completion.chunk", model: "fixture", choices: [{ index: 0, delta: { role: "assistant", content: "ok" }, finish_reason: null }] })}\n\n`);
++    res.write(`data: ${JSON.stringify({ id: "l", object: "chat.completion.chunk", model: "fixture", choices: [{ index: 0, delta: {}, finish_reason: "stop" }] })}\n\n`);
++    res.end("data: [DONE]\n\n");
++  });
++  http.listen(0, "127.0.0.1");
++  await once(http, "listening");
++  t.after(async () => {
++    http.closeAllConnections();
++    await new Promise<void>((r) => http.close(() => r()));
++  });
++  const addr = http.address();
++  assert.ok(addr && typeof addr === "object");
++  return { port: (addr as { port: number }).port, getCallCount: () => callCount };
++}
++
++test("tree navigation immediately restores mode at destination (ancestor with no selection yields config default)", { timeout: 15000 }, async (t) => {
++  const root = await mkdtemp(join(tmpdir(), "pij-mode-tree-"));
++  const cwd = join(root, "project"), home = join(root, "agent");
++  await mkdir(cwd);
++  t.after(() => rm(root, { recursive: true, force: true }));
++
++  const { port } = await makeLoopbackServer(t);
++  const runtime = await ModelRuntime.create({ authPath: join(home, "auth.json"), modelsPath: null, refreshOnCreate: false });
++  runtime.registerProvider("tree-local", { baseUrl: `http://127.0.0.1:${port}/v1`, api: "openai-completions", apiKey: "local-fixture", models: [{ id: "fixture", name: "fixture", reasoning: false, input: ["text"], cost: { input: 0, output: 0, cacheRead: 0, cacheWrite: 0 }, contextWindow: 32000, maxTokens: 128 }] });
++
++  const sessions: Awaited<ReturnType<typeof createAgentSession>>["session"][] = [];
++  const notices: string[] = [];
++  t.after(async () => { for (const s of sessions) { await s.abort(); s.dispose(); } });
++
++  async function open(manager: SessionManager) {
++    const settings = SettingsManager.inMemory({ retry: { enabled: false }, compaction: { enabled: false } });
++    const resources = new DefaultResourceLoader({ cwd, agentDir: home, settingsManager: settings, noExtensions: true, noSkills: true, noThemes: true, noPromptTemplates: true, agentsFilesOverride: () => ({ agentsFiles: [] }), skillsOverride: () => ({ skills: [], diagnostics: [] }), extensionFactories: [createPijExtension(loadConfig({ PIJ_HOME: home, PIJ_MODE: "assist" }))] });
++    await resources.reload();
++    assert.deepEqual(resources.getExtensions().errors, []);
++    const { session } = await createAgentSession({ cwd, agentDir: home, modelRuntime: runtime, model: runtime.getModel("tree-local", "fixture"), resourceLoader: resources, settingsManager: settings, sessionManager: manager, tools: [] });
++    sessions.push(session);
++    await session.bindExtensions({ uiContext: { ...session.extensionRunner.createContext().ui, notify: (msg: string) => notices.push(msg) } });
++    return session;
++  }
++
++  const session = await open(SessionManager.inMemory());
++
++  // Root state: default mode "assist", no pij-mode entry yet.
++  // Capture the leaf ID at the very start (before any user interaction).
++  const rootLeafId = session.sessionManager.getLeafId();
++  assert.ok(rootLeafId, "session must have a leaf before any messages");
++
++  // Switch to "off" and generate an assistant response so the tree diverges.
++  await session.prompt("/pij off");
++  await session.prompt("trigger a turn");   // generates an LLM response → new leaf
++
++  const offLeafId = session.sessionManager.getLeafId();
++
++  // Navigate back to the root (before mode was set). The branch at rootLeafId
++  // has no pij-mode entry, so the mode should revert to config default "assist".
++  await session.extensionRunner.createContext().sessionManager; // just ensure manager is accessible
++  const nav = await session.navigateTree(rootLeafId!);
++  assert.equal(nav.cancelled, false, "navigation must not be cancelled");
++
++  // Ask for status — mode should be the config default "assist" because the
++  // ancestor branch carries no pij-mode entry.
++  await session.prompt("/pij status");
++  assert.match(notices.at(-1)!, /Mode: assist\b/, "navigating to ancestor with no entry must restore config default");
++
++  // Navigate forward to the off leaf and check mode is restored to "off".
++  const nav2 = await session.navigateTree(offLeafId!);
++  assert.equal(nav2.cancelled, false);
++  await session.prompt("/pij status");
++  assert.match(notices.at(-1)!, /Mode: off\b/, "navigating to off branch must restore off");
++});

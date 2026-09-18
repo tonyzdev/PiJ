@@ -36,3 +36,11 @@ test("selects the matching Jev provider, credentials, model and endpoint", () =>
   assert.equal(explicit.apiKey, undefined);
   assert.throws(() => loadConfig({ PIJ_JEV_PROVIDER: "unknown" }));
 });
+
+// A broad automatic read is explicit opt-in until whole-task benefits are measured.
+test("source briefing is experimental, disabled by default, and validates its flag", () => {
+  assert.equal(loadConfig({}).sourceBriefing, false);
+  assert.equal(loadConfig({ PIJ_SOURCE_BRIEFING: "1" }).sourceBriefing, true);
+  assert.equal(loadConfig({ PIJ_SOURCE_BRIEFING: "0" }).sourceBriefing, false);
+  assert.throws(() => loadConfig({ PIJ_SOURCE_BRIEFING: "yes" }));
+});

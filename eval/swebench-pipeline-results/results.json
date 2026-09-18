@@ -1,0 +1,1609 @@
+{
+ "pipeline": "pij",
+ "records": [
+  {
+   "instance_id": "django__django-10097",
+   "repo": "django/django",
+   "difficulty": "<15 min fix",
+   "gold": [
+    "django/core/validators.py"
+   ],
+   "filesScanned": 5851,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 0,
+     "20": 0,
+     "100": 1
+    },
+    "firstGoldRank": 34
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 19585,
+     "outputTokens": 822,
+     "latencyMs": 1524
+    },
+    {
+     "status": "ok",
+     "inputTokens": 19730,
+     "outputTokens": 796,
+     "latencyMs": 1028
+    },
+    {
+     "status": "ok",
+     "inputTokens": 4933,
+     "outputTokens": 184,
+     "latencyMs": 452
+    }
+   ],
+   "discoverMs": 3958,
+   "rankMs": 3020,
+   "topBm25": [
+    "docs/releases/1.10.txt",
+    "docs/releases/1.9.txt",
+    "docs/ref/unicode.txt",
+    "docs/releases/1.7.txt",
+    "docs/topics/testing/tools.txt",
+    "docs/releases/1.6.txt",
+    "docs/topics/auth/passwords.txt",
+    "docs/ref/csrf.txt",
+    "docs/topics/auth/default.txt",
+    "docs/internals/contributing/triaging-tickets.txt"
+   ],
+   "topJev": [
+    "django/core/validators.py",
+    "tests/forms_tests/tests/test_validators.py",
+    "tests/validators/tests.py",
+    "tests/forms_tests/field_tests/test_urlfield.py",
+    "tests/utils_tests/test_http.py",
+    "django/utils/http.py",
+    "django/utils/encoding.py",
+    "django/utils/html.py",
+    "tests/admin_widgets/tests.py",
+    "tests/template_tests/filter_tests/test_urlize.py"
+   ]
+  },
+  {
+   "instance_id": "django__django-10554",
+   "repo": "django/django",
+   "difficulty": "1-4 hours",
+   "gold": [
+    "django/db/models/sql/compiler.py",
+    "django/db/models/sql/query.py"
+   ],
+   "filesScanned": 5994,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 2,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 2
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 0.5,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 20048,
+     "outputTokens": 822,
+     "latencyMs": 1460
+    },
+    {
+     "status": "ok",
+     "inputTokens": 19848,
+     "outputTokens": 778,
+     "latencyMs": 1035
+    },
+    {
+     "status": "ok",
+     "inputTokens": 5729,
+     "outputTokens": 202,
+     "latencyMs": 538
+    }
+   ],
+   "discoverMs": 4186,
+   "rankMs": 3040,
+   "topBm25": [
+    "django/db/models/query.py",
+    "django/db/models/sql/compiler.py",
+    "docs/ref/models/querysets.txt",
+    "django/db/models/sql/subqueries.py",
+    "django/db/models/sql/query.py",
+    "docs/ref/models/expressions.txt",
+    "tests/queries/test_iterator.py",
+    "tests/queries/tests.py",
+    "docs/releases/1.8.txt",
+    "docs/topics/db/optimization.txt"
+   ],
+   "topJev": [
+    "django/db/models/sql/compiler.py",
+    "django/db/models/query.py",
+    "django/db/models/sql/query.py",
+    "tests/queries/test_qs_combinators.py",
+    "tests/queries/tests.py",
+    "tests/ordering/tests.py",
+    "django/db/models/query_utils.py",
+    "django/db/backends/postgresql/operations.py",
+    "tests/lookup/tests.py",
+    "tests/queries/test_iterator.py"
+   ]
+  },
+  {
+   "instance_id": "django__django-10880",
+   "repo": "django/django",
+   "difficulty": "<15 min fix",
+   "gold": [
+    "django/db/models/aggregates.py"
+   ],
+   "filesScanned": 5965,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 0,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 11
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 0,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 2
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 19442,
+     "outputTokens": 840,
+     "latencyMs": 1306
+    },
+    {
+     "status": "ok",
+     "inputTokens": 19584,
+     "outputTokens": 814,
+     "latencyMs": 866
+    },
+    {
+     "status": "ok",
+     "inputTokens": 3580,
+     "outputTokens": 148,
+     "latencyMs": 392
+    }
+   ],
+   "discoverMs": 3764,
+   "rankMs": 2571,
+   "topBm25": [
+    "django/db/models/sql/query.py",
+    "django/db/models/sql/compiler.py",
+    "docs/ref/models/expressions.txt",
+    "docs/topics/db/aggregation.txt",
+    "django/db/backends/base/features.py",
+    "docs/ref/models/querysets.txt",
+    "django/db/models/query.py",
+    "tests/aggregation_regress/tests.py",
+    "tests/queries/tests.py",
+    "tests/annotations/tests.py"
+   ],
+   "topJev": [
+    "django/db/models/sql/compiler.py",
+    "django/db/models/aggregates.py",
+    "tests/aggregation_regress/tests.py",
+    "django/db/models/sql/query.py",
+    "django/db/models/expressions.py",
+    "django/db/backends/base/operations.py",
+    "tests/expressions/tests.py",
+    "tests/postgres_tests/test_aggregates.py",
+    "django/db/models/lookups.py",
+    "tests/aggregation/tests.py"
+   ]
+  },
+  {
+   "instance_id": "django__django-10914",
+   "repo": "django/django",
+   "difficulty": "<15 min fix",
+   "gold": [
+    "django/conf/global_settings.py"
+   ],
+   "filesScanned": 5969,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 2
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 19353,
+     "outputTokens": 858,
+     "latencyMs": 892
+    },
+    {
+     "status": "ok",
+     "inputTokens": 19405,
+     "outputTokens": 814,
+     "latencyMs": 1206
+    },
+    {
+     "status": "ok",
+     "inputTokens": 3479,
+     "outputTokens": 130,
+     "latencyMs": 576
+    }
+   ],
+   "discoverMs": 3753,
+   "rankMs": 2705,
+   "topBm25": [
+    "docs/ref/settings.txt",
+    "django/conf/global_settings.py",
+    "docs/releases/1.4.txt",
+    "docs/ref/files/uploads.txt",
+    "docs/topics/performance.txt",
+    "docs/internals/contributing/writing-code/submitting-patches.txt",
+    "docs/topics/security.txt",
+    "docs/ref/django-admin.txt",
+    "docs/topics/http/file-uploads.txt",
+    "docs/topics/cache.txt"
+   ],
+   "topJev": [
+    "django/conf/global_settings.py",
+    "django/core/files/storage.py",
+    "docs/topics/http/file-uploads.txt",
+    "docs/ref/files/uploads.txt",
+    "docs/ref/settings.txt",
+    "django/core/files/uploadedfile.py",
+    "tests/file_storage/tests.py",
+    "django/core/files/temp.py",
+    "django/core/files/uploadhandler.py",
+    "django/conf/__init__.py"
+   ]
+  },
+  {
+   "instance_id": "django__django-10973",
+   "repo": "django/django",
+   "difficulty": "15 min - 1 hour",
+   "gold": [
+    "django/db/backends/postgresql/client.py"
+   ],
+   "filesScanned": 5973,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 0,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 20
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 19283,
+     "outputTokens": 894,
+     "latencyMs": 886
+    },
+    {
+     "status": "ok",
+     "inputTokens": 19087,
+     "outputTokens": 832,
+     "latencyMs": 800
+    },
+    {
+     "status": "ok",
+     "inputTokens": 1827,
+     "outputTokens": 76,
+     "latencyMs": 441
+    }
+   ],
+   "discoverMs": 3637,
+   "rankMs": 2133,
+   "topBm25": [
+    "docs/releases/1.11.txt",
+    "docs/releases/2.2.txt",
+    "docs/releases/1.8.txt",
+    "docs/releases/1.9.txt",
+    "docs/releases/1.10.txt",
+    "docs/releases/1.1.txt",
+    "docs/releases/1.2.txt",
+    "docs/releases/2.0.txt",
+    "docs/releases/2.1.txt",
+    "docs/topics/testing/advanced.txt"
+   ],
+   "topJev": [
+    "django/db/backends/postgresql/client.py",
+    "tests/dbshell/test_postgresql.py",
+    "django/db/backends/postgresql/operations.py",
+    "django/db/backends/oracle/client.py",
+    "django/db/backends/postgresql/base.py",
+    "tests/dbshell/test_oracle.py",
+    "tests/postgres_tests/test_integration.py",
+    "django/db/backends/mysql/client.py",
+    "django/db/backends/utils.py",
+    "django/db/utils.py"
+   ]
+  },
+  {
+   "instance_id": "django__django-10999",
+   "repo": "django/django",
+   "difficulty": "<15 min fix",
+   "gold": [
+    "django/utils/dateparse.py"
+   ],
+   "filesScanned": 5974,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 19415,
+     "outputTokens": 894,
+     "latencyMs": 940
+    },
+    {
+     "status": "ok",
+     "inputTokens": 20200,
+     "outputTokens": 850,
+     "latencyMs": 1071
+    },
+    {
+     "status": "ok",
+     "inputTokens": 1776,
+     "outputTokens": 58,
+     "latencyMs": 546
+    }
+   ],
+   "discoverMs": 3347,
+   "rankMs": 2563,
+   "topBm25": [
+    "django/utils/dateparse.py",
+    "tests/utils_tests/test_dateparse.py",
+    "tests/utils_tests/test_duration.py",
+    "docs/internals/contributing/writing-code/submitting-patches.txt",
+    "docs/ref/utils.txt",
+    "django/utils/dateformat.py",
+    "docs/ref/databases.txt",
+    "django/utils/duration.py",
+    "django/conf/global_settings.py",
+    "django/utils/http.py"
+   ],
+   "topJev": [
+    "django/utils/dateparse.py",
+    "tests/utils_tests/test_dateparse.py",
+    "tests/utils_tests/test_duration.py",
+    "tests/model_fields/test_durationfield.py",
+    "tests/test_utils/tests.py",
+    "tests/forms_tests/field_tests/test_durationfield.py",
+    "tests/template_tests/filter_tests/test_timeuntil.py",
+    "django/utils/duration.py",
+    "tests/template_tests/filter_tests/test_timesince.py",
+    "django/utils/timezone.py"
+   ]
+  },
+  {
+   "instance_id": "django__django-11087",
+   "repo": "django/django",
+   "difficulty": "15 min - 1 hour",
+   "gold": [
+    "django/db/models/deletion.py"
+   ],
+   "filesScanned": 5986,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 0,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 0,
+     "20": 0,
+     "100": 0
+    },
+    "firstGoldRank": null
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 0,
+     "20": 0,
+     "100": 0
+    },
+    "firstGoldRank": null
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 19870,
+     "outputTokens": 858,
+     "latencyMs": 940
+    },
+    {
+     "status": "ok",
+     "inputTokens": 19723,
+     "outputTokens": 814,
+     "latencyMs": 818
+    },
+    {
+     "status": "ok",
+     "inputTokens": 3699,
+     "outputTokens": 130,
+     "latencyMs": 397
+    }
+   ],
+   "discoverMs": 3752,
+   "rankMs": 2161,
+   "topBm25": [
+    "django/core/management/__init__.py",
+    "django/core/management/base.py",
+    "docs/ref/django-admin.txt",
+    "docs/releases/1.4.txt",
+    "docs/ref/databases.txt",
+    "docs/howto/custom-management-commands.txt",
+    "docs/releases/1.8.txt",
+    "docs/internals/contributing/writing-code/unit-tests.txt",
+    "tests/admin_scripts/tests.py",
+    "docs/releases/1.5.txt"
+   ],
+   "topJev": [
+    "django/db/models/sql/subqueries.py",
+    "django/db/models/query.py",
+    "django/db/models/base.py",
+    "django/db/models/sql/query.py",
+    "django/db/models/sql/compiler.py",
+    "django/db/backends/base/schema.py",
+    "django/db/backends/mysql/base.py",
+    "django/db/models/fields/files.py",
+    "django/db/models/fields/__init__.py",
+    "django/db/backends/base/operations.py"
+   ]
+  },
+  {
+   "instance_id": "django__django-11095",
+   "repo": "django/django",
+   "difficulty": "15 min - 1 hour",
+   "gold": [
+    "django/contrib/admin/options.py"
+   ],
+   "filesScanned": 5986,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 2
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 19949,
+     "outputTokens": 822,
+     "latencyMs": 757
+    },
+    {
+     "status": "ok",
+     "inputTokens": 19281,
+     "outputTokens": 814,
+     "latencyMs": 751
+    },
+    {
+     "status": "ok",
+     "inputTokens": 4248,
+     "outputTokens": 166,
+     "latencyMs": 537
+    }
+   ],
+   "discoverMs": 3377,
+   "rankMs": 2052,
+   "topBm25": [
+    "docs/ref/contrib/admin/index.txt",
+    "django/contrib/admin/options.py",
+    "tests/admin_views/admin.py",
+    "docs/topics/auth/customizing.txt",
+    "tests/modeladmin/tests.py",
+    "tests/generic_inline_admin/tests.py",
+    "docs/releases/1.2.txt",
+    "tests/admin_inlines/tests.py",
+    "docs/topics/db/multi-db.txt",
+    "docs/ref/models/instances.txt"
+   ],
+   "topJev": [
+    "django/contrib/admin/options.py",
+    "docs/ref/contrib/admin/index.txt",
+    "tests/modeladmin/tests.py",
+    "tests/admin_ordering/tests.py",
+    "django/contrib/admin/views/main.py",
+    "tests/admin_inlines/tests.py",
+    "tests/inline_formsets/tests.py",
+    "django/contrib/contenttypes/admin.py",
+    "tests/modeladmin/test_checks.py",
+    "django/contrib/admin/checks.py"
+   ]
+  },
+  {
+   "instance_id": "django__django-11138",
+   "repo": "django/django",
+   "difficulty": "1-4 hours",
+   "gold": [
+    "django/db/backends/mysql/operations.py",
+    "django/db/backends/oracle/operations.py",
+    "django/db/backends/sqlite3/base.py",
+    "django/db/backends/sqlite3/operations.py"
+   ],
+   "filesScanned": 5986,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 4,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 0,
+     "20": 0.75,
+     "100": 1
+    },
+    "firstGoldRank": 11
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 0.25,
+     "5": 0.75,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 19620,
+     "outputTokens": 840,
+     "latencyMs": 903
+    },
+    {
+     "status": "ok",
+     "inputTokens": 19573,
+     "outputTokens": 796,
+     "latencyMs": 749
+    },
+    {
+     "status": "ok",
+     "inputTokens": 4774,
+     "outputTokens": 166,
+     "latencyMs": 574
+    }
+   ],
+   "discoverMs": 3780,
+   "rankMs": 2233,
+   "topBm25": [
+    "docs/ref/databases.txt",
+    "docs/topics/i18n/timezones.txt",
+    "docs/ref/models/querysets.txt",
+    "docs/intro/tutorial02.txt",
+    "docs/releases/1.4.txt",
+    "docs/releases/1.6.txt",
+    "docs/releases/1.9.txt",
+    "docs/ref/utils.txt",
+    "docs/ref/settings.txt",
+    "docs/ref/unicode.txt"
+   ],
+   "topJev": [
+    "django/db/backends/mysql/operations.py",
+    "django/db/backends/sqlite3/operations.py",
+    "django/db/backends/oracle/operations.py",
+    "django/db/backends/base/operations.py",
+    "django/db/backends/base/base.py",
+    "django/db/models/expressions.py",
+    "django/db/backends/sqlite3/base.py",
+    "django/db/models/functions/datetime.py",
+    "tests/timezones/tests.py",
+    "django/db/backends/postgresql/operations.py"
+   ]
+  },
+  {
+   "instance_id": "django__django-11141",
+   "repo": "django/django",
+   "difficulty": "15 min - 1 hour",
+   "gold": [
+    "django/db/migrations/loader.py"
+   ],
+   "filesScanned": 6048,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 0,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 14
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 19637,
+     "outputTokens": 840,
+     "latencyMs": 701
+    },
+    {
+     "status": "ok",
+     "inputTokens": 19832,
+     "outputTokens": 814,
+     "latencyMs": 743
+    },
+    {
+     "status": "ok",
+     "inputTokens": 3683,
+     "outputTokens": 148,
+     "latencyMs": 413
+    }
+   ],
+   "discoverMs": 3432,
+   "rankMs": 1864,
+   "topBm25": [
+    "docs/releases/1.9.txt",
+    "docs/ref/django-admin.txt",
+    "docs/releases/1.8.txt",
+    "docs/topics/migrations.txt",
+    "docs/releases/1.7.txt",
+    "docs/man/django-admin.1",
+    "docs/ref/applications.txt",
+    "docs/internals/deprecation.txt",
+    "docs/intro/reusable-apps.txt",
+    "docs/releases/1.4.txt"
+   ],
+   "topJev": [
+    "django/db/migrations/loader.py",
+    "tests/migrations/test_loader.py",
+    "tests/migrations/test_commands.py",
+    "django/core/management/commands/squashmigrations.py",
+    "docs/topics/migrations.txt",
+    "django/core/management/commands/migrate.py",
+    "django/db/migrations/graph.py",
+    "django/apps/config.py",
+    "django/utils/module_loading.py",
+    "django/db/migrations/executor.py"
+   ]
+  },
+  {
+   "instance_id": "sympy__sympy-11618",
+   "repo": "sympy/sympy",
+   "difficulty": "15 min - 1 hour",
+   "gold": [
+    "sympy/geometry/point.py"
+   ],
+   "filesScanned": 1411,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 4
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 21344,
+     "outputTokens": 876,
+     "latencyMs": 901
+    },
+    {
+     "status": "ok",
+     "inputTokens": 21446,
+     "outputTokens": 850,
+     "latencyMs": 893
+    },
+    {
+     "status": "ok",
+     "inputTokens": 2452,
+     "outputTokens": 76,
+     "latencyMs": 584
+    }
+   ],
+   "discoverMs": 962,
+   "rankMs": 2384,
+   "topBm25": [
+    "sympy/geometry/ellipse.py",
+    "sympy/geometry/plane.py",
+    "sympy/geometry/tests/test_util.py",
+    "sympy/geometry/point.py",
+    "sympy/geometry/polygon.py",
+    "doc/src/gotchas.rst",
+    "doc/src/modules/vector/intro.rst",
+    "sympy/geometry/util.py",
+    "sympy/geometry/line.py",
+    "examples/advanced/autowrap_integrators.py"
+   ],
+   "topJev": [
+    "sympy/geometry/point.py",
+    "sympy/geometry/tests/test_point.py",
+    "sympy/geometry/tests/test_line.py",
+    "sympy/geometry/parabola.py",
+    "sympy/geometry/tests/test_geometrysets.py",
+    "sympy/geometry/tests/test_plane.py",
+    "sympy/core/numbers.py",
+    "sympy/physics/optics/utils.py",
+    "sympy/geometry/entity.py",
+    "sympy/geometry/line3d.py"
+   ]
+  },
+  {
+   "instance_id": "sympy__sympy-12096",
+   "repo": "sympy/sympy",
+   "difficulty": "<15 min fix",
+   "gold": [
+    "sympy/core/function.py"
+   ],
+   "filesScanned": 1414,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 2
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 21745,
+     "outputTokens": 858,
+     "latencyMs": 907
+    },
+    {
+     "status": "ok",
+     "inputTokens": 21469,
+     "outputTokens": 832,
+     "latencyMs": 926
+    },
+    {
+     "status": "ok",
+     "inputTokens": 3270,
+     "outputTokens": 112,
+     "latencyMs": 453
+    }
+   ],
+   "discoverMs": 904,
+   "rankMs": 2292,
+   "topBm25": [
+    "sympy/utilities/lambdify.py",
+    "sympy/core/function.py",
+    "sympy/utilities/tests/test_lambdify.py",
+    "doc/src/modules/solvers/solveset.rst",
+    "sympy/core/tests/test_evalf.py",
+    "sympy/plotting/experimental_lambdify.py",
+    "sympy/core/basic.py",
+    "doc/src/guide.rst",
+    "sympy/core/relational.py",
+    "sympy/utilities/iterables.py"
+   ],
+   "topJev": [
+    "sympy/core/function.py",
+    "sympy/core/tests/test_function.py",
+    "sympy/core/tests/test_evalf.py",
+    "sympy/core/evalf.py",
+    "sympy/functions/elementary/miscellaneous.py",
+    "sympy/functions/special/gamma_functions.py",
+    "sympy/utilities/lambdify.py",
+    "sympy/core/expr.py",
+    "sympy/functions/elementary/piecewise.py",
+    "sympy/core/operations.py"
+   ]
+  },
+  {
+   "instance_id": "sympy__sympy-12419",
+   "repo": "sympy/sympy",
+   "difficulty": "15 min - 1 hour",
+   "gold": [
+    "sympy/matrices/expressions/matexpr.py"
+   ],
+   "filesScanned": 1421,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 0,
+     "20": 0,
+     "100": 1
+    },
+    "firstGoldRank": 82
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 0,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 2
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 21667,
+     "outputTokens": 840,
+     "latencyMs": 856
+    },
+    {
+     "status": "ok",
+     "inputTokens": 21777,
+     "outputTokens": 832,
+     "latencyMs": 994
+    },
+    {
+     "status": "ok",
+     "inputTokens": 3825,
+     "outputTokens": 130,
+     "latencyMs": 658
+    }
+   ],
+   "discoverMs": 976,
+   "rankMs": 2514,
+   "topBm25": [
+    "sympy/assumptions/ask.py",
+    "sympy/utilities/enumerative.py",
+    "sympy/solvers/solvers.py",
+    "sympy/core/tests/test_wester.py",
+    "doc/src/tutorial/simplification.rst",
+    "sympy/core/basic.py",
+    "sympy/matrices/matrices.py",
+    "doc/src/gotchas.rst",
+    "sympy/assumptions/handlers/matrices.py",
+    "sympy/core/expr.py"
+   ],
+   "topJev": [
+    "sympy/concrete/summations.py",
+    "sympy/matrices/expressions/matexpr.py",
+    "sympy/matrices/expressions/matmul.py",
+    "sympy/matrices/matrices.py",
+    "sympy/assumptions/ask.py",
+    "sympy/assumptions/handlers/matrices.py",
+    "sympy/matrices/densearith.py",
+    "sympy/matrices/expressions/blockmatrix.py",
+    "sympy/matrices/sparse.py",
+    "sympy/assumptions/handlers/sets.py"
+   ]
+  },
+  {
+   "instance_id": "sympy__sympy-12481",
+   "repo": "sympy/sympy",
+   "difficulty": "<15 min fix",
+   "gold": [
+    "sympy/combinatorics/permutations.py"
+   ],
+   "filesScanned": 1419,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 21735,
+     "outputTokens": 840,
+     "latencyMs": 914
+    },
+    {
+     "status": "ok",
+     "inputTokens": 21587,
+     "outputTokens": 832,
+     "latencyMs": 964
+    },
+    {
+     "status": "ok",
+     "inputTokens": 3427,
+     "outputTokens": 130,
+     "latencyMs": 422
+    }
+   ],
+   "discoverMs": 1046,
+   "rankMs": 2304,
+   "topBm25": [
+    "sympy/combinatorics/permutations.py",
+    "sympy/utilities/iterables.py",
+    "sympy/combinatorics/polyhedron.py",
+    "sympy/matrices/matrices.py",
+    "sympy/combinatorics/perm_groups.py",
+    "doc/src/tutorial/calculus.rst",
+    "sympy/core/expr.py",
+    "doc/src/modules/simplify/hyperexpand.rst",
+    "sympy/core/basic.py",
+    "doc/src/tutorial/simplification.rst"
+   ],
+   "topJev": [
+    "sympy/combinatorics/permutations.py",
+    "sympy/combinatorics/tests/test_permutations.py",
+    "sympy/combinatorics/tests/test_util.py",
+    "sympy/combinatorics/util.py",
+    "sympy/combinatorics/named_groups.py",
+    "sympy/combinatorics/perm_groups.py",
+    "sympy/combinatorics/free_groups.py",
+    "sympy/combinatorics/tensor_can.py",
+    "sympy/combinatorics/generators.py",
+    "sympy/utilities/iterables.py"
+   ]
+  },
+  {
+   "instance_id": "sympy__sympy-12489",
+   "repo": "sympy/sympy",
+   "difficulty": "1-4 hours",
+   "gold": [
+    "sympy/combinatorics/permutations.py"
+   ],
+   "filesScanned": 1421,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 6
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 20823,
+     "outputTokens": 840,
+     "latencyMs": 863
+    },
+    {
+     "status": "ok",
+     "inputTokens": 21975,
+     "outputTokens": 814,
+     "latencyMs": 752
+    },
+    {
+     "status": "ok",
+     "inputTokens": 4200,
+     "outputTokens": 148,
+     "latencyMs": 417
+    }
+   ],
+   "discoverMs": 948,
+   "rankMs": 2037,
+   "topBm25": [
+    "doc/src/guide.rst",
+    "sympy/core/relational.py",
+    "sympy/combinatorics/perm_groups.py",
+    "sympy/printing/printer.py",
+    "doc/src/python-comparisons.rst",
+    "sympy/combinatorics/permutations.py",
+    "sympy/core/singleton.py",
+    "sympy/core/compatibility.py",
+    "sympy/core/basic.py",
+    "sympy/integrals/risch.py"
+   ],
+   "topJev": [
+    "sympy/combinatorics/permutations.py",
+    "sympy/core/basic.py",
+    "sympy/combinatorics/util.py",
+    "sympy/combinatorics/perm_groups.py",
+    "sympy/combinatorics/polyhedron.py",
+    "sympy/core/operations.py",
+    "sympy/combinatorics/partitions.py",
+    "sympy/combinatorics/generators.py",
+    "sympy/combinatorics/tests/test_perm_groups.py",
+    "sympy/combinatorics/testutil.py"
+   ]
+  },
+  {
+   "instance_id": "sympy__sympy-13031",
+   "repo": "sympy/sympy",
+   "difficulty": "15 min - 1 hour",
+   "gold": [
+    "sympy/matrices/sparse.py"
+   ],
+   "filesScanned": 1433,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 0,
+     "20": 0,
+     "100": 1
+    },
+    "firstGoldRank": 28
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 9
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 22107,
+     "outputTokens": 858,
+     "latencyMs": 955
+    },
+    {
+     "status": "ok",
+     "inputTokens": 21815,
+     "outputTokens": 886,
+     "latencyMs": 946
+    },
+    {
+     "status": "ok",
+     "inputTokens": 2081,
+     "outputTokens": 58,
+     "latencyMs": 622
+    }
+   ],
+   "discoverMs": 909,
+   "rankMs": 2527,
+   "topBm25": [
+    "sympy/matrices/tests/test_commonmatrix.py",
+    "sympy/matrices/tests/test_matrices.py",
+    "sympy/physics/hep/tests/test_gamma_matrices.py",
+    "sympy/holonomic/linearsolver.py",
+    "doc/src/modules/matrices/matrices.rst",
+    "sympy/physics/optics/tests/test_medium.py",
+    "sympy/tensor/array/__init__.py",
+    "sympy/solvers/diophantine.py",
+    "sympy/tensor/tensor.py",
+    "sympy/utilities/enumerative.py"
+   ],
+   "topJev": [
+    "sympy/matrices/common.py",
+    "sympy/matrices/immutable.py",
+    "sympy/matrices/matrices.py",
+    "sympy/matrices/tests/test_matrices.py",
+    "sympy/matrices/__init__.py",
+    "sympy/matrices/tests/test_commonmatrix.py",
+    "sympy/matrices/tests/test_immutable.py",
+    "sympy/matrices/dense.py",
+    "sympy/matrices/sparse.py",
+    "sympy/matrices/expressions/matmul.py"
+   ]
+  },
+  {
+   "instance_id": "sympy__sympy-13091",
+   "repo": "sympy/sympy",
+   "difficulty": "15 min - 1 hour",
+   "gold": [
+    "sympy/core/basic.py",
+    "sympy/core/exprtools.py",
+    "sympy/core/numbers.py",
+    "sympy/geometry/entity.py",
+    "sympy/physics/optics/medium.py",
+    "sympy/physics/vector/dyadic.py",
+    "sympy/physics/vector/frame.py",
+    "sympy/physics/vector/vector.py",
+    "sympy/polys/agca/modules.py",
+    "sympy/polys/domains/domain.py",
+    "sympy/polys/domains/expressiondomain.py",
+    "sympy/polys/domains/pythonrational.py",
+    "sympy/polys/domains/quotientring.py",
+    "sympy/polys/fields.py",
+    "sympy/polys/monomials.py",
+    "sympy/polys/polyclasses.py",
+    "sympy/polys/polytools.py",
+    "sympy/polys/rings.py",
+    "sympy/polys/rootoftools.py",
+    "sympy/tensor/array/ndim_array.py",
+    "sympy/utilities/enumerative.py"
+   ],
+   "filesScanned": 1447,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 6,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 0.047619047619047616,
+     "20": 0.047619047619047616,
+     "100": 0.2857142857142857
+    },
+    "firstGoldRank": 8
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 0.047619047619047616,
+     "5": 0.047619047619047616,
+     "10": 0.09523809523809523,
+     "20": 0.14285714285714285,
+     "100": 0.2857142857142857
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 20933,
+     "outputTokens": 840,
+     "latencyMs": 1000
+    },
+    {
+     "status": "ok",
+     "inputTokens": 21865,
+     "outputTokens": 814,
+     "latencyMs": 1385
+    },
+    {
+     "status": "ok",
+     "inputTokens": 4497,
+     "outputTokens": 148,
+     "latencyMs": 565
+    }
+   ],
+   "discoverMs": 1163,
+   "rankMs": 2955,
+   "topBm25": [
+    "doc/src/guide.rst",
+    "doc/src/python-comparisons.rst",
+    "sympy/core/relational.py",
+    "doc/src/gotchas.rst",
+    "doc/src/modules/codegen.rst",
+    "sympy/printing/rust.py",
+    "sympy/core/function.py",
+    "sympy/core/basic.py",
+    "sympy/utilities/runtests.py",
+    "release/fabfile.py"
+   ],
+   "topJev": [
+    "sympy/core/basic.py",
+    "sympy/core/expr.py",
+    "sympy/core/containers.py",
+    "sympy/core/relational.py",
+    "sympy/matrices/common.py",
+    "sympy/core/logic.py",
+    "sympy/geometry/entity.py",
+    "sympy/core/tests/test_relational.py",
+    "sympy/matrices/dense.py",
+    "sympy/core/operations.py"
+   ]
+  },
+  {
+   "instance_id": "sympy__sympy-13372",
+   "repo": "sympy/sympy",
+   "difficulty": "<15 min fix",
+   "gold": [
+    "sympy/core/evalf.py"
+   ],
+   "filesScanned": 1475,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 3
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 21688,
+     "outputTokens": 804,
+     "latencyMs": 1057
+    },
+    {
+     "status": "ok",
+     "inputTokens": 21686,
+     "outputTokens": 850,
+     "latencyMs": 1008
+    },
+    {
+     "status": "ok",
+     "inputTokens": 4190,
+     "outputTokens": 148,
+     "latencyMs": 384
+    }
+   ],
+   "discoverMs": 1254,
+   "rankMs": 2455,
+   "topBm25": [
+    "doc/src/gotchas.rst",
+    "sympy/core/function.py",
+    "sympy/core/evalf.py",
+    "sympy/core/sympify.py",
+    "release/fabfile.py",
+    "doc/src/guide.rst",
+    "sympy/integrals/integrals.py",
+    "release/rever.xsh",
+    "sympy/core/expr.py",
+    "sympy/core/compatibility.py"
+   ],
+   "topJev": [
+    "sympy/core/evalf.py",
+    "sympy/functions/elementary/miscellaneous.py",
+    "sympy/core/mul.py",
+    "sympy/functions/elementary/piecewise.py",
+    "sympy/core/expr.py",
+    "sympy/core/basic.py",
+    "sympy/core/function.py",
+    "sympy/core/operations.py",
+    "sympy/core/relational.py",
+    "sympy/functions/elementary/complexes.py"
+   ]
+  },
+  {
+   "instance_id": "sympy__sympy-13480",
+   "repo": "sympy/sympy",
+   "difficulty": "<15 min fix",
+   "gold": [
+    "sympy/functions/elementary/hyperbolic.py"
+   ],
+   "filesScanned": 1477,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 21918,
+     "outputTokens": 786,
+     "latencyMs": 833
+    },
+    {
+     "status": "ok",
+     "inputTokens": 21472,
+     "outputTokens": 850,
+     "latencyMs": 1124
+    },
+    {
+     "status": "ok",
+     "inputTokens": 3781,
+     "outputTokens": 166,
+     "latencyMs": 600
+    }
+   ],
+   "discoverMs": 966,
+   "rankMs": 2561,
+   "topBm25": [
+    "sympy/functions/elementary/hyperbolic.py",
+    "sympy/functions/elementary/trigonometric.py",
+    "sympy/functions/special/error_functions.py",
+    "sympy/integrals/rubi/parsetools/parse.py",
+    "sympy/integrals/risch.py",
+    "sympy/functions/special/elliptic_integrals.py",
+    "sympy/functions/elementary/complexes.py",
+    "sympy/integrals/rde.py",
+    "sympy/printing/ccode.py",
+    "sympy/core/tests/test_args.py"
+   ],
+   "topJev": [
+    "sympy/functions/elementary/hyperbolic.py",
+    "sympy/core/tests/test_subs.py",
+    "sympy/functions/elementary/trigonometric.py",
+    "sympy/functions/elementary/tests/test_trigonometric.py",
+    "sympy/simplify/tests/test_trigsimp.py",
+    "sympy/core/function.py",
+    "sympy/series/tests/test_gruntz.py",
+    "sympy/integrals/rubi/utility_function.py",
+    "sympy/core/tests/test_evalf.py",
+    "sympy/functions/elementary/exponential.py"
+   ]
+  },
+  {
+   "instance_id": "sympy__sympy-13852",
+   "repo": "sympy/sympy",
+   "difficulty": "1-4 hours",
+   "gold": [
+    "sympy/functions/special/zeta_functions.py"
+   ],
+   "filesScanned": 1486,
+   "shortlist": 100,
+   "truncated": true,
+   "goldInShortlist": 1,
+   "bm25": {
+    "recall": {
+     "1": 0,
+     "5": 0,
+     "10": 0,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 18
+   },
+   "jev": {
+    "applied": true,
+    "recall": {
+     "1": 1,
+     "5": 1,
+     "10": 1,
+     "20": 1,
+     "100": 1
+    },
+    "firstGoldRank": 1
+   },
+   "decisions": [
+    {
+     "status": "ok",
+     "inputTokens": 21936,
+     "outputTokens": 840,
+     "latencyMs": 741
+    },
+    {
+     "status": "ok",
+     "inputTokens": 21845,
+     "outputTokens": 796,
+     "latencyMs": 905
+    },
+    {
+     "status": "ok",
+     "inputTokens": 5024,
+     "outputTokens": 166,
+     "latencyMs": 679
+    }
+   ],
+   "discoverMs": 1125,
+   "rankMs": 2330,
+   "topBm25": [
+    "sympy/core/function.py",
+    "sympy/core/expr.py",
+    "doc/src/tutorial/simplification.rst",
+    "doc/src/guide.rst",
+    "doc/src/gotchas.rst",
+    "sympy/simplify/simplify.py",
+    "sympy/core/basic.py",
+    "doc/src/modules/simplify/hyperexpand.rst",
+    "doc/src/tutorial/calculus.rst",
+    "doc/src/modules/solvers/solveset.rst"
+   ],
+   "topJev": [
+    "sympy/functions/special/zeta_functions.py",
+    "sympy/functions/special/tests/test_zeta_functions.py",
+    "sympy/simplify/tests/test_hyperexpand.py",
+    "sympy/functions/special/tests/test_hyper.py",
+    "sympy/utilities/tests/test_wester.py",
+    "sympy/core/tests/test_arit.py",
+    "sympy/simplify/hyperexpand.py",
+    "sympy/core/tests/test_function.py",
+    "sympy/core/evalf.py",
+    "sympy/simplify/powsimp.py"
+   ]
+  }
+ ]
+}

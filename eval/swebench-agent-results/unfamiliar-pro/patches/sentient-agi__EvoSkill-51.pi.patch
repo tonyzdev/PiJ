@@ -1,0 +1,20 @@
+diff --git a/src/harness/opencode/executor.py b/src/harness/opencode/executor.py
+index cfa71dd..e8799f2 100644
+--- a/src/harness/opencode/executor.py
++++ b/src/harness/opencode/executor.py
+@@ -198,10 +198,11 @@ async def execute_query(options: dict[str, Any], query: str) -> list[Any]:
+         r.raise_for_status()
+         chat_info = r.json()
+ 
+-        # 3. fetch full messages (with parts + structured output)
+-        r = await client.get(f"/session/{session_id}/message")
+-        r.raise_for_status()
+-        messages = r.json()
++        # The POST response already contains the full assistant message
++        # (info incl. structured, parts, cost, tokens). Re-fetching via GET
++        # 400s on opencode when the session used a json_schema format, so use
++        # the POST response directly instead of an extra round trip.
++        messages = [chat_info]
+ 
+     return [{"session_id": session_id, "chat_info": chat_info, "messages": messages}]
+ 

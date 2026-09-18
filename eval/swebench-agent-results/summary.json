@@ -1,0 +1,494 @@
+{
+ "pi": {
+  "n": 20,
+  "resolved": 15,
+  "search": {
+   "mean": 4.6,
+   "median": 3.0
+  },
+  "tools": {
+   "mean": 17.1,
+   "median": 11.0
+  },
+  "tokens": {
+   "mean": 192373.55,
+   "median": 47274.5
+  },
+  "seconds": {
+   "mean": 41.5035,
+   "median": 20.417
+  },
+  "usd": 0.00312685324,
+  "jev_seconds": 0.0,
+  "per_instance": [
+   {
+    "id": "10554",
+    "tokens": 619160,
+    "resolved": false,
+    "search": 9,
+    "seconds": 85.446
+   },
+   {
+    "id": "10880",
+    "tokens": 47245,
+    "resolved": true,
+    "search": 3,
+    "seconds": 18.115
+   },
+   {
+    "id": "10914",
+    "tokens": 186053,
+    "resolved": true,
+    "search": 7,
+    "seconds": 41.59
+   },
+   {
+    "id": "10973",
+    "tokens": 34923,
+    "resolved": true,
+    "search": 1,
+    "seconds": 13.685
+   },
+   {
+    "id": "10999",
+    "tokens": 15836,
+    "resolved": false,
+    "search": 1,
+    "seconds": 8.653
+   },
+   {
+    "id": "11066",
+    "tokens": 12940,
+    "resolved": true,
+    "search": 0,
+    "seconds": 5.687
+   },
+   {
+    "id": "11087",
+    "tokens": 377678,
+    "resolved": true,
+    "search": 5,
+    "seconds": 54.913
+   },
+   {
+    "id": "11095",
+    "tokens": 49807,
+    "resolved": true,
+    "search": 3,
+    "seconds": 49.411
+   },
+   {
+    "id": "11099",
+    "tokens": 9403,
+    "resolved": true,
+    "search": 0,
+    "seconds": 4.645
+   },
+   {
+    "id": "11119",
+    "tokens": 13044,
+    "resolved": true,
+    "search": 2,
+    "seconds": 10.811
+   },
+   {
+    "id": "11133",
+    "tokens": 46649,
+    "resolved": true,
+    "search": 2,
+    "seconds": 16.053
+   },
+   {
+    "id": "11138",
+    "tokens": 604527,
+    "resolved": false,
+    "search": 20,
+    "seconds": 102.653
+   },
+   {
+    "id": "11141",
+    "tokens": 47050,
+    "resolved": false,
+    "search": 3,
+    "seconds": 22.719
+   },
+   {
+    "id": "11149",
+    "tokens": 590714,
+    "resolved": true,
+    "search": 15,
+    "seconds": 134.074
+   },
+   {
+    "id": "11163",
+    "tokens": 15710,
+    "resolved": true,
+    "search": 1,
+    "seconds": 8.565
+   },
+   {
+    "id": "11179",
+    "tokens": 27540,
+    "resolved": true,
+    "search": 0,
+    "seconds": 13.324
+   },
+   {
+    "id": "11206",
+    "tokens": 413887,
+    "resolved": true,
+    "search": 2,
+    "seconds": 70.091
+   },
+   {
+    "id": "11211",
+    "tokens": 73610,
+    "resolved": true,
+    "search": 4,
+    "seconds": 38.755
+   },
+   {
+    "id": "11239",
+    "tokens": 47304,
+    "resolved": true,
+    "search": 5,
+    "seconds": 13.821
+   },
+   {
+    "id": "11265",
+    "tokens": 614391,
+    "resolved": false,
+    "search": 9,
+    "seconds": 117.059
+   }
+  ]
+ },
+ "pij-off": {
+  "n": 20,
+  "resolved": 14,
+  "search": {
+   "mean": 4.05,
+   "median": 2.0
+  },
+  "tools": {
+   "mean": 15.85,
+   "median": 12.0
+  },
+  "tokens": {
+   "mean": 172304.35,
+   "median": 77354.5
+  },
+  "seconds": {
+   "mean": 33.12,
+   "median": 28.5105
+  },
+  "usd": 0.0028812742,
+  "jev_seconds": 0.0,
+  "per_instance": [
+   {
+    "id": "10554",
+    "tokens": 594502,
+    "resolved": false,
+    "search": 9,
+    "seconds": 67.077
+   },
+   {
+    "id": "10880",
+    "tokens": 132186,
+    "resolved": true,
+    "search": 4,
+    "seconds": 36.797
+   },
+   {
+    "id": "10914",
+    "tokens": 177042,
+    "resolved": true,
+    "search": 6,
+    "seconds": 34.505
+   },
+   {
+    "id": "10973",
+    "tokens": 60917,
+    "resolved": false,
+    "search": 1,
+    "seconds": 20.579
+   },
+   {
+    "id": "10999",
+    "tokens": 27884,
+    "resolved": false,
+    "search": 0,
+    "seconds": 11.408
+   },
+   {
+    "id": "11066",
+    "tokens": 22059,
+    "resolved": true,
+    "search": 0,
+    "seconds": 28.443
+   },
+   {
+    "id": "11087",
+    "tokens": 384893,
+    "resolved": false,
+    "search": 13,
+    "seconds": 48.989
+   },
+   {
+    "id": "11095",
+    "tokens": 35435,
+    "resolved": true,
+    "search": 1,
+    "seconds": 14.274
+   },
+   {
+    "id": "11099",
+    "tokens": 22306,
+    "resolved": true,
+    "search": 0,
+    "seconds": 14.235
+   },
+   {
+    "id": "11119",
+    "tokens": 42848,
+    "resolved": true,
+    "search": 2,
+    "seconds": 26.38
+   },
+   {
+    "id": "11133",
+    "tokens": 58714,
+    "resolved": true,
+    "search": 2,
+    "seconds": 19.909
+   },
+   {
+    "id": "11138",
+    "tokens": 618900,
+    "resolved": true,
+    "search": 11,
+    "seconds": 62.17
+   },
+   {
+    "id": "11141",
+    "tokens": 84579,
+    "resolved": false,
+    "search": 5,
+    "seconds": 29.676
+   },
+   {
+    "id": "11149",
+    "tokens": 70130,
+    "resolved": true,
+    "search": 4,
+    "seconds": 36.016
+   },
+   {
+    "id": "11163",
+    "tokens": 41503,
+    "resolved": true,
+    "search": 2,
+    "seconds": 18.587
+   },
+   {
+    "id": "11179",
+    "tokens": 28598,
+    "resolved": true,
+    "search": 0,
+    "seconds": 12.589
+   },
+   {
+    "id": "11206",
+    "tokens": 609040,
+    "resolved": true,
+    "search": 2,
+    "seconds": 90.814
+   },
+   {
+    "id": "11211",
+    "tokens": 177243,
+    "resolved": true,
+    "search": 9,
+    "seconds": 36.599
+   },
+   {
+    "id": "11239",
+    "tokens": 87412,
+    "resolved": true,
+    "search": 8,
+    "seconds": 24.775
+   },
+   {
+    "id": "11265",
+    "tokens": 169896,
+    "resolved": false,
+    "search": 2,
+    "seconds": 28.578
+   }
+  ]
+ },
+ "pij-jev": {
+  "n": 20,
+  "resolved": 15,
+  "search": {
+   "mean": 4.7,
+   "median": 1.5
+  },
+  "tools": {
+   "mean": 15.65,
+   "median": 9.5
+  },
+  "tokens": {
+   "mean": 195088.4,
+   "median": 62036.5
+  },
+  "seconds": {
+   "mean": 59.82485,
+   "median": 25.9295
+  },
+  "usd": 0.0032237917600000006,
+  "jev_seconds": 9.5117,
+  "per_instance": [
+   {
+    "id": "10554",
+    "tokens": 617241,
+    "resolved": false,
+    "search": 14,
+    "seconds": 212.167
+   },
+   {
+    "id": "10880",
+    "tokens": 42422,
+    "resolved": true,
+    "search": 1,
+    "seconds": 18.695
+   },
+   {
+    "id": "10914",
+    "tokens": 96492,
+    "resolved": true,
+    "search": 3,
+    "seconds": 31.878
+   },
+   {
+    "id": "10973",
+    "tokens": 33565,
+    "resolved": true,
+    "search": 1,
+    "seconds": 16.869
+   },
+   {
+    "id": "10999",
+    "tokens": 23770,
+    "resolved": false,
+    "search": 0,
+    "seconds": 16.083
+   },
+   {
+    "id": "11066",
+    "tokens": 20743,
+    "resolved": true,
+    "search": 0,
+    "seconds": 12.822
+   },
+   {
+    "id": "11087",
+    "tokens": 610871,
+    "resolved": false,
+    "search": 18,
+    "seconds": 280.056
+   },
+   {
+    "id": "11095",
+    "tokens": 55546,
+    "resolved": true,
+    "search": 3,
+    "seconds": 22.401
+   },
+   {
+    "id": "11099",
+    "tokens": 16527,
+    "resolved": true,
+    "search": 0,
+    "seconds": 13.636
+   },
+   {
+    "id": "11119",
+    "tokens": 20092,
+    "resolved": true,
+    "search": 0,
+    "seconds": 13.592
+   },
+   {
+    "id": "11133",
+    "tokens": 65439,
+    "resolved": true,
+    "search": 1,
+    "seconds": 47.285
+   },
+   {
+    "id": "11138",
+    "tokens": 615085,
+    "resolved": true,
+    "search": 20,
+    "seconds": 149.482
+   },
+   {
+    "id": "11141",
+    "tokens": 136003,
+    "resolved": false,
+    "search": 6,
+    "seconds": 38.912
+   },
+   {
+    "id": "11149",
+    "tokens": 587983,
+    "resolved": true,
+    "search": 10,
+    "seconds": 139.049
+   },
+   {
+    "id": "11163",
+    "tokens": 58634,
+    "resolved": true,
+    "search": 2,
+    "seconds": 25.032
+   },
+   {
+    "id": "11179",
+    "tokens": 29176,
+    "resolved": true,
+    "search": 0,
+    "seconds": 15.271
+   },
+   {
+    "id": "11206",
+    "tokens": 65495,
+    "resolved": true,
+    "search": 0,
+    "seconds": 26.827
+   },
+   {
+    "id": "11211",
+    "tokens": 173421,
+    "resolved": true,
+    "search": 6,
+    "seconds": 38.079
+   },
+   {
+    "id": "11239",
+    "tokens": 29649,
+    "resolved": true,
+    "search": 0,
+    "seconds": 15.102
+   },
+   {
+    "id": "11265",
+    "tokens": 603614,
+    "resolved": false,
+    "search": 9,
+    "seconds": 63.259
+   }
+  ]
+ }
+}

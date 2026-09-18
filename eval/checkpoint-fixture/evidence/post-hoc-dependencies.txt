@@ -1,0 +1,68 @@
+Post-hoc diagnostic added after candidate inspection; frozen visible/holdout scores unchanged.
+exit=1 signal=null
+TAP version 13
+# POST_HOC_MAPPING [{"index":0,"actualUserEntryId":"97237309","journalUserMessageId":"cdc8c81b","matches":false,"referencedEntryRole":null,"cached":false},{"index":1,"actualUserEntryId":"9eec800e","journalUserMessageId":"d93de888","matches":false,"referencedEntryRole":"toolResult","cached":true}]
+# POST_HOC_RENDER "00:00:00  s:esession t:--------  assist  code_rank       ok  1ms"
+# Subtest: post-hoc: journal IDs identify the actual consumed user entries
+not ok 1 - post-hoc: journal IDs identify the actual consumed user entries
+  ---
+  duration_ms: 88.336084
+  type: 'test'
+  location: '<candidate>/.pij/attribution-diagnostic.test.ts:3:1833'
+  failureType: 'testCodeFailure'
+  error: |-
+    Journal IDs must identify their actual consumed user entries
+    + actual - expected
+
+      [
+    +   'cdc8c81b',
+    +   'd93de888'
+    -   '97237309',
+    -   '9eec800e'
+      ]
+
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected:
+    0: '97237309'
+    1: '9eec800e'
+  actual:
+    0: 'cdc8c81b'
+    1: 'd93de888'
+  operator: 'deepStrictEqual'
+  stack: |-
+    TestContext.<anonymous> (<candidate>/.pij/attribution-diagnostic.test.ts:92:9)
+    async Test.run (node:internal/test_runner/test:1208:7)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+  ...
+# Subtest: post-hoc: decisions display the new userMessageId field
+not ok 2 - post-hoc: decisions display the new userMessageId field
+  ---
+  duration_ms: 0.161125
+  type: 'test'
+  location: '<candidate>/.pij/attribution-diagnostic.test.ts:3:2864'
+  failureType: 'testCodeFailure'
+  error: 'New attribution must be visible in decisions presentation'
+  code: 'ERR_ASSERTION'
+  name: 'AssertionError'
+  expected: true
+  actual: false
+  operator: '=='
+  stack: |-
+    TestContext.<anonymous> (<candidate>/.pij/attribution-diagnostic.test.ts:98:9)
+    Test.runInAsyncScope (node:async_hooks:226:14)
+    Test.run (node:internal/test_runner/test:1201:25)
+    Test.processPendingSubtests (node:internal/test_runner/test:831:18)
+    Test.postRun (node:internal/test_runner/test:1330:19)
+    Test.run (node:internal/test_runner/test:1258:12)
+    async startSubtestAfterBootstrap (node:internal/test_runner/harness:385:3)
+  ...
+1..2
+# tests 2
+# suites 0
+# pass 0
+# fail 2
+# cancelled 0
+# skipped 0
+# todo 0
+# duration_ms 754.400208

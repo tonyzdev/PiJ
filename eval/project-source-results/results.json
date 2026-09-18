@@ -1,0 +1,2429 @@
+{
+  "schemaVersion": 1,
+  "task": "session-mode",
+  "protocol": "docs/project-source-experiment.md",
+  "interpretation": "Two repetitions on a previously studied task. Full eligible source given to Jev; both policies deliver every file path. Descriptive diagnostic only, not evidence of general superiority or comparison against pi-jev.",
+  "cost": "Main-model catalog estimates, not billing receipts; Jev usage separate.",
+  "timing": "Preprocessing plus parent agent timer, excluding installation/early startup. First-edit time is initial user message to first successful edit/write result.",
+  "records": [
+    {
+      "id": "jev-1",
+      "runId": "2026-09-18T00-29-41.582Z-session-mode-1-project-jev",
+      "sample": 1,
+      "mode": "jev",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "66a8ad15bda4da8a98e7bb43837ef103b38bd1c9",
+        "dirty": false,
+        "sourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "trackedSourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 212,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "66a8ad15bda4da8a98e7bb43837ef103b38bd1c9",
+        "dirty": false,
+        "sourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "trackedSourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 212,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "budget",
+      "budgetReason": "tokens",
+      "requests": 43,
+      "tokens": 2527993,
+      "usage": {
+        "input": 45,
+        "output": 17729,
+        "cacheRead": 2420456,
+        "cacheWrite": 89763,
+        "estimatedUsd": 1.3288180499999998
+      },
+      "elapsedMs": 415073,
+      "evidenceAndAgentElapsedMs": 417490,
+      "calls": {
+        "read": 6,
+        "bash": 37,
+        "edit": 4,
+        "write": 1
+      },
+      "dependencyPathCalls": 26,
+      "preEditToolCalls": 32,
+      "preEditExplicitSourceReads": 5,
+      "evidenceDelivered": true,
+      "userTimestamp": 1789691388603,
+      "firstEdit": {
+        "toolIndex": 33,
+        "secondsToToolResult": 248.692
+      },
+      "runtimeAccepted": false,
+      "allChecksPassed": false,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "addedTests": 15,
+        "meaningfulAddedTests": true,
+        "documentation": "Code comments describe validation and restoration; token-budget termination leaves no final explanation or documentation file.",
+        "findings": [
+          "Missing session_tree handler: independent tree-navigation restoration holdout fails; the other seven pass.",
+          "Eleven unit tests exercise the production entry parser; four SDK cases cover saved observe restoration, config fallback, latest valid saved mode, and custom-entry kind.",
+          "The SDK test titled invalid newer entries inserts only valid observe and off entries; it tests newest-valid precedence, not skipping malformed records.",
+          "The metadata test inspects custom entry kinds; it does not directly capture model context. Frozen holdout separately passes the model-context privacy case."
+        ]
+      },
+      "projectEvidence": {
+        "policy": "project-source",
+        "mode": "jev",
+        "status": "ok",
+        "inventory": [
+          {
+            "id": "f0",
+            "path": "bin/pij.mjs",
+            "bytes": 442,
+            "lines": 10,
+            "sha256": "44b81a3d229e01c45515a050b2e14a034eeb045e8716daf46625d18bc19e6dc9"
+          },
+          {
+            "id": "f1",
+            "path": "src/cli.ts",
+            "bytes": 6036,
+            "lines": 108,
+            "sha256": "e053019d6cfc02e3e83d801dea850e85ff661099c49daa34e21124933f367270"
+          },
+          {
+            "id": "f2",
+            "path": "src/config.ts",
+            "bytes": 2250,
+            "lines": 37,
+            "sha256": "b6b29a3a3ae697c76b35815e6e25ab69878128a97fd1b7832d9646663563dbcb"
+          },
+          {
+            "id": "f3",
+            "path": "src/decisions.ts",
+            "bytes": 7247,
+            "lines": 93,
+            "sha256": "5a734ad37f5ad88e5eb8d3bdaf2afa175ab063c5762a85b3b897b88dc2c54391"
+          },
+          {
+            "id": "f4",
+            "path": "src/extension.ts",
+            "bytes": 10069,
+            "lines": 144,
+            "sha256": "cb7a878fd3c74f802ca270bd97a992d0d22c23fda11ad46360e5cc3b3b18ad10"
+          },
+          {
+            "id": "f5",
+            "path": "src/gateway.ts",
+            "bytes": 1652,
+            "lines": 27,
+            "sha256": "68aac957470ecf5b2a663b1566da5f2562da4592dccda86f306ebc6f12a87fd3"
+          },
+          {
+            "id": "f6",
+            "path": "src/jev.ts",
+            "bytes": 8297,
+            "lines": 147,
+            "sha256": "2deb6f031f399ddb807ff610cc32d5fcdd2a35961f27eac6f7042d1b2f3c0604"
+          },
+          {
+            "id": "f7",
+            "path": "src/search.ts",
+            "bytes": 6338,
+            "lines": 107,
+            "sha256": "7b8914432960984ee55cf53e33f6a7446e0cbfc24cdeefdb2d5692d36732a0e5"
+          },
+          {
+            "id": "f8",
+            "path": "src/telemetry.ts",
+            "bytes": 3751,
+            "lines": 85,
+            "sha256": "3525aefbdea31a36924d01af67f03882d305c23c5d14f5be47428fc3b62969bf"
+          },
+          {
+            "id": "f9",
+            "path": "src/ui.ts",
+            "bytes": 2239,
+            "lines": 37,
+            "sha256": "d8bad3cfbee5240a7f82cd4bf4358ed20b6f3bf243399f7aa015dc8241eced13"
+          },
+          {
+            "id": "f10",
+            "path": "test/cancellation.test.ts",
+            "bytes": 4090,
+            "lines": 65,
+            "sha256": "e3f700f84fd2963128874a6de9705e8a21e60df498d7937031b6c42814f5cf15"
+          },
+          {
+            "id": "f11",
+            "path": "test/cli.test.ts",
+            "bytes": 2501,
+            "lines": 43,
+            "sha256": "9a88f4bea3d858d0cc5b356523c1b97d1e6480091389a393930c96c419bf9488"
+          },
+          {
+            "id": "f12",
+            "path": "test/config.test.ts",
+            "bytes": 1865,
+            "lines": 38,
+            "sha256": "a81bad6fa155d78a63a59d1378c270128d8e8883b39b27f4e200572812899fe7"
+          },
+          {
+            "id": "f13",
+            "path": "test/decisions.test.ts",
+            "bytes": 4747,
+            "lines": 71,
+            "sha256": "4bfc8ae354460d108a6b60cb4412ac89ae49b276cbcbaae480d13e78e28c5736"
+          },
+          {
+            "id": "f14",
+            "path": "test/gateway.test.ts",
+            "bytes": 5111,
+            "lines": 87,
+            "sha256": "95a708d34d0589a50b80ecffe94286c44fdf500eeb17bd21dfa974ff1c89bec7"
+          },
+          {
+            "id": "f15",
+            "path": "test/integration.test.ts",
+            "bytes": 7549,
+            "lines": 104,
+            "sha256": "89ed83d0e4a4c13821fa60eee5420f93c7967e9547f0d56652f87d0cf83de28f"
+          },
+          {
+            "id": "f16",
+            "path": "test/jev.test.ts",
+            "bytes": 5077,
+            "lines": 98,
+            "sha256": "ef4be4627dc1063d6aaa456f923513aa9f45f13804370bd03b902ce2332f46d5"
+          },
+          {
+            "id": "f17",
+            "path": "test/search.test.ts",
+            "bytes": 4500,
+            "lines": 87,
+            "sha256": "8280b1d6101c75afd4dfa9a651c04a079ff6b529a9d1c0ce2709f578712cfd7e"
+          },
+          {
+            "id": "f18",
+            "path": "test/session-mode-visible.test.ts",
+            "bytes": 4133,
+            "lines": 56,
+            "sha256": "4371e771af7229de38ea21cde495c378bbe4ddd3109a6adac56bc0eba169a0d3"
+          },
+          {
+            "id": "f19",
+            "path": "test/telemetry.test.ts",
+            "bytes": 1413,
+            "lines": 25,
+            "sha256": "44b9a1a99009c01ef2ddd580a961a555ba5dc44db4bf92183c1a6fef33750847"
+          },
+          {
+            "id": "f20",
+            "path": "test/ui.test.ts",
+            "bytes": 1217,
+            "lines": 19,
+            "sha256": "3614513c5792376630341d54617b118c950b7661198000dd65d967ba2a09b639"
+          }
+        ],
+        "inventoryDigest": "e3a01ef895b544ed4e694a2ee3a860a83ecb80b1d0d7ab9136bca9c8d50ca554",
+        "filesScanned": 21,
+        "bytesRead": 90524,
+        "excluded": [
+          {
+            "path": ".env.example",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".github/workflows/ci.yml",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".gitignore",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".npmrc",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": "CONTRIBUTING.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "LICENSE",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "README.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "README.zh-CN.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "TASK.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "THIRD_PARTY_NOTICES.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/design.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/implementation-plan.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/verification.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "package-lock.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "package.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "tsconfig.build.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "tsconfig.json",
+            "reason": "outside-ts-js-source-scope"
+          }
+        ],
+        "ranking": [
+          {
+            "path": "test/session-mode-visible.test.ts",
+            "bytes": 4133,
+            "lines": 56,
+            "score": 0.93
+          },
+          {
+            "path": "src/extension.ts",
+            "bytes": 10069,
+            "lines": 144,
+            "score": 0.89
+          },
+          {
+            "path": "test/integration.test.ts",
+            "bytes": 7549,
+            "lines": 104,
+            "score": 0.52
+          },
+          {
+            "path": "src/config.ts",
+            "bytes": 2250,
+            "lines": 37,
+            "score": 0.45
+          },
+          {
+            "path": "src/cli.ts",
+            "bytes": 6036,
+            "lines": 108,
+            "score": 0.43
+          },
+          {
+            "path": "test/telemetry.test.ts",
+            "bytes": 1413,
+            "lines": 25,
+            "score": 0.25
+          },
+          {
+            "path": "test/config.test.ts",
+            "bytes": 1865,
+            "lines": 38,
+            "score": 0.24
+          },
+          {
+            "path": "test/cancellation.test.ts",
+            "bytes": 4090,
+            "lines": 65,
+            "score": 0.23
+          },
+          {
+            "path": "src/telemetry.ts",
+            "bytes": 3751,
+            "lines": 85,
+            "score": 0.22
+          },
+          {
+            "path": "src/ui.ts",
+            "bytes": 2239,
+            "lines": 37,
+            "score": 0.21
+          },
+          {
+            "path": "test/decisions.test.ts",
+            "bytes": 4747,
+            "lines": 71,
+            "score": 0.2
+          },
+          {
+            "path": "test/ui.test.ts",
+            "bytes": 1217,
+            "lines": 19,
+            "score": 0.2
+          },
+          {
+            "path": "src/decisions.ts",
+            "bytes": 7247,
+            "lines": 93,
+            "score": 0.19
+          },
+          {
+            "path": "src/jev.ts",
+            "bytes": 8297,
+            "lines": 147,
+            "score": 0.19
+          },
+          {
+            "path": "test/cli.test.ts",
+            "bytes": 2501,
+            "lines": 43,
+            "score": 0.19
+          },
+          {
+            "path": "test/search.test.ts",
+            "bytes": 4500,
+            "lines": 87,
+            "score": 0.15
+          },
+          {
+            "path": "src/gateway.ts",
+            "bytes": 1652,
+            "lines": 27,
+            "score": 0.14
+          },
+          {
+            "path": "bin/pij.mjs",
+            "bytes": 442,
+            "lines": 10,
+            "score": 0.13
+          },
+          {
+            "path": "test/jev.test.ts",
+            "bytes": 5077,
+            "lines": 98,
+            "score": 0.12
+          },
+          {
+            "path": "src/search.ts",
+            "bytes": 6338,
+            "lines": 107,
+            "score": 0.11
+          },
+          {
+            "path": "test/gateway.test.ts",
+            "bytes": 5111,
+            "lines": 87,
+            "score": 0.1
+          }
+        ],
+        "batches": [
+          {
+            "ids": [
+              "f0",
+              "f1",
+              "f2",
+              "f3",
+              "f4",
+              "f5",
+              "f6",
+              "f7",
+              "f8",
+              "f9",
+              "f10",
+              "f11",
+              "f12",
+              "f13"
+            ],
+            "requestBytes": 71713,
+            "result": {
+              "status": "ok",
+              "answers": {
+                "f0": {
+                  "type": "noul",
+                  "noul": 0.13
+                },
+                "f1": {
+                  "type": "noul",
+                  "noul": 0.43
+                },
+                "f2": {
+                  "type": "noul",
+                  "noul": 0.45
+                },
+                "f3": {
+                  "type": "noul",
+                  "noul": 0.19
+                },
+                "f4": {
+                  "type": "noul",
+                  "noul": 0.89
+                },
+                "f5": {
+                  "type": "noul",
+                  "noul": 0.14
+                },
+                "f6": {
+                  "type": "noul",
+                  "noul": 0.19
+                },
+                "f7": {
+                  "type": "noul",
+                  "noul": 0.11
+                },
+                "f8": {
+                  "type": "noul",
+                  "noul": 0.22
+                },
+                "f9": {
+                  "type": "noul",
+                  "noul": 0.21
+                },
+                "f10": {
+                  "type": "noul",
+                  "noul": 0.23
+                },
+                "f11": {
+                  "type": "noul",
+                  "noul": 0.19
+                },
+                "f12": {
+                  "type": "noul",
+                  "noul": 0.24
+                },
+                "f13": {
+                  "type": "noul",
+                  "noul": 0.2
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 18914,
+              "outputTokens": 246,
+              "latencyMs": 1665,
+              "cached": false
+            }
+          },
+          {
+            "ids": [
+              "f14",
+              "f15",
+              "f16",
+              "f17",
+              "f18",
+              "f19",
+              "f20"
+            ],
+            "requestBytes": 35723,
+            "result": {
+              "status": "ok",
+              "answers": {
+                "f14": {
+                  "type": "noul",
+                  "noul": 0.1
+                },
+                "f15": {
+                  "type": "noul",
+                  "noul": 0.52
+                },
+                "f16": {
+                  "type": "noul",
+                  "noul": 0.12
+                },
+                "f17": {
+                  "type": "noul",
+                  "noul": 0.15
+                },
+                "f18": {
+                  "type": "noul",
+                  "noul": 0.93
+                },
+                "f19": {
+                  "type": "noul",
+                  "noul": 0.25
+                },
+                "f20": {
+                  "type": "noul",
+                  "noul": 0.2
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 9747,
+              "outputTokens": 130,
+              "latencyMs": 704,
+              "cached": false
+            }
+          }
+        ],
+        "maxBatchBytes": 75000,
+        "elapsedMs": 2417
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 55,
+          "pass": 55,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 1,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 7,
+          "fail": 1,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": [
+            "session mode: tree navigation restores ancestors and divergent branches immediately"
+          ]
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "jev-1-ordinary.txt",
+        "visible": "jev-1-visible.txt",
+        "holdout": "jev-1-holdout.txt",
+        "check": "jev-1-check.txt",
+        "build": "jev-1-build.txt"
+      },
+      "candidate": {
+        "patch": "jev-1.patch",
+        "patchSha256": "716f1ed9a596179040b3ea3ec4653746145147ff42f1cd29371a5c4e13c59a6b",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "src/extension.ts": "75e55cd695b69d7eb87671554c4bd142a75305d6b9ef3b66fd4131684b9edc03",
+          "test/mode-persistence.test.ts": "67b796997bb99507cb30b4c2d9d03fad727a2561e2e10c382eb0963039e1e146"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 2,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "lexical-1",
+      "runId": "2026-09-18T00-29-41.583Z-session-mode-1-project-lexical",
+      "sample": 1,
+      "mode": "lexical",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "66a8ad15bda4da8a98e7bb43837ef103b38bd1c9",
+        "dirty": false,
+        "sourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "trackedSourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 212,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "66a8ad15bda4da8a98e7bb43837ef103b38bd1c9",
+        "dirty": false,
+        "sourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "trackedSourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 212,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "requests": 36,
+      "tokens": 1100955,
+      "usage": {
+        "input": 38,
+        "output": 9250,
+        "cacheRead": 1046252,
+        "cacheWrite": 45415,
+        "estimatedUsd": 0.6230458500000001
+      },
+      "elapsedMs": 266481,
+      "evidenceAndAgentElapsedMs": 266502,
+      "calls": {
+        "read": 7,
+        "bash": 32,
+        "edit": 2
+      },
+      "dependencyPathCalls": 25,
+      "preEditToolCalls": 31,
+      "preEditExplicitSourceReads": 5,
+      "evidenceDelivered": true,
+      "userTimestamp": 1789691386415,
+      "firstEdit": {
+        "toolIndex": 32,
+        "secondsToToolResult": 211.302
+      },
+      "runtimeAccepted": true,
+      "allChecksPassed": true,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "addedTests": 0,
+        "meaningfulAddedTests": false,
+        "documentation": "Final answer describes changes; no separate documentation file was required or added.",
+        "findings": [
+          "All independent behavior checks pass, but no new regression tests were authored despite the task requirement. Supplied reproduction and evaluator tests are not authored delivery."
+        ]
+      },
+      "projectEvidence": {
+        "policy": "project-source",
+        "mode": "lexical",
+        "status": "local",
+        "inventory": [
+          {
+            "id": "f0",
+            "path": "bin/pij.mjs",
+            "bytes": 442,
+            "lines": 10,
+            "sha256": "44b81a3d229e01c45515a050b2e14a034eeb045e8716daf46625d18bc19e6dc9"
+          },
+          {
+            "id": "f1",
+            "path": "src/cli.ts",
+            "bytes": 6036,
+            "lines": 108,
+            "sha256": "e053019d6cfc02e3e83d801dea850e85ff661099c49daa34e21124933f367270"
+          },
+          {
+            "id": "f2",
+            "path": "src/config.ts",
+            "bytes": 2250,
+            "lines": 37,
+            "sha256": "b6b29a3a3ae697c76b35815e6e25ab69878128a97fd1b7832d9646663563dbcb"
+          },
+          {
+            "id": "f3",
+            "path": "src/decisions.ts",
+            "bytes": 7247,
+            "lines": 93,
+            "sha256": "5a734ad37f5ad88e5eb8d3bdaf2afa175ab063c5762a85b3b897b88dc2c54391"
+          },
+          {
+            "id": "f4",
+            "path": "src/extension.ts",
+            "bytes": 10069,
+            "lines": 144,
+            "sha256": "cb7a878fd3c74f802ca270bd97a992d0d22c23fda11ad46360e5cc3b3b18ad10"
+          },
+          {
+            "id": "f5",
+            "path": "src/gateway.ts",
+            "bytes": 1652,
+            "lines": 27,
+            "sha256": "68aac957470ecf5b2a663b1566da5f2562da4592dccda86f306ebc6f12a87fd3"
+          },
+          {
+            "id": "f6",
+            "path": "src/jev.ts",
+            "bytes": 8297,
+            "lines": 147,
+            "sha256": "2deb6f031f399ddb807ff610cc32d5fcdd2a35961f27eac6f7042d1b2f3c0604"
+          },
+          {
+            "id": "f7",
+            "path": "src/search.ts",
+            "bytes": 6338,
+            "lines": 107,
+            "sha256": "7b8914432960984ee55cf53e33f6a7446e0cbfc24cdeefdb2d5692d36732a0e5"
+          },
+          {
+            "id": "f8",
+            "path": "src/telemetry.ts",
+            "bytes": 3751,
+            "lines": 85,
+            "sha256": "3525aefbdea31a36924d01af67f03882d305c23c5d14f5be47428fc3b62969bf"
+          },
+          {
+            "id": "f9",
+            "path": "src/ui.ts",
+            "bytes": 2239,
+            "lines": 37,
+            "sha256": "d8bad3cfbee5240a7f82cd4bf4358ed20b6f3bf243399f7aa015dc8241eced13"
+          },
+          {
+            "id": "f10",
+            "path": "test/cancellation.test.ts",
+            "bytes": 4090,
+            "lines": 65,
+            "sha256": "e3f700f84fd2963128874a6de9705e8a21e60df498d7937031b6c42814f5cf15"
+          },
+          {
+            "id": "f11",
+            "path": "test/cli.test.ts",
+            "bytes": 2501,
+            "lines": 43,
+            "sha256": "9a88f4bea3d858d0cc5b356523c1b97d1e6480091389a393930c96c419bf9488"
+          },
+          {
+            "id": "f12",
+            "path": "test/config.test.ts",
+            "bytes": 1865,
+            "lines": 38,
+            "sha256": "a81bad6fa155d78a63a59d1378c270128d8e8883b39b27f4e200572812899fe7"
+          },
+          {
+            "id": "f13",
+            "path": "test/decisions.test.ts",
+            "bytes": 4747,
+            "lines": 71,
+            "sha256": "4bfc8ae354460d108a6b60cb4412ac89ae49b276cbcbaae480d13e78e28c5736"
+          },
+          {
+            "id": "f14",
+            "path": "test/gateway.test.ts",
+            "bytes": 5111,
+            "lines": 87,
+            "sha256": "95a708d34d0589a50b80ecffe94286c44fdf500eeb17bd21dfa974ff1c89bec7"
+          },
+          {
+            "id": "f15",
+            "path": "test/integration.test.ts",
+            "bytes": 7549,
+            "lines": 104,
+            "sha256": "89ed83d0e4a4c13821fa60eee5420f93c7967e9547f0d56652f87d0cf83de28f"
+          },
+          {
+            "id": "f16",
+            "path": "test/jev.test.ts",
+            "bytes": 5077,
+            "lines": 98,
+            "sha256": "ef4be4627dc1063d6aaa456f923513aa9f45f13804370bd03b902ce2332f46d5"
+          },
+          {
+            "id": "f17",
+            "path": "test/search.test.ts",
+            "bytes": 4500,
+            "lines": 87,
+            "sha256": "8280b1d6101c75afd4dfa9a651c04a079ff6b529a9d1c0ce2709f578712cfd7e"
+          },
+          {
+            "id": "f18",
+            "path": "test/session-mode-visible.test.ts",
+            "bytes": 4133,
+            "lines": 56,
+            "sha256": "4371e771af7229de38ea21cde495c378bbe4ddd3109a6adac56bc0eba169a0d3"
+          },
+          {
+            "id": "f19",
+            "path": "test/telemetry.test.ts",
+            "bytes": 1413,
+            "lines": 25,
+            "sha256": "44b9a1a99009c01ef2ddd580a961a555ba5dc44db4bf92183c1a6fef33750847"
+          },
+          {
+            "id": "f20",
+            "path": "test/ui.test.ts",
+            "bytes": 1217,
+            "lines": 19,
+            "sha256": "3614513c5792376630341d54617b118c950b7661198000dd65d967ba2a09b639"
+          }
+        ],
+        "inventoryDigest": "e3a01ef895b544ed4e694a2ee3a860a83ecb80b1d0d7ab9136bca9c8d50ca554",
+        "filesScanned": 21,
+        "bytesRead": 90524,
+        "excluded": [
+          {
+            "path": ".env.example",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".github/workflows/ci.yml",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".gitignore",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".npmrc",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": "CONTRIBUTING.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "LICENSE",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "README.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "README.zh-CN.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "TASK.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "THIRD_PARTY_NOTICES.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/design.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/implementation-plan.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/verification.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "package-lock.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "package.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "tsconfig.build.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "tsconfig.json",
+            "reason": "outside-ts-js-source-scope"
+          }
+        ],
+        "ranking": [
+          {
+            "path": "src/extension.ts",
+            "bytes": 10069,
+            "lines": 144,
+            "score": 87.06158086607384
+          },
+          {
+            "path": "src/cli.ts",
+            "bytes": 6036,
+            "lines": 108,
+            "score": 83.43637012136966
+          },
+          {
+            "path": "test/session-mode-visible.test.ts",
+            "bytes": 4133,
+            "lines": 56,
+            "score": 75.77575798540923
+          },
+          {
+            "path": "test/integration.test.ts",
+            "bytes": 7549,
+            "lines": 104,
+            "score": 64.26878320818781
+          },
+          {
+            "path": "src/decisions.ts",
+            "bytes": 7247,
+            "lines": 93,
+            "score": 56.61939205662446
+          },
+          {
+            "path": "src/search.ts",
+            "bytes": 6338,
+            "lines": 107,
+            "score": 47.686863465536106
+          },
+          {
+            "path": "test/search.test.ts",
+            "bytes": 4500,
+            "lines": 87,
+            "score": 38.72772778917122
+          },
+          {
+            "path": "src/jev.ts",
+            "bytes": 8297,
+            "lines": 147,
+            "score": 36.70522112308539
+          },
+          {
+            "path": "test/cancellation.test.ts",
+            "bytes": 4090,
+            "lines": 65,
+            "score": 35.72710638908105
+          },
+          {
+            "path": "src/telemetry.ts",
+            "bytes": 3751,
+            "lines": 85,
+            "score": 34.2742479676406
+          },
+          {
+            "path": "test/gateway.test.ts",
+            "bytes": 5111,
+            "lines": 87,
+            "score": 33.99300601269683
+          },
+          {
+            "path": "test/decisions.test.ts",
+            "bytes": 4747,
+            "lines": 71,
+            "score": 32.048084237484986
+          },
+          {
+            "path": "test/jev.test.ts",
+            "bytes": 5077,
+            "lines": 98,
+            "score": 31.775337419960906
+          },
+          {
+            "path": "src/config.ts",
+            "bytes": 2250,
+            "lines": 37,
+            "score": 30.27283578705844
+          },
+          {
+            "path": "test/cli.test.ts",
+            "bytes": 2501,
+            "lines": 43,
+            "score": 28.967620001109548
+          },
+          {
+            "path": "test/config.test.ts",
+            "bytes": 1865,
+            "lines": 38,
+            "score": 28.330563091162894
+          },
+          {
+            "path": "src/gateway.ts",
+            "bytes": 1652,
+            "lines": 27,
+            "score": 24.56147132560673
+          },
+          {
+            "path": "src/ui.ts",
+            "bytes": 2239,
+            "lines": 37,
+            "score": 24.036908456176448
+          },
+          {
+            "path": "test/telemetry.test.ts",
+            "bytes": 1413,
+            "lines": 25,
+            "score": 20.12022541443484
+          },
+          {
+            "path": "test/ui.test.ts",
+            "bytes": 1217,
+            "lines": 19,
+            "score": 19.1989390495861
+          },
+          {
+            "path": "bin/pij.mjs",
+            "bytes": 442,
+            "lines": 10,
+            "score": 9.937488704774191
+          }
+        ],
+        "batches": [
+          {
+            "ids": [
+              "f0",
+              "f1",
+              "f2",
+              "f3",
+              "f4",
+              "f5",
+              "f6",
+              "f7",
+              "f8",
+              "f9",
+              "f10",
+              "f11",
+              "f12",
+              "f13"
+            ],
+            "requestBytes": 71713
+          },
+          {
+            "ids": [
+              "f14",
+              "f15",
+              "f16",
+              "f17",
+              "f18",
+              "f19",
+              "f20"
+            ],
+            "requestBytes": 35723
+          }
+        ],
+        "maxBatchBytes": 75000,
+        "elapsedMs": 21
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "lexical-1-ordinary.txt",
+        "visible": "lexical-1-visible.txt",
+        "holdout": "lexical-1-holdout.txt",
+        "check": "lexical-1-check.txt",
+        "build": "lexical-1-build.txt"
+      },
+      "candidate": {
+        "patch": "lexical-1.patch",
+        "patchSha256": "32302da5f0f5e0d14500b6928ea68b7d03ab98eea7aa66815551d3b4f6496eb3",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "src/extension.ts": "eae0a85c4d6bdc2e1c7cb8b0142b07790b0769517aeacc4ac703769868a71bc0"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 1,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "jev-2",
+      "runId": "2026-09-18T00-36-43.522Z-session-mode-2-project-jev",
+      "sample": 2,
+      "mode": "jev",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "66a8ad15bda4da8a98e7bb43837ef103b38bd1c9",
+        "dirty": false,
+        "sourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "trackedSourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 212,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "66a8ad15bda4da8a98e7bb43837ef103b38bd1c9",
+        "dirty": false,
+        "sourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "trackedSourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 212,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "requests": 25,
+      "tokens": 1431475,
+      "usage": {
+        "input": 27,
+        "output": 15255,
+        "cacheRead": 1337450,
+        "cacheWrite": 78743,
+        "estimatedUsd": 0.92542725
+      },
+      "elapsedMs": 326931,
+      "evidenceAndAgentElapsedMs": 329010,
+      "calls": {
+        "read": 11,
+        "bash": 18,
+        "edit": 1,
+        "write": 1
+      },
+      "dependencyPathCalls": 17,
+      "preEditToolCalls": 23,
+      "preEditExplicitSourceReads": 5,
+      "evidenceDelivered": true,
+      "userTimestamp": 1789691810241,
+      "firstEdit": {
+        "toolIndex": 24,
+        "secondsToToolResult": 220.632
+      },
+      "runtimeAccepted": true,
+      "allChecksPassed": true,
+      "completeDeliverable": true,
+      "deliverableReview": {
+        "completeDeliverable": true,
+        "addedTests": 20,
+        "meaningfulAddedTests": true,
+        "documentation": "Final answer explains implementation and tests; no separate documentation file was required or added.",
+        "findings": [
+          "Eighteen unit tests call production readModeFromBranch; two actual SDK integration tests exercise disk-save/reopen observe restoration and config fallback.",
+          "The final answer reports nineteen unit tests, but the actual count is eighteen (twenty new tests total).",
+          "No new tree/fork integration test is authored; those behaviors pass the unchanged independent runtime holdouts. Appropriate new tests are present without inventing a requirement to duplicate every holdout."
+        ]
+      },
+      "projectEvidence": {
+        "policy": "project-source",
+        "mode": "jev",
+        "status": "ok",
+        "inventory": [
+          {
+            "id": "f0",
+            "path": "bin/pij.mjs",
+            "bytes": 442,
+            "lines": 10,
+            "sha256": "44b81a3d229e01c45515a050b2e14a034eeb045e8716daf46625d18bc19e6dc9"
+          },
+          {
+            "id": "f1",
+            "path": "src/cli.ts",
+            "bytes": 6036,
+            "lines": 108,
+            "sha256": "e053019d6cfc02e3e83d801dea850e85ff661099c49daa34e21124933f367270"
+          },
+          {
+            "id": "f2",
+            "path": "src/config.ts",
+            "bytes": 2250,
+            "lines": 37,
+            "sha256": "b6b29a3a3ae697c76b35815e6e25ab69878128a97fd1b7832d9646663563dbcb"
+          },
+          {
+            "id": "f3",
+            "path": "src/decisions.ts",
+            "bytes": 7247,
+            "lines": 93,
+            "sha256": "5a734ad37f5ad88e5eb8d3bdaf2afa175ab063c5762a85b3b897b88dc2c54391"
+          },
+          {
+            "id": "f4",
+            "path": "src/extension.ts",
+            "bytes": 10069,
+            "lines": 144,
+            "sha256": "cb7a878fd3c74f802ca270bd97a992d0d22c23fda11ad46360e5cc3b3b18ad10"
+          },
+          {
+            "id": "f5",
+            "path": "src/gateway.ts",
+            "bytes": 1652,
+            "lines": 27,
+            "sha256": "68aac957470ecf5b2a663b1566da5f2562da4592dccda86f306ebc6f12a87fd3"
+          },
+          {
+            "id": "f6",
+            "path": "src/jev.ts",
+            "bytes": 8297,
+            "lines": 147,
+            "sha256": "2deb6f031f399ddb807ff610cc32d5fcdd2a35961f27eac6f7042d1b2f3c0604"
+          },
+          {
+            "id": "f7",
+            "path": "src/search.ts",
+            "bytes": 6338,
+            "lines": 107,
+            "sha256": "7b8914432960984ee55cf53e33f6a7446e0cbfc24cdeefdb2d5692d36732a0e5"
+          },
+          {
+            "id": "f8",
+            "path": "src/telemetry.ts",
+            "bytes": 3751,
+            "lines": 85,
+            "sha256": "3525aefbdea31a36924d01af67f03882d305c23c5d14f5be47428fc3b62969bf"
+          },
+          {
+            "id": "f9",
+            "path": "src/ui.ts",
+            "bytes": 2239,
+            "lines": 37,
+            "sha256": "d8bad3cfbee5240a7f82cd4bf4358ed20b6f3bf243399f7aa015dc8241eced13"
+          },
+          {
+            "id": "f10",
+            "path": "test/cancellation.test.ts",
+            "bytes": 4090,
+            "lines": 65,
+            "sha256": "e3f700f84fd2963128874a6de9705e8a21e60df498d7937031b6c42814f5cf15"
+          },
+          {
+            "id": "f11",
+            "path": "test/cli.test.ts",
+            "bytes": 2501,
+            "lines": 43,
+            "sha256": "9a88f4bea3d858d0cc5b356523c1b97d1e6480091389a393930c96c419bf9488"
+          },
+          {
+            "id": "f12",
+            "path": "test/config.test.ts",
+            "bytes": 1865,
+            "lines": 38,
+            "sha256": "a81bad6fa155d78a63a59d1378c270128d8e8883b39b27f4e200572812899fe7"
+          },
+          {
+            "id": "f13",
+            "path": "test/decisions.test.ts",
+            "bytes": 4747,
+            "lines": 71,
+            "sha256": "4bfc8ae354460d108a6b60cb4412ac89ae49b276cbcbaae480d13e78e28c5736"
+          },
+          {
+            "id": "f14",
+            "path": "test/gateway.test.ts",
+            "bytes": 5111,
+            "lines": 87,
+            "sha256": "95a708d34d0589a50b80ecffe94286c44fdf500eeb17bd21dfa974ff1c89bec7"
+          },
+          {
+            "id": "f15",
+            "path": "test/integration.test.ts",
+            "bytes": 7549,
+            "lines": 104,
+            "sha256": "89ed83d0e4a4c13821fa60eee5420f93c7967e9547f0d56652f87d0cf83de28f"
+          },
+          {
+            "id": "f16",
+            "path": "test/jev.test.ts",
+            "bytes": 5077,
+            "lines": 98,
+            "sha256": "ef4be4627dc1063d6aaa456f923513aa9f45f13804370bd03b902ce2332f46d5"
+          },
+          {
+            "id": "f17",
+            "path": "test/search.test.ts",
+            "bytes": 4500,
+            "lines": 87,
+            "sha256": "8280b1d6101c75afd4dfa9a651c04a079ff6b529a9d1c0ce2709f578712cfd7e"
+          },
+          {
+            "id": "f18",
+            "path": "test/session-mode-visible.test.ts",
+            "bytes": 4133,
+            "lines": 56,
+            "sha256": "4371e771af7229de38ea21cde495c378bbe4ddd3109a6adac56bc0eba169a0d3"
+          },
+          {
+            "id": "f19",
+            "path": "test/telemetry.test.ts",
+            "bytes": 1413,
+            "lines": 25,
+            "sha256": "44b9a1a99009c01ef2ddd580a961a555ba5dc44db4bf92183c1a6fef33750847"
+          },
+          {
+            "id": "f20",
+            "path": "test/ui.test.ts",
+            "bytes": 1217,
+            "lines": 19,
+            "sha256": "3614513c5792376630341d54617b118c950b7661198000dd65d967ba2a09b639"
+          }
+        ],
+        "inventoryDigest": "e3a01ef895b544ed4e694a2ee3a860a83ecb80b1d0d7ab9136bca9c8d50ca554",
+        "filesScanned": 21,
+        "bytesRead": 90524,
+        "excluded": [
+          {
+            "path": ".env.example",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".github/workflows/ci.yml",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".gitignore",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".npmrc",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": "CONTRIBUTING.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "LICENSE",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "README.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "README.zh-CN.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "TASK.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "THIRD_PARTY_NOTICES.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/design.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/implementation-plan.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/verification.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "package-lock.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "package.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "tsconfig.build.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "tsconfig.json",
+            "reason": "outside-ts-js-source-scope"
+          }
+        ],
+        "ranking": [
+          {
+            "path": "test/session-mode-visible.test.ts",
+            "bytes": 4133,
+            "lines": 56,
+            "score": 0.94
+          },
+          {
+            "path": "src/extension.ts",
+            "bytes": 10069,
+            "lines": 144,
+            "score": 0.85
+          },
+          {
+            "path": "test/integration.test.ts",
+            "bytes": 7549,
+            "lines": 104,
+            "score": 0.57
+          },
+          {
+            "path": "src/config.ts",
+            "bytes": 2250,
+            "lines": 37,
+            "score": 0.45
+          },
+          {
+            "path": "src/cli.ts",
+            "bytes": 6036,
+            "lines": 108,
+            "score": 0.4
+          },
+          {
+            "path": "test/telemetry.test.ts",
+            "bytes": 1413,
+            "lines": 25,
+            "score": 0.27
+          },
+          {
+            "path": "src/telemetry.ts",
+            "bytes": 3751,
+            "lines": 85,
+            "score": 0.25
+          },
+          {
+            "path": "test/config.test.ts",
+            "bytes": 1865,
+            "lines": 38,
+            "score": 0.24
+          },
+          {
+            "path": "test/cancellation.test.ts",
+            "bytes": 4090,
+            "lines": 65,
+            "score": 0.23
+          },
+          {
+            "path": "src/jev.ts",
+            "bytes": 8297,
+            "lines": 147,
+            "score": 0.2
+          },
+          {
+            "path": "test/ui.test.ts",
+            "bytes": 1217,
+            "lines": 19,
+            "score": 0.2
+          },
+          {
+            "path": "test/cli.test.ts",
+            "bytes": 2501,
+            "lines": 43,
+            "score": 0.18
+          },
+          {
+            "path": "src/decisions.ts",
+            "bytes": 7247,
+            "lines": 93,
+            "score": 0.17
+          },
+          {
+            "path": "src/ui.ts",
+            "bytes": 2239,
+            "lines": 37,
+            "score": 0.17
+          },
+          {
+            "path": "test/decisions.test.ts",
+            "bytes": 4747,
+            "lines": 71,
+            "score": 0.17
+          },
+          {
+            "path": "test/search.test.ts",
+            "bytes": 4500,
+            "lines": 87,
+            "score": 0.17
+          },
+          {
+            "path": "src/gateway.ts",
+            "bytes": 1652,
+            "lines": 27,
+            "score": 0.15
+          },
+          {
+            "path": "test/jev.test.ts",
+            "bytes": 5077,
+            "lines": 98,
+            "score": 0.13
+          },
+          {
+            "path": "bin/pij.mjs",
+            "bytes": 442,
+            "lines": 10,
+            "score": 0.12
+          },
+          {
+            "path": "test/gateway.test.ts",
+            "bytes": 5111,
+            "lines": 87,
+            "score": 0.11
+          },
+          {
+            "path": "src/search.ts",
+            "bytes": 6338,
+            "lines": 107,
+            "score": 0.1
+          }
+        ],
+        "batches": [
+          {
+            "ids": [
+              "f0",
+              "f1",
+              "f2",
+              "f3",
+              "f4",
+              "f5",
+              "f6",
+              "f7",
+              "f8",
+              "f9",
+              "f10",
+              "f11",
+              "f12",
+              "f13"
+            ],
+            "requestBytes": 71713,
+            "result": {
+              "status": "ok",
+              "answers": {
+                "f0": {
+                  "type": "noul",
+                  "noul": 0.12
+                },
+                "f1": {
+                  "type": "noul",
+                  "noul": 0.4
+                },
+                "f2": {
+                  "type": "noul",
+                  "noul": 0.45
+                },
+                "f3": {
+                  "type": "noul",
+                  "noul": 0.17
+                },
+                "f4": {
+                  "type": "noul",
+                  "noul": 0.85
+                },
+                "f5": {
+                  "type": "noul",
+                  "noul": 0.15
+                },
+                "f6": {
+                  "type": "noul",
+                  "noul": 0.2
+                },
+                "f7": {
+                  "type": "noul",
+                  "noul": 0.1
+                },
+                "f8": {
+                  "type": "noul",
+                  "noul": 0.25
+                },
+                "f9": {
+                  "type": "noul",
+                  "noul": 0.17
+                },
+                "f10": {
+                  "type": "noul",
+                  "noul": 0.23
+                },
+                "f11": {
+                  "type": "noul",
+                  "noul": 0.18
+                },
+                "f12": {
+                  "type": "noul",
+                  "noul": 0.24
+                },
+                "f13": {
+                  "type": "noul",
+                  "noul": 0.17
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 18914,
+              "outputTokens": 246,
+              "latencyMs": 1174,
+              "cached": false
+            }
+          },
+          {
+            "ids": [
+              "f14",
+              "f15",
+              "f16",
+              "f17",
+              "f18",
+              "f19",
+              "f20"
+            ],
+            "requestBytes": 35723,
+            "result": {
+              "status": "ok",
+              "answers": {
+                "f14": {
+                  "type": "noul",
+                  "noul": 0.11
+                },
+                "f15": {
+                  "type": "noul",
+                  "noul": 0.57
+                },
+                "f16": {
+                  "type": "noul",
+                  "noul": 0.13
+                },
+                "f17": {
+                  "type": "noul",
+                  "noul": 0.17
+                },
+                "f18": {
+                  "type": "noul",
+                  "noul": 0.94
+                },
+                "f19": {
+                  "type": "noul",
+                  "noul": 0.27
+                },
+                "f20": {
+                  "type": "noul",
+                  "noul": 0.2
+                }
+              },
+              "model": "typesafe-ai/jev",
+              "inputTokens": 9747,
+              "outputTokens": 130,
+              "latencyMs": 864,
+              "cached": false
+            }
+          }
+        ],
+        "maxBatchBytes": 75000,
+        "elapsedMs": 2079
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 60,
+          "pass": 60,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "jev-2-ordinary.txt",
+        "visible": "jev-2-visible.txt",
+        "holdout": "jev-2-holdout.txt",
+        "check": "jev-2-check.txt",
+        "build": "jev-2-build.txt"
+      },
+      "candidate": {
+        "patch": "jev-2.patch",
+        "patchSha256": "a8172f88ff2b40a1947c68c5662f5ae5f4b4bc47ba44c53ef3e07eb4d9a8ae18",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "src/extension.ts": "f0a99d6c75e5588c89cd733540eb1ac271e878d2a8cdf17e813e8fd7f4332287",
+          "test/session-persistence.test.ts": "019b28dd2e79a6c157f28deec9a4b4060be18b1adadef24292b4386b611b04de"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 2,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "lexical-2",
+      "runId": "2026-09-18T00-36-43.527Z-session-mode-2-project-lexical",
+      "sample": 2,
+      "mode": "lexical",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "66a8ad15bda4da8a98e7bb43837ef103b38bd1c9",
+        "dirty": false,
+        "sourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "trackedSourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 212,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "66a8ad15bda4da8a98e7bb43837ef103b38bd1c9",
+        "dirty": false,
+        "sourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "trackedSourceDigest": "af57b2eb71fafa39748abbd311e0aa1b45f616fad26087a7910e48529b57848a",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 212,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "requests": 34,
+      "tokens": 1730290,
+      "usage": {
+        "input": 36,
+        "output": 16713,
+        "cacheRead": 1641054,
+        "cacheWrite": 72487,
+        "estimatedUsd": 1.0149454499999997
+      },
+      "elapsedMs": 361627,
+      "evidenceAndAgentElapsedMs": 361663,
+      "calls": {
+        "read": 14,
+        "bash": 30,
+        "edit": 2,
+        "write": 1
+      },
+      "dependencyPathCalls": 28,
+      "preEditToolCalls": 35,
+      "preEditExplicitSourceReads": 6,
+      "evidenceDelivered": true,
+      "userTimestamp": 1789691808313,
+      "firstEdit": {
+        "toolIndex": 36,
+        "secondsToToolResult": 262.461
+      },
+      "runtimeAccepted": true,
+      "allChecksPassed": true,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "addedTests": 19,
+        "meaningfulAddedTests": false,
+        "documentation": "Final answer describes changes and claims validation/resolution coverage; no separate documentation file was required or added.",
+        "findings": [
+          "All nineteen new tests call locally copied parsePijModeEntry/resolveModeFromBranch functions; they never import or invoke product implementation.",
+          "Introductory comments claim exported-factory/session_start behavior is exercised, but the test body does not do so.",
+          "All independent behavior checks pass, but these copied-logic tests do not satisfy the requirement for appropriate product regression tests."
+        ],
+        "copyOnlyProbe": {
+          "exitCode": 0,
+          "tests": 19,
+          "pass": 19,
+          "productSourcePresent": false,
+          "directoryEntries": [
+            "isolated.test.ts"
+          ],
+          "copiedTestSha256": "c21ff4fc9f156217024364a4704f46effd26046c5667a4c11cc81d42abf090f8",
+          "log": "lexical-2-isolated-tests.txt"
+        }
+      },
+      "projectEvidence": {
+        "policy": "project-source",
+        "mode": "lexical",
+        "status": "local",
+        "inventory": [
+          {
+            "id": "f0",
+            "path": "bin/pij.mjs",
+            "bytes": 442,
+            "lines": 10,
+            "sha256": "44b81a3d229e01c45515a050b2e14a034eeb045e8716daf46625d18bc19e6dc9"
+          },
+          {
+            "id": "f1",
+            "path": "src/cli.ts",
+            "bytes": 6036,
+            "lines": 108,
+            "sha256": "e053019d6cfc02e3e83d801dea850e85ff661099c49daa34e21124933f367270"
+          },
+          {
+            "id": "f2",
+            "path": "src/config.ts",
+            "bytes": 2250,
+            "lines": 37,
+            "sha256": "b6b29a3a3ae697c76b35815e6e25ab69878128a97fd1b7832d9646663563dbcb"
+          },
+          {
+            "id": "f3",
+            "path": "src/decisions.ts",
+            "bytes": 7247,
+            "lines": 93,
+            "sha256": "5a734ad37f5ad88e5eb8d3bdaf2afa175ab063c5762a85b3b897b88dc2c54391"
+          },
+          {
+            "id": "f4",
+            "path": "src/extension.ts",
+            "bytes": 10069,
+            "lines": 144,
+            "sha256": "cb7a878fd3c74f802ca270bd97a992d0d22c23fda11ad46360e5cc3b3b18ad10"
+          },
+          {
+            "id": "f5",
+            "path": "src/gateway.ts",
+            "bytes": 1652,
+            "lines": 27,
+            "sha256": "68aac957470ecf5b2a663b1566da5f2562da4592dccda86f306ebc6f12a87fd3"
+          },
+          {
+            "id": "f6",
+            "path": "src/jev.ts",
+            "bytes": 8297,
+            "lines": 147,
+            "sha256": "2deb6f031f399ddb807ff610cc32d5fcdd2a35961f27eac6f7042d1b2f3c0604"
+          },
+          {
+            "id": "f7",
+            "path": "src/search.ts",
+            "bytes": 6338,
+            "lines": 107,
+            "sha256": "7b8914432960984ee55cf53e33f6a7446e0cbfc24cdeefdb2d5692d36732a0e5"
+          },
+          {
+            "id": "f8",
+            "path": "src/telemetry.ts",
+            "bytes": 3751,
+            "lines": 85,
+            "sha256": "3525aefbdea31a36924d01af67f03882d305c23c5d14f5be47428fc3b62969bf"
+          },
+          {
+            "id": "f9",
+            "path": "src/ui.ts",
+            "bytes": 2239,
+            "lines": 37,
+            "sha256": "d8bad3cfbee5240a7f82cd4bf4358ed20b6f3bf243399f7aa015dc8241eced13"
+          },
+          {
+            "id": "f10",
+            "path": "test/cancellation.test.ts",
+            "bytes": 4090,
+            "lines": 65,
+            "sha256": "e3f700f84fd2963128874a6de9705e8a21e60df498d7937031b6c42814f5cf15"
+          },
+          {
+            "id": "f11",
+            "path": "test/cli.test.ts",
+            "bytes": 2501,
+            "lines": 43,
+            "sha256": "9a88f4bea3d858d0cc5b356523c1b97d1e6480091389a393930c96c419bf9488"
+          },
+          {
+            "id": "f12",
+            "path": "test/config.test.ts",
+            "bytes": 1865,
+            "lines": 38,
+            "sha256": "a81bad6fa155d78a63a59d1378c270128d8e8883b39b27f4e200572812899fe7"
+          },
+          {
+            "id": "f13",
+            "path": "test/decisions.test.ts",
+            "bytes": 4747,
+            "lines": 71,
+            "sha256": "4bfc8ae354460d108a6b60cb4412ac89ae49b276cbcbaae480d13e78e28c5736"
+          },
+          {
+            "id": "f14",
+            "path": "test/gateway.test.ts",
+            "bytes": 5111,
+            "lines": 87,
+            "sha256": "95a708d34d0589a50b80ecffe94286c44fdf500eeb17bd21dfa974ff1c89bec7"
+          },
+          {
+            "id": "f15",
+            "path": "test/integration.test.ts",
+            "bytes": 7549,
+            "lines": 104,
+            "sha256": "89ed83d0e4a4c13821fa60eee5420f93c7967e9547f0d56652f87d0cf83de28f"
+          },
+          {
+            "id": "f16",
+            "path": "test/jev.test.ts",
+            "bytes": 5077,
+            "lines": 98,
+            "sha256": "ef4be4627dc1063d6aaa456f923513aa9f45f13804370bd03b902ce2332f46d5"
+          },
+          {
+            "id": "f17",
+            "path": "test/search.test.ts",
+            "bytes": 4500,
+            "lines": 87,
+            "sha256": "8280b1d6101c75afd4dfa9a651c04a079ff6b529a9d1c0ce2709f578712cfd7e"
+          },
+          {
+            "id": "f18",
+            "path": "test/session-mode-visible.test.ts",
+            "bytes": 4133,
+            "lines": 56,
+            "sha256": "4371e771af7229de38ea21cde495c378bbe4ddd3109a6adac56bc0eba169a0d3"
+          },
+          {
+            "id": "f19",
+            "path": "test/telemetry.test.ts",
+            "bytes": 1413,
+            "lines": 25,
+            "sha256": "44b9a1a99009c01ef2ddd580a961a555ba5dc44db4bf92183c1a6fef33750847"
+          },
+          {
+            "id": "f20",
+            "path": "test/ui.test.ts",
+            "bytes": 1217,
+            "lines": 19,
+            "sha256": "3614513c5792376630341d54617b118c950b7661198000dd65d967ba2a09b639"
+          }
+        ],
+        "inventoryDigest": "e3a01ef895b544ed4e694a2ee3a860a83ecb80b1d0d7ab9136bca9c8d50ca554",
+        "filesScanned": 21,
+        "bytesRead": 90524,
+        "excluded": [
+          {
+            "path": ".env.example",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".github/workflows/ci.yml",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".gitignore",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": ".npmrc",
+            "reason": "private-or-generated-path"
+          },
+          {
+            "path": "CONTRIBUTING.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "LICENSE",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "README.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "README.zh-CN.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "TASK.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "THIRD_PARTY_NOTICES.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/design.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/implementation-plan.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "docs/verification.md",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "package-lock.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "package.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "tsconfig.build.json",
+            "reason": "outside-ts-js-source-scope"
+          },
+          {
+            "path": "tsconfig.json",
+            "reason": "outside-ts-js-source-scope"
+          }
+        ],
+        "ranking": [
+          {
+            "path": "src/extension.ts",
+            "bytes": 10069,
+            "lines": 144,
+            "score": 87.06158086607384
+          },
+          {
+            "path": "src/cli.ts",
+            "bytes": 6036,
+            "lines": 108,
+            "score": 83.43637012136966
+          },
+          {
+            "path": "test/session-mode-visible.test.ts",
+            "bytes": 4133,
+            "lines": 56,
+            "score": 75.77575798540923
+          },
+          {
+            "path": "test/integration.test.ts",
+            "bytes": 7549,
+            "lines": 104,
+            "score": 64.26878320818781
+          },
+          {
+            "path": "src/decisions.ts",
+            "bytes": 7247,
+            "lines": 93,
+            "score": 56.61939205662446
+          },
+          {
+            "path": "src/search.ts",
+            "bytes": 6338,
+            "lines": 107,
+            "score": 47.686863465536106
+          },
+          {
+            "path": "test/search.test.ts",
+            "bytes": 4500,
+            "lines": 87,
+            "score": 38.72772778917122
+          },
+          {
+            "path": "src/jev.ts",
+            "bytes": 8297,
+            "lines": 147,
+            "score": 36.70522112308539
+          },
+          {
+            "path": "test/cancellation.test.ts",
+            "bytes": 4090,
+            "lines": 65,
+            "score": 35.72710638908105
+          },
+          {
+            "path": "src/telemetry.ts",
+            "bytes": 3751,
+            "lines": 85,
+            "score": 34.2742479676406
+          },
+          {
+            "path": "test/gateway.test.ts",
+            "bytes": 5111,
+            "lines": 87,
+            "score": 33.99300601269683
+          },
+          {
+            "path": "test/decisions.test.ts",
+            "bytes": 4747,
+            "lines": 71,
+            "score": 32.048084237484986
+          },
+          {
+            "path": "test/jev.test.ts",
+            "bytes": 5077,
+            "lines": 98,
+            "score": 31.775337419960906
+          },
+          {
+            "path": "src/config.ts",
+            "bytes": 2250,
+            "lines": 37,
+            "score": 30.27283578705844
+          },
+          {
+            "path": "test/cli.test.ts",
+            "bytes": 2501,
+            "lines": 43,
+            "score": 28.967620001109548
+          },
+          {
+            "path": "test/config.test.ts",
+            "bytes": 1865,
+            "lines": 38,
+            "score": 28.330563091162894
+          },
+          {
+            "path": "src/gateway.ts",
+            "bytes": 1652,
+            "lines": 27,
+            "score": 24.56147132560673
+          },
+          {
+            "path": "src/ui.ts",
+            "bytes": 2239,
+            "lines": 37,
+            "score": 24.036908456176448
+          },
+          {
+            "path": "test/telemetry.test.ts",
+            "bytes": 1413,
+            "lines": 25,
+            "score": 20.12022541443484
+          },
+          {
+            "path": "test/ui.test.ts",
+            "bytes": 1217,
+            "lines": 19,
+            "score": 19.1989390495861
+          },
+          {
+            "path": "bin/pij.mjs",
+            "bytes": 442,
+            "lines": 10,
+            "score": 9.937488704774191
+          }
+        ],
+        "batches": [
+          {
+            "ids": [
+              "f0",
+              "f1",
+              "f2",
+              "f3",
+              "f4",
+              "f5",
+              "f6",
+              "f7",
+              "f8",
+              "f9",
+              "f10",
+              "f11",
+              "f12",
+              "f13"
+            ],
+            "requestBytes": 71713
+          },
+          {
+            "ids": [
+              "f14",
+              "f15",
+              "f16",
+              "f17",
+              "f18",
+              "f19",
+              "f20"
+            ],
+            "requestBytes": 35723
+          }
+        ],
+        "maxBatchBytes": 75000,
+        "elapsedMs": 36
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 59,
+          "pass": 59,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "lexical-2-ordinary.txt",
+        "visible": "lexical-2-visible.txt",
+        "holdout": "lexical-2-holdout.txt",
+        "check": "lexical-2-check.txt",
+        "build": "lexical-2-build.txt"
+      },
+      "candidate": {
+        "patch": "lexical-2.patch",
+        "patchSha256": "4742d226182c3132d45af1728a5b84943524bad2cbfc66e20faeaf6e5ee4c321",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "src/extension.ts": "94711d73e329be6193eefed6dd3ef162ff3fb21d757a7c7069ec722261ee38dd",
+          "test/session-mode-persist.test.ts": "c21ff4fc9f156217024364a4704f46effd26046c5667a4c11cc81d42abf090f8"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 2,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    }
+  ]
+}

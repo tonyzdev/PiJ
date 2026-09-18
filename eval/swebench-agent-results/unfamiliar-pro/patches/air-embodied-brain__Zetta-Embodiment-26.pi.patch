@@ -1,0 +1,38 @@
+diff --git a/robots/libero/critic_runtime.py b/robots/libero/critic_runtime.py
+index 660993a..bd9721c 100644
+--- a/robots/libero/critic_runtime.py
++++ b/robots/libero/critic_runtime.py
+@@ -98,6 +98,14 @@ def extract_libero_critic_features(
+                 features["command.realization.direction_cosine"] = float(
+                     np.dot(command[:3], realized) / (command_norm * realized_norm)
+                 )
++        else:
++            # First physics step has no previous EEF to compare against, so
++            # no motion has been realized yet.  Emit the realization features
++            # with their neutral defaults so rules such as
++            # ``close-while-stalled`` never observe a missing feature.
++            features["command.realization.direction_available"] = False
++            features["command.realization.eef_motion_m"] = 0.0
++            features["command.realization.stalled"] = False
+ 
+     for key, value in (privileged_state or {}).items():
+         name = str(key)
+diff --git a/rollout_runtime/backends/libero_critic.py b/rollout_runtime/backends/libero_critic.py
+index 35104f9..ce335d2 100644
+--- a/rollout_runtime/backends/libero_critic.py
++++ b/rollout_runtime/backends/libero_critic.py
+@@ -508,6 +508,14 @@ def extract_libero_critic_features(
+                 features["command.realization.direction_cosine"] = float(
+                     np.dot(command[:3], realized) / (command_norm * realized_norm)
+                 )
++        else:
++            # First physics step has no previous EEF to compare against, so
++            # no motion has been realized yet.  Emit the realization features
++            # with their neutral defaults so rules such as
++            # ``close-while-stalled`` never observe a missing feature.
++            features["command.realization.direction_available"] = False
++            features["command.realization.eef_motion_m"] = 0.0
++            features["command.realization.stalled"] = False
+ 
+     for key, value in (privileged_state or {}).items():
+         name = str(key)

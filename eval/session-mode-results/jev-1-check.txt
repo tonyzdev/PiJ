@@ -1,0 +1,9 @@
+test/session-persistence.test.ts(27,42): error TS2344: Type 'undefined' does not satisfy the constraint '(...args: any) => any'.
+test/session-persistence.test.ts(27,66): error TS2493: Tuple type '[fn?: TestFn | undefined]' of length '1' has no element at index '1'.
+test/session-persistence.test.ts(74,5): error TS2339: Property 'after' does not exist on type 'never'.
+test/session-persistence.test.ts(85,48): error TS2345: Argument of type 'TestContext' is not assignable to parameter of type 'never'.
+test/session-persistence.test.ts(99,48): error TS2345: Argument of type 'TestContext' is not assignable to parameter of type 'never'.
+test/session-persistence.test.ts(107,48): error TS2345: Argument of type 'TestContext' is not assignable to parameter of type 'never'.
+test/session-persistence.test.ts(122,48): error TS2345: Argument of type 'TestContext' is not assignable to parameter of type 'never'.
+test/session-persistence.test.ts(154,48): error TS2345: Argument of type 'TestContext' is not assignable to parameter of type 'never'.
+test/session-persistence.test.ts(171,48): error TS2345: Argument of type 'TestContext' is not assignable to parameter of type 'never'.

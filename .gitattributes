@@ -1,0 +1,2 @@
+# Unified diff fixtures contain space-only context markers as format data.
+*.patch -whitespace

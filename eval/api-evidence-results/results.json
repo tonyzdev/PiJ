@@ -1,0 +1,2380 @@
+{
+  "schemaVersion": 1,
+  "task": "session-mode",
+  "protocol": "docs/api-evidence-experiment.md",
+  "interpretation": "Two descriptive repetitions of a task-informed API-evidence diagnostic on the previously used session-mode task. Runtime acceptance and requested deliverables are recorded separately. No head-to-head with pi-jev or general product advantage is established.",
+  "cost": "Main-model catalog estimates including cache, excluding Jev fees; not billing receipts.",
+  "firstEditMetric": "Initial user message timestamp to first successful edit/write result; excludes preprocessing and startup.",
+  "navigationMetric": "Tool execution arguments containing node_modules/; a navigation proxy, not unique facts read or causal substitution.",
+  "jeVPlacement": "One parent-side API relevance evaluation per Jev run. Ordinary PiJ decisions, source briefing and automatic checkpoints off in both conditions.",
+  "records": [
+    {
+      "id": "lexical-1",
+      "runId": "2026-09-17T22-41-35.521Z-session-mode-1-api-lexical",
+      "sample": 1,
+      "mode": "lexical",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "b7916d1975936f12d93c99d37a6e64cf582c70a6",
+        "dirty": false,
+        "sourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "trackedSourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 184,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "b7916d1975936f12d93c99d37a6e64cf582c70a6",
+        "dirty": false,
+        "sourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "trackedSourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 184,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "requests": 18,
+      "tokens": 561146,
+      "usage": {
+        "input": 20,
+        "output": 7913,
+        "cacheRead": 509586,
+        "cacheWrite": 43627,
+        "estimatedUsd": 0.43523205
+      },
+      "elapsedMs": 178324,
+      "evidenceAndAgentElapsedMs": 179435,
+      "calls": {
+        "bash": 11,
+        "read": 10,
+        "edit": 1
+      },
+      "dependencyPathCalls": 11,
+      "evidenceDelivered": true,
+      "firstEdit": {
+        "toolIndex": 19,
+        "secondsToToolResult": 146.989
+      },
+      "runtimeAccepted": true,
+      "allChecksPassed": true,
+      "completeDeliverable": false,
+      "deliverableReview": {
+        "completeDeliverable": false,
+        "newTests": 0,
+        "documentationFiles": [],
+        "finalExplanation": true,
+        "findings": [
+          "All frozen checks pass, but no candidate-authored tests were added despite the explicit requirement."
+        ],
+        "coverage": "Only the supplied reproduction and existing suite remain. Evaluator holdouts do not count as authored delivery."
+      },
+      "dependencyEvidence": {
+        "packages": [
+          "@earendil-works/pi-coding-agent@0.85.1",
+          "ai@7.0.105"
+        ],
+        "filesScanned": 413,
+        "bytesRead": 2458404,
+        "inventoryDigest": "6e73470a42f4599c19f8756ed3da2925de92c006b871bf0349e16f94c4be8089",
+        "inventoryTruncated": true,
+        "policy": "api",
+        "unresolvedExportPackages": [
+          "ai"
+        ],
+        "unitsFound": 5098,
+        "poolDigest": "e44765e3f0d8f15e3c1c7c44e4fe6a7086818709c0da06351461c0848a71a754",
+        "pool": [
+          {
+            "id": "a0",
+            "symbol": "TreeList.applyFilter",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a1",
+            "symbol": "CreateAgentSessionOptions.tools",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.d.ts"
+          },
+          {
+            "id": "a2",
+            "symbol": "sessionEntryToContextMessages",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a3",
+            "symbol": "ExtensionAPI.unregisterProvider",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          },
+          {
+            "id": "a4",
+            "symbol": "TreeList.recalculateVisualStructure",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a5",
+            "symbol": "prepareBranchEntries",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.d.ts"
+          },
+          {
+            "id": "a6",
+            "symbol": "findValidCutPoints",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js"
+          },
+          {
+            "id": "a7",
+            "symbol": "SessionManager.appendCustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a8",
+            "symbol": "SessionManager.buildContextEntries",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a9",
+            "symbol": "AgentSession.sendCustomMessage",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a10",
+            "symbol": "AgentSessionRuntime.fork",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.d.ts"
+          },
+          {
+            "id": "a11",
+            "symbol": "ExtensionAPI.registerProvider",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          },
+          {
+            "id": "a12",
+            "symbol": "AgentSession.setModel",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a13",
+            "symbol": "CustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a14",
+            "symbol": "restoreModelFromSession",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/model-resolver.d.ts"
+          },
+          {
+            "id": "a15",
+            "symbol": "LanguageModelResponseMetadata",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a16",
+            "symbol": "AgentSession.prompt",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a17",
+            "symbol": "getNoChangeError",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/tools/edit-diff.js"
+          },
+          {
+            "id": "a18",
+            "symbol": "SessionManager.appendMessage",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a19",
+            "symbol": "SessionManager.getBranch",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a20",
+            "symbol": "createExtensionAPI",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/loader.js"
+          },
+          {
+            "id": "a21",
+            "symbol": "buildSessionContext",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a22",
+            "symbol": "SessionManager.appendModelChange",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a23",
+            "symbol": "TelemetryOptions",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a24",
+            "symbol": "TreeList.buildActivePath",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a25",
+            "symbol": "AgentSession.setThinkingLevel",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a26",
+            "symbol": "TreeSelectorComponent.constructor",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.d.ts"
+          },
+          {
+            "id": "a27",
+            "symbol": "AgentSession.navigateTree",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a28",
+            "symbol": "ReasoningFileOutput",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a29",
+            "symbol": "SessionManager.buildSessionContext",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a30",
+            "symbol": "RpcResponse",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/rpc/rpc-types.d.ts"
+          },
+          {
+            "id": "a31",
+            "symbol": "TreePreparation",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          }
+        ],
+        "candidates": [
+          {
+            "id": "a0",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "TreeList.applyFilter",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+            "exportedAs": [],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+                "startLine": 233,
+                "endLine": 253,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 1307,
+                "sha256": "f8ce24003bfe9e9366d91900d752ac4d96ce1b6a51c2d78ecc270b1fbbdaf2ee"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+                "startLine": 303,
+                "endLine": 318,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 825,
+                "sha256": "69861495c38cc725898dd000b11404f2c77ebecfadeff1d3ac82125dea2186f3"
+              }
+            ]
+          },
+          {
+            "id": "a1",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "CreateAgentSessionOptions.tools",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.d.ts",
+            "exportedAs": [
+              "CreateAgentSessionOptions"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.d.ts",
+                "startLine": 34,
+                "endLine": 43,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 428,
+                "sha256": "f131944db5dbf9158ca1860891126251291ac1d23878f576203d2b25023e0148"
+              }
+            ]
+          },
+          {
+            "id": "a2",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "sessionEntryToContextMessages",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+            "exportedAs": [
+              "sessionEntryToContextMessages"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+                "startLine": 147,
+                "endLine": 151,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 249,
+                "sha256": "299cfc19bbdab28bd8412f0efeb9debfd9ed0d23ff310e9aca5b4e2b5cd91ec4"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+                "startLine": 162,
+                "endLine": 189,
+                "kind": "implementation",
+                "truncated": false,
+                "bytes": 1197,
+                "sha256": "894da6b01a21dae416b3e95d7c9c162749a755ab878e873a461be341977fee42"
+              }
+            ]
+          },
+          {
+            "id": "a3",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "ExtensionAPI.unregisterProvider",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts",
+            "exportedAs": [
+              "ExtensionAPI"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts",
+                "startLine": 1068,
+                "endLine": 1081,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 493,
+                "sha256": "f71164b18c8e2511a6a26f285a0fa1db76d32329cb747c3364083c86b4c78358"
+              }
+            ]
+          },
+          {
+            "id": "a4",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "TreeList.recalculateVisualStructure",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+            "exportedAs": [],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+                "startLine": 319,
+                "endLine": 346,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 1283,
+                "sha256": "b3c76417fca6aa3f6e1a17a330f9a75e7b51762b7a552b641d99709652eb45a7"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+                "startLine": 411,
+                "endLine": 431,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 860,
+                "sha256": "6e6b4e578133050a49a0ba1959b521e4e728bfe87a94febeb005533691f78f79"
+              }
+            ]
+          },
+          {
+            "id": "a5",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "prepareBranchEntries",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.d.ts",
+            "exportedAs": [
+              "prepareBranchEntries"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.d.ts",
+                "startLine": 77,
+                "endLine": 90,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 613,
+                "sha256": "9adc2f24cab61c8d463814b999390e9d6f3f2cc830644abc925fe3a37bb8d72f"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.js",
+                "startLine": 85,
+                "endLine": 102,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 747,
+                "sha256": "0d63fdaf90ffc399754ce1a957e891a34559a9c8d4d37b47a0185bf19acbca1c"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.js",
+                "startLine": 131,
+                "endLine": 145,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 541,
+                "sha256": "4d6ce0e05ebc83dd8d3b3b943be4373042831a7af5038ff907dc29996e446b4a"
+              }
+            ]
+          }
+        ],
+        "elapsedMs": 1111,
+        "decisions": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 40,
+          "pass": 40,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "lexical-1-ordinary.txt",
+        "visible": "lexical-1-visible.txt",
+        "holdout": "lexical-1-holdout.txt",
+        "check": "lexical-1-check.txt",
+        "build": "lexical-1-build.txt"
+      },
+      "candidate": {
+        "patch": "lexical-1.patch",
+        "patchSha256": "d55b2a712704729739206a0c8c680f5c74769dba7167d3d1151bf0b9734585c0",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "src/extension.ts": "d173c8ad43cd2b8d50bf4df048897e582aaa4230f4583b1abc3ba1c35b7bd4c2"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 1,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "jev-1",
+      "runId": "2026-09-17T22-41-36.677Z-session-mode-1-api-jev",
+      "sample": 1,
+      "mode": "jev",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "b7916d1975936f12d93c99d37a6e64cf582c70a6",
+        "dirty": false,
+        "sourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "trackedSourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 184,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "b7916d1975936f12d93c99d37a6e64cf582c70a6",
+        "dirty": false,
+        "sourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "trackedSourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 184,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "requests": 29,
+      "tokens": 1072971,
+      "usage": {
+        "input": 31,
+        "output": 12012,
+        "cacheRead": 1010161,
+        "cacheWrite": 50767,
+        "estimatedUsd": 0.67369755
+      },
+      "elapsedMs": 249065,
+      "evidenceAndAgentElapsedMs": 251466,
+      "calls": {
+        "bash": 25,
+        "read": 5,
+        "edit": 4,
+        "write": 1
+      },
+      "dependencyPathCalls": 10,
+      "evidenceDelivered": true,
+      "firstEdit": {
+        "toolIndex": 19,
+        "secondsToToolResult": 105.972
+      },
+      "runtimeAccepted": true,
+      "allChecksPassed": true,
+      "completeDeliverable": true,
+      "deliverableReview": {
+        "completeDeliverable": true,
+        "newTests": 4,
+        "documentationFiles": [],
+        "finalExplanation": true,
+        "findings": [
+          "New tests use the actual SDK: command metadata, disk reopen into saved observe, configured default, and restoration past deliberately malformed newer entries.",
+          "Test-file introductory comment mentions tree restoration, but the four added tests do not navigate a tree; frozen independent checks supply that evidence."
+        ],
+        "coverage": "Meaningful persistence and malformed-record regressions, not exhaustive lifecycle coverage."
+      },
+      "dependencyEvidence": {
+        "packages": [
+          "@earendil-works/pi-coding-agent@0.85.1",
+          "ai@7.0.105"
+        ],
+        "filesScanned": 413,
+        "bytesRead": 2458404,
+        "inventoryDigest": "6e73470a42f4599c19f8756ed3da2925de92c006b871bf0349e16f94c4be8089",
+        "inventoryTruncated": true,
+        "policy": "api",
+        "unresolvedExportPackages": [
+          "ai"
+        ],
+        "unitsFound": 5098,
+        "poolDigest": "e44765e3f0d8f15e3c1c7c44e4fe6a7086818709c0da06351461c0848a71a754",
+        "pool": [
+          {
+            "id": "a0",
+            "symbol": "TreeList.applyFilter",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a1",
+            "symbol": "CreateAgentSessionOptions.tools",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.d.ts"
+          },
+          {
+            "id": "a2",
+            "symbol": "sessionEntryToContextMessages",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a3",
+            "symbol": "ExtensionAPI.unregisterProvider",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          },
+          {
+            "id": "a4",
+            "symbol": "TreeList.recalculateVisualStructure",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a5",
+            "symbol": "prepareBranchEntries",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.d.ts"
+          },
+          {
+            "id": "a6",
+            "symbol": "findValidCutPoints",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js"
+          },
+          {
+            "id": "a7",
+            "symbol": "SessionManager.appendCustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a8",
+            "symbol": "SessionManager.buildContextEntries",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a9",
+            "symbol": "AgentSession.sendCustomMessage",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a10",
+            "symbol": "AgentSessionRuntime.fork",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.d.ts"
+          },
+          {
+            "id": "a11",
+            "symbol": "ExtensionAPI.registerProvider",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          },
+          {
+            "id": "a12",
+            "symbol": "AgentSession.setModel",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a13",
+            "symbol": "CustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a14",
+            "symbol": "restoreModelFromSession",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/model-resolver.d.ts"
+          },
+          {
+            "id": "a15",
+            "symbol": "LanguageModelResponseMetadata",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a16",
+            "symbol": "AgentSession.prompt",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a17",
+            "symbol": "getNoChangeError",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/tools/edit-diff.js"
+          },
+          {
+            "id": "a18",
+            "symbol": "SessionManager.appendMessage",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a19",
+            "symbol": "SessionManager.getBranch",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a20",
+            "symbol": "createExtensionAPI",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/loader.js"
+          },
+          {
+            "id": "a21",
+            "symbol": "buildSessionContext",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a22",
+            "symbol": "SessionManager.appendModelChange",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a23",
+            "symbol": "TelemetryOptions",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a24",
+            "symbol": "TreeList.buildActivePath",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a25",
+            "symbol": "AgentSession.setThinkingLevel",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a26",
+            "symbol": "TreeSelectorComponent.constructor",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.d.ts"
+          },
+          {
+            "id": "a27",
+            "symbol": "AgentSession.navigateTree",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a28",
+            "symbol": "ReasoningFileOutput",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a29",
+            "symbol": "SessionManager.buildSessionContext",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a30",
+            "symbol": "RpcResponse",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/rpc/rpc-types.d.ts"
+          },
+          {
+            "id": "a31",
+            "symbol": "TreePreparation",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          }
+        ],
+        "candidates": [
+          {
+            "id": "a7",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "SessionManager.appendCustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+            "exportedAs": [
+              "SessionManager"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+                "startLine": 225,
+                "endLine": 226,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 179,
+                "sha256": "b736cd469f85d552c78f20515d8a996073937740c33d1e7766e5e69925cd020c"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+                "startLine": 834,
+                "endLine": 846,
+                "kind": "implementation",
+                "truncated": false,
+                "bytes": 447,
+                "sha256": "8c62625ffa0037dea1b335bd978954b50a42c278a4ea6250b0409644cebf09b7"
+              }
+            ]
+          },
+          {
+            "id": "a13",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "CustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+            "exportedAs": [
+              "CustomEntry"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+                "startLine": 59,
+                "endLine": 73,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 569,
+                "sha256": "99b688bfff42c704ca42a9ba6e3944d419d19dae6b018d24b6607791ef103cd0"
+              }
+            ]
+          },
+          {
+            "id": "a19",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "SessionManager.getBranch",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+            "exportedAs": [
+              "SessionManager"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+                "startLine": 257,
+                "endLine": 262,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 284,
+                "sha256": "547d2c9f1327f1bf62e5b7dc6eafc2ff865140c10b3558feab2a754582eff97a"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+                "startLine": 953,
+                "endLine": 968,
+                "kind": "implementation",
+                "truncated": false,
+                "bytes": 605,
+                "sha256": "4a03d53879c46061248774bfa7568ef0228ded736f082cca6a0e128d977257a8"
+              }
+            ]
+          },
+          {
+            "id": "a27",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "AgentSession.navigateTree",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts",
+            "exportedAs": [
+              "AgentSession"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts",
+                "startLine": 607,
+                "endLine": 614,
+                "kind": "declaration",
+                "truncated": true,
+                "bytes": 461,
+                "sha256": "6b78f98e6395667ee9f2803359bb1b5c669b70f74024631c4126c83d0f4c147e"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts",
+                "startLine": 617,
+                "endLine": 628,
+                "kind": "declaration",
+                "truncated": true,
+                "bytes": 336,
+                "sha256": "6c3d1416eba8410a283b3581a8324ca5bb1bb6f240cba096aa2b2a22b730d9c8"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+                "startLine": 2460,
+                "endLine": 2473,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 808,
+                "sha256": "f2fc490ed39654788f8c0bf55078cc34d3f01ce902da8ebbd90b5a5c5615fe87"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+                "startLine": 2618,
+                "endLine": 2632,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 539,
+                "sha256": "5d1bb34201bd8d2f53e05d6ed55bf7af6248bc06af8e19aa7effb5315443fc31"
+              }
+            ]
+          },
+          {
+            "id": "a2",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "sessionEntryToContextMessages",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+            "exportedAs": [
+              "sessionEntryToContextMessages"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+                "startLine": 147,
+                "endLine": 151,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 249,
+                "sha256": "299cfc19bbdab28bd8412f0efeb9debfd9ed0d23ff310e9aca5b4e2b5cd91ec4"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+                "startLine": 162,
+                "endLine": 189,
+                "kind": "implementation",
+                "truncated": false,
+                "bytes": 1197,
+                "sha256": "894da6b01a21dae416b3e95d7c9c162749a755ab878e873a461be341977fee42"
+              }
+            ]
+          },
+          {
+            "id": "a10",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "AgentSessionRuntime.fork",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.d.ts",
+            "exportedAs": [
+              "AgentSessionRuntime"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.d.ts",
+                "startLine": 87,
+                "endLine": 93,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 228,
+                "sha256": "91fc357d2a264ca081dca40e1f8ee60e3d9c56f10f22335dae6a033d904067c5"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.js",
+                "startLine": 174,
+                "endLine": 192,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 762,
+                "sha256": "1fd73667f039589da07b5651294ed5692f66ff9526039ad31874b4ce884910e7"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.js",
+                "startLine": 236,
+                "endLine": 250,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 585,
+                "sha256": "8f8aa69a5f9a3880472f50c75b6807696bb23fef8ab794267a9633d7e8a82f2c"
+              }
+            ]
+          }
+        ],
+        "elapsedMs": 2401,
+        "decisions": [
+          {
+            "status": "ok",
+            "answers": {
+              "a0": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "a1": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "a2": {
+                "type": "noul",
+                "noul": 0.63
+              },
+              "a3": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "a4": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "a5": {
+                "type": "noul",
+                "noul": 0.1
+              },
+              "a6": {
+                "type": "noul",
+                "noul": 0.08
+              },
+              "a7": {
+                "type": "noul",
+                "noul": 0.92
+              },
+              "a8": {
+                "type": "noul",
+                "noul": 0.38
+              },
+              "a9": {
+                "type": "noul",
+                "noul": 0.34
+              },
+              "a10": {
+                "type": "noul",
+                "noul": 0.58
+              },
+              "a11": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "a12": {
+                "type": "noul",
+                "noul": 0.08
+              },
+              "a13": {
+                "type": "noul",
+                "noul": 0.91
+              },
+              "a14": {
+                "type": "noul",
+                "noul": 0.06
+              },
+              "a15": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "a16": {
+                "type": "noul",
+                "noul": 0.23
+              },
+              "a17": {
+                "type": "noul",
+                "noul": 0.02
+              },
+              "a18": {
+                "type": "noul",
+                "noul": 0.12
+              },
+              "a19": {
+                "type": "noul",
+                "noul": 0.9
+              },
+              "a20": {
+                "type": "noul",
+                "noul": 0.13
+              },
+              "a21": {
+                "type": "noul",
+                "noul": 0.36
+              },
+              "a22": {
+                "type": "noul",
+                "noul": 0.11
+              },
+              "a23": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "a24": {
+                "type": "noul",
+                "noul": 0.19
+              },
+              "a25": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "a26": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "a27": {
+                "type": "noul",
+                "noul": 0.71
+              },
+              "a28": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "a29": {
+                "type": "noul",
+                "noul": 0.31
+              },
+              "a30": {
+                "type": "noul",
+                "noul": 0.14
+              },
+              "a31": {
+                "type": "noul",
+                "noul": 0.18
+              }
+            },
+            "model": "typesafe-ai/jev",
+            "inputTokens": 19826,
+            "outputTokens": 570,
+            "latencyMs": 1641,
+            "cached": false
+          }
+        ]
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 44,
+          "pass": 44,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "jev-1-ordinary.txt",
+        "visible": "jev-1-visible.txt",
+        "holdout": "jev-1-holdout.txt",
+        "check": "jev-1-check.txt",
+        "build": "jev-1-build.txt"
+      },
+      "candidate": {
+        "patch": "jev-1.patch",
+        "patchSha256": "e04dcc76dd0625a53d9dd421bac552f35ddbf8010a0fc34351d0e43aa0c5fbd5",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "src/extension.ts": "db7249bc78c9da46e4168b3c704ede2f6c1c00f596254ce876be1ce2217fc11a",
+          "test/session-persistence.test.ts": "9cb344368fbeac99addbb44999f8ef3997fbb10f532cf8f0d0ca5fcb19e16d98"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 2,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "jev-2",
+      "runId": "2026-09-17T22-46-25.685Z-session-mode-2-api-jev",
+      "sample": 2,
+      "mode": "jev",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "b7916d1975936f12d93c99d37a6e64cf582c70a6",
+        "dirty": false,
+        "sourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "trackedSourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 184,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "b7916d1975936f12d93c99d37a6e64cf582c70a6",
+        "dirty": false,
+        "sourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "trackedSourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 184,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "requests": 48,
+      "tokens": 1766669,
+      "usage": {
+        "input": 50,
+        "output": 19382,
+        "cacheRead": 1689342,
+        "cacheWrite": 57895,
+        "estimatedUsd": 1.01478885
+      },
+      "elapsedMs": 425127,
+      "evidenceAndAgentElapsedMs": 427615,
+      "calls": {
+        "bash": 33,
+        "read": 12,
+        "edit": 4,
+        "write": 2
+      },
+      "dependencyPathCalls": 26,
+      "evidenceDelivered": true,
+      "firstEdit": {
+        "toolIndex": 33,
+        "secondsToToolResult": 226.708
+      },
+      "runtimeAccepted": true,
+      "allChecksPassed": true,
+      "completeDeliverable": true,
+      "deliverableReview": {
+        "completeDeliverable": true,
+        "newTests": 15,
+        "documentationFiles": [
+          "docs/implementation-plan.md"
+        ],
+        "finalExplanation": true,
+        "findings": [
+          "Fourteen unit tests invoke production validation/reader helpers rather than a copied test implementation; one actual SDK navigation test checks ancestor/default and saved-off destinations.",
+          "The other-customType test places that entry before a newer valid entry; the reverse reader returns first and need not inspect the unrelated record. That test does not establish the claimed exclusion.",
+          "The navigation test checks mode through status; the independent frozen behavior-before-status check supplies the stronger immediate-effect evidence."
+        ],
+        "coverage": "Meaningful helper and navigation regressions, with one weak exclusion fixture and remaining lifecycle coverage supplied by the evaluator."
+      },
+      "dependencyEvidence": {
+        "packages": [
+          "@earendil-works/pi-coding-agent@0.85.1",
+          "ai@7.0.105"
+        ],
+        "filesScanned": 413,
+        "bytesRead": 2458404,
+        "inventoryDigest": "6e73470a42f4599c19f8756ed3da2925de92c006b871bf0349e16f94c4be8089",
+        "inventoryTruncated": true,
+        "policy": "api",
+        "unresolvedExportPackages": [
+          "ai"
+        ],
+        "unitsFound": 5098,
+        "poolDigest": "e44765e3f0d8f15e3c1c7c44e4fe6a7086818709c0da06351461c0848a71a754",
+        "pool": [
+          {
+            "id": "a0",
+            "symbol": "TreeList.applyFilter",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a1",
+            "symbol": "CreateAgentSessionOptions.tools",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.d.ts"
+          },
+          {
+            "id": "a2",
+            "symbol": "sessionEntryToContextMessages",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a3",
+            "symbol": "ExtensionAPI.unregisterProvider",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          },
+          {
+            "id": "a4",
+            "symbol": "TreeList.recalculateVisualStructure",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a5",
+            "symbol": "prepareBranchEntries",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.d.ts"
+          },
+          {
+            "id": "a6",
+            "symbol": "findValidCutPoints",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js"
+          },
+          {
+            "id": "a7",
+            "symbol": "SessionManager.appendCustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a8",
+            "symbol": "SessionManager.buildContextEntries",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a9",
+            "symbol": "AgentSession.sendCustomMessage",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a10",
+            "symbol": "AgentSessionRuntime.fork",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.d.ts"
+          },
+          {
+            "id": "a11",
+            "symbol": "ExtensionAPI.registerProvider",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          },
+          {
+            "id": "a12",
+            "symbol": "AgentSession.setModel",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a13",
+            "symbol": "CustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a14",
+            "symbol": "restoreModelFromSession",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/model-resolver.d.ts"
+          },
+          {
+            "id": "a15",
+            "symbol": "LanguageModelResponseMetadata",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a16",
+            "symbol": "AgentSession.prompt",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a17",
+            "symbol": "getNoChangeError",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/tools/edit-diff.js"
+          },
+          {
+            "id": "a18",
+            "symbol": "SessionManager.appendMessage",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a19",
+            "symbol": "SessionManager.getBranch",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a20",
+            "symbol": "createExtensionAPI",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/loader.js"
+          },
+          {
+            "id": "a21",
+            "symbol": "buildSessionContext",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a22",
+            "symbol": "SessionManager.appendModelChange",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a23",
+            "symbol": "TelemetryOptions",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a24",
+            "symbol": "TreeList.buildActivePath",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a25",
+            "symbol": "AgentSession.setThinkingLevel",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a26",
+            "symbol": "TreeSelectorComponent.constructor",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.d.ts"
+          },
+          {
+            "id": "a27",
+            "symbol": "AgentSession.navigateTree",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a28",
+            "symbol": "ReasoningFileOutput",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a29",
+            "symbol": "SessionManager.buildSessionContext",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a30",
+            "symbol": "RpcResponse",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/rpc/rpc-types.d.ts"
+          },
+          {
+            "id": "a31",
+            "symbol": "TreePreparation",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          }
+        ],
+        "candidates": [
+          {
+            "id": "a7",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "SessionManager.appendCustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+            "exportedAs": [
+              "SessionManager"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+                "startLine": 225,
+                "endLine": 226,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 179,
+                "sha256": "b736cd469f85d552c78f20515d8a996073937740c33d1e7766e5e69925cd020c"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+                "startLine": 834,
+                "endLine": 846,
+                "kind": "implementation",
+                "truncated": false,
+                "bytes": 447,
+                "sha256": "8c62625ffa0037dea1b335bd978954b50a42c278a4ea6250b0409644cebf09b7"
+              }
+            ]
+          },
+          {
+            "id": "a13",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "CustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+            "exportedAs": [
+              "CustomEntry"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+                "startLine": 59,
+                "endLine": 73,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 569,
+                "sha256": "99b688bfff42c704ca42a9ba6e3944d419d19dae6b018d24b6607791ef103cd0"
+              }
+            ]
+          },
+          {
+            "id": "a19",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "SessionManager.getBranch",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+            "exportedAs": [
+              "SessionManager"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+                "startLine": 257,
+                "endLine": 262,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 284,
+                "sha256": "547d2c9f1327f1bf62e5b7dc6eafc2ff865140c10b3558feab2a754582eff97a"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+                "startLine": 953,
+                "endLine": 968,
+                "kind": "implementation",
+                "truncated": false,
+                "bytes": 605,
+                "sha256": "4a03d53879c46061248774bfa7568ef0228ded736f082cca6a0e128d977257a8"
+              }
+            ]
+          },
+          {
+            "id": "a27",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "AgentSession.navigateTree",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts",
+            "exportedAs": [
+              "AgentSession"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts",
+                "startLine": 607,
+                "endLine": 614,
+                "kind": "declaration",
+                "truncated": true,
+                "bytes": 461,
+                "sha256": "6b78f98e6395667ee9f2803359bb1b5c669b70f74024631c4126c83d0f4c147e"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts",
+                "startLine": 617,
+                "endLine": 628,
+                "kind": "declaration",
+                "truncated": true,
+                "bytes": 336,
+                "sha256": "6c3d1416eba8410a283b3581a8324ca5bb1bb6f240cba096aa2b2a22b730d9c8"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+                "startLine": 2460,
+                "endLine": 2473,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 808,
+                "sha256": "f2fc490ed39654788f8c0bf55078cc34d3f01ce902da8ebbd90b5a5c5615fe87"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.js",
+                "startLine": 2618,
+                "endLine": 2632,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 539,
+                "sha256": "5d1bb34201bd8d2f53e05d6ed55bf7af6248bc06af8e19aa7effb5315443fc31"
+              }
+            ]
+          },
+          {
+            "id": "a2",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "sessionEntryToContextMessages",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+            "exportedAs": [
+              "sessionEntryToContextMessages"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+                "startLine": 147,
+                "endLine": 151,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 249,
+                "sha256": "299cfc19bbdab28bd8412f0efeb9debfd9ed0d23ff310e9aca5b4e2b5cd91ec4"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+                "startLine": 162,
+                "endLine": 189,
+                "kind": "implementation",
+                "truncated": false,
+                "bytes": 1197,
+                "sha256": "894da6b01a21dae416b3e95d7c9c162749a755ab878e873a461be341977fee42"
+              }
+            ]
+          },
+          {
+            "id": "a10",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "AgentSessionRuntime.fork",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.d.ts",
+            "exportedAs": [
+              "AgentSessionRuntime"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.d.ts",
+                "startLine": 87,
+                "endLine": 93,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 228,
+                "sha256": "91fc357d2a264ca081dca40e1f8ee60e3d9c56f10f22335dae6a033d904067c5"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.js",
+                "startLine": 174,
+                "endLine": 192,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 762,
+                "sha256": "1fd73667f039589da07b5651294ed5692f66ff9526039ad31874b4ce884910e7"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.js",
+                "startLine": 236,
+                "endLine": 250,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 585,
+                "sha256": "8f8aa69a5f9a3880472f50c75b6807696bb23fef8ab794267a9633d7e8a82f2c"
+              }
+            ]
+          }
+        ],
+        "elapsedMs": 2488,
+        "decisions": [
+          {
+            "status": "ok",
+            "answers": {
+              "a0": {
+                "type": "noul",
+                "noul": 0.06
+              },
+              "a1": {
+                "type": "noul",
+                "noul": 0.06
+              },
+              "a2": {
+                "type": "noul",
+                "noul": 0.64
+              },
+              "a3": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "a4": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "a5": {
+                "type": "noul",
+                "noul": 0.09
+              },
+              "a6": {
+                "type": "noul",
+                "noul": 0.08
+              },
+              "a7": {
+                "type": "noul",
+                "noul": 0.93
+              },
+              "a8": {
+                "type": "noul",
+                "noul": 0.39
+              },
+              "a9": {
+                "type": "noul",
+                "noul": 0.31
+              },
+              "a10": {
+                "type": "noul",
+                "noul": 0.61
+              },
+              "a11": {
+                "type": "noul",
+                "noul": 0.07
+              },
+              "a12": {
+                "type": "noul",
+                "noul": 0.08
+              },
+              "a13": {
+                "type": "noul",
+                "noul": 0.9
+              },
+              "a14": {
+                "type": "noul",
+                "noul": 0.06
+              },
+              "a15": {
+                "type": "noul",
+                "noul": 0.05
+              },
+              "a16": {
+                "type": "noul",
+                "noul": 0.22
+              },
+              "a17": {
+                "type": "noul",
+                "noul": 0.03
+              },
+              "a18": {
+                "type": "noul",
+                "noul": 0.13
+              },
+              "a19": {
+                "type": "noul",
+                "noul": 0.9
+              },
+              "a20": {
+                "type": "noul",
+                "noul": 0.13
+              },
+              "a21": {
+                "type": "noul",
+                "noul": 0.37
+              },
+              "a22": {
+                "type": "noul",
+                "noul": 0.1
+              },
+              "a23": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "a24": {
+                "type": "noul",
+                "noul": 0.17
+              },
+              "a25": {
+                "type": "noul",
+                "noul": 0.08
+              },
+              "a26": {
+                "type": "noul",
+                "noul": 0.06
+              },
+              "a27": {
+                "type": "noul",
+                "noul": 0.76
+              },
+              "a28": {
+                "type": "noul",
+                "noul": 0.04
+              },
+              "a29": {
+                "type": "noul",
+                "noul": 0.32
+              },
+              "a30": {
+                "type": "noul",
+                "noul": 0.14
+              },
+              "a31": {
+                "type": "noul",
+                "noul": 0.19
+              }
+            },
+            "model": "typesafe-ai/jev",
+            "inputTokens": 19826,
+            "outputTokens": 570,
+            "latencyMs": 1481,
+            "cached": false
+          }
+        ]
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 55,
+          "pass": 55,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "jev-2-ordinary.txt",
+        "visible": "jev-2-visible.txt",
+        "holdout": "jev-2-holdout.txt",
+        "check": "jev-2-check.txt",
+        "build": "jev-2-build.txt"
+      },
+      "candidate": {
+        "patch": "jev-2.patch",
+        "patchSha256": "ef93c3e01a2f875cf0ce557680ff730dbc1d421ae443fbb7403a22622eafeec6",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "docs/implementation-plan.md": "f7308d49e30886a8f48d748b60d9e8fcc6fc77a5a031efbebcc7d71fcd18541f",
+          "src/extension.ts": "4bf1e879ae88f27258678ac7ef27ffa8880eccd90777853307174e7febe541af",
+          "src/session-mode.ts": "f368b0d37140e3ce33f2d6425b996d79389f089c7fbcb24c5708a7fee9b9d7dd",
+          "test/session-mode-persist.test.ts": "62c527e8d6cb908bb370a2db44d3a6ffb4bd61a22e9d4bd9f09a1f513f94e703"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 4,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    },
+    {
+      "id": "lexical-2",
+      "runId": "2026-09-17T22-46-26.842Z-session-mode-2-api-lexical",
+      "sample": 2,
+      "mode": "lexical",
+      "model": "anthropic/claude-sonnet-4.6",
+      "thinking": "medium",
+      "baseline": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+      "source": {
+        "head": "b7916d1975936f12d93c99d37a6e64cf582c70a6",
+        "dirty": false,
+        "sourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "trackedSourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 184,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceAtEnd": {
+        "head": "b7916d1975936f12d93c99d37a6e64cf582c70a6",
+        "dirty": false,
+        "sourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "trackedSourceDigest": "3074772d6489cc3ba5c48750795a94bf149c8a986d6d5cc0542f7036b7fc5322",
+        "untrackedSourceDigest": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "builtRuntimeDigest": "c8becf28b5cf535bfce2a62f12d38dd95d11226df21fa33c6a61b09bf4004f97",
+        "trackedSourceFiles": 184,
+        "untrackedSourceFiles": 0,
+        "builtRuntimeFiles": 30
+      },
+      "sourceChangedDuringRun": false,
+      "budgets": {
+        "turns": 64,
+        "seconds": 600,
+        "tokens": 2500000,
+        "maxOutputTokens": 16384
+      },
+      "termination": "completed",
+      "requests": 28,
+      "tokens": 999992,
+      "usage": {
+        "input": 30,
+        "output": 14215,
+        "cacheRead": 934949,
+        "cacheWrite": 50798,
+        "estimatedUsd": 0.6842922
+      },
+      "elapsedMs": 292804,
+      "evidenceAndAgentElapsedMs": 293552,
+      "calls": {
+        "bash": 29,
+        "read": 5,
+        "edit": 2,
+        "write": 1
+      },
+      "dependencyPathCalls": 20,
+      "evidenceDelivered": true,
+      "firstEdit": {
+        "toolIndex": 25,
+        "secondsToToolResult": 187.043
+      },
+      "runtimeAccepted": true,
+      "allChecksPassed": true,
+      "completeDeliverable": true,
+      "deliverableReview": {
+        "completeDeliverable": true,
+        "newTests": 5,
+        "documentationFiles": [],
+        "finalExplanation": true,
+        "reviewStatus": "Required artifacts present; test-review findings remain",
+        "findings": [
+          "Command tests exercise real appended entries, exact metadata, repeated writes, and current-mode status.",
+          "The malformed-entry test never appends malformed records or recreates/restores the runtime. It does not establish its title or the final explanation's claimed coverage.",
+          "The newest-wins test checks command state and appended records, not restoration precedence. Added tests never navigate the tree."
+        ],
+        "coverage": "Some meaningful new regression assertions satisfy the non-exhaustive add-tests requirement; the vacuous malformed-record test is preserved and explicitly flagged, not counted as coverage."
+      },
+      "dependencyEvidence": {
+        "packages": [
+          "@earendil-works/pi-coding-agent@0.85.1",
+          "ai@7.0.105"
+        ],
+        "filesScanned": 413,
+        "bytesRead": 2458404,
+        "inventoryDigest": "6e73470a42f4599c19f8756ed3da2925de92c006b871bf0349e16f94c4be8089",
+        "inventoryTruncated": true,
+        "policy": "api",
+        "unresolvedExportPackages": [
+          "ai"
+        ],
+        "unitsFound": 5098,
+        "poolDigest": "e44765e3f0d8f15e3c1c7c44e4fe6a7086818709c0da06351461c0848a71a754",
+        "pool": [
+          {
+            "id": "a0",
+            "symbol": "TreeList.applyFilter",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a1",
+            "symbol": "CreateAgentSessionOptions.tools",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.d.ts"
+          },
+          {
+            "id": "a2",
+            "symbol": "sessionEntryToContextMessages",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a3",
+            "symbol": "ExtensionAPI.unregisterProvider",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          },
+          {
+            "id": "a4",
+            "symbol": "TreeList.recalculateVisualStructure",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a5",
+            "symbol": "prepareBranchEntries",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.d.ts"
+          },
+          {
+            "id": "a6",
+            "symbol": "findValidCutPoints",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/compaction.js"
+          },
+          {
+            "id": "a7",
+            "symbol": "SessionManager.appendCustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a8",
+            "symbol": "SessionManager.buildContextEntries",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a9",
+            "symbol": "AgentSession.sendCustomMessage",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a10",
+            "symbol": "AgentSessionRuntime.fork",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session-runtime.d.ts"
+          },
+          {
+            "id": "a11",
+            "symbol": "ExtensionAPI.registerProvider",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          },
+          {
+            "id": "a12",
+            "symbol": "AgentSession.setModel",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a13",
+            "symbol": "CustomEntry",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a14",
+            "symbol": "restoreModelFromSession",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/model-resolver.d.ts"
+          },
+          {
+            "id": "a15",
+            "symbol": "LanguageModelResponseMetadata",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a16",
+            "symbol": "AgentSession.prompt",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a17",
+            "symbol": "getNoChangeError",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/tools/edit-diff.js"
+          },
+          {
+            "id": "a18",
+            "symbol": "SessionManager.appendMessage",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a19",
+            "symbol": "SessionManager.getBranch",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a20",
+            "symbol": "createExtensionAPI",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/loader.js"
+          },
+          {
+            "id": "a21",
+            "symbol": "buildSessionContext",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a22",
+            "symbol": "SessionManager.appendModelChange",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a23",
+            "symbol": "TelemetryOptions",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a24",
+            "symbol": "TreeList.buildActivePath",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js"
+          },
+          {
+            "id": "a25",
+            "symbol": "AgentSession.setThinkingLevel",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a26",
+            "symbol": "TreeSelectorComponent.constructor",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.d.ts"
+          },
+          {
+            "id": "a27",
+            "symbol": "AgentSession.navigateTree",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/agent-session.d.ts"
+          },
+          {
+            "id": "a28",
+            "symbol": "ReasoningFileOutput",
+            "declaredIn": "node_modules/ai/dist/internal/index.d.ts"
+          },
+          {
+            "id": "a29",
+            "symbol": "SessionManager.buildSessionContext",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts"
+          },
+          {
+            "id": "a30",
+            "symbol": "RpcResponse",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/rpc/rpc-types.d.ts"
+          },
+          {
+            "id": "a31",
+            "symbol": "TreePreparation",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts"
+          }
+        ],
+        "candidates": [
+          {
+            "id": "a0",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "TreeList.applyFilter",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+            "exportedAs": [],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+                "startLine": 233,
+                "endLine": 253,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 1307,
+                "sha256": "f8ce24003bfe9e9366d91900d752ac4d96ce1b6a51c2d78ecc270b1fbbdaf2ee"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+                "startLine": 303,
+                "endLine": 318,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 825,
+                "sha256": "69861495c38cc725898dd000b11404f2c77ebecfadeff1d3ac82125dea2186f3"
+              }
+            ]
+          },
+          {
+            "id": "a1",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "CreateAgentSessionOptions.tools",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.d.ts",
+            "exportedAs": [
+              "CreateAgentSessionOptions"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/sdk.d.ts",
+                "startLine": 34,
+                "endLine": 43,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 428,
+                "sha256": "f131944db5dbf9158ca1860891126251291ac1d23878f576203d2b25023e0148"
+              }
+            ]
+          },
+          {
+            "id": "a2",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "sessionEntryToContextMessages",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+            "exportedAs": [
+              "sessionEntryToContextMessages"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.d.ts",
+                "startLine": 147,
+                "endLine": 151,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 249,
+                "sha256": "299cfc19bbdab28bd8412f0efeb9debfd9ed0d23ff310e9aca5b4e2b5cd91ec4"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/session-manager.js",
+                "startLine": 162,
+                "endLine": 189,
+                "kind": "implementation",
+                "truncated": false,
+                "bytes": 1197,
+                "sha256": "894da6b01a21dae416b3e95d7c9c162749a755ab878e873a461be341977fee42"
+              }
+            ]
+          },
+          {
+            "id": "a3",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "ExtensionAPI.unregisterProvider",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts",
+            "exportedAs": [
+              "ExtensionAPI"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/extensions/types.d.ts",
+                "startLine": 1068,
+                "endLine": 1081,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 493,
+                "sha256": "f71164b18c8e2511a6a26f285a0fa1db76d32329cb747c3364083c86b4c78358"
+              }
+            ]
+          },
+          {
+            "id": "a4",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "TreeList.recalculateVisualStructure",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+            "exportedAs": [],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+                "startLine": 319,
+                "endLine": 346,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 1283,
+                "sha256": "b3c76417fca6aa3f6e1a17a330f9a75e7b51762b7a552b641d99709652eb45a7"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/modes/interactive/components/tree-selector.js",
+                "startLine": 411,
+                "endLine": 431,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 860,
+                "sha256": "6e6b4e578133050a49a0ba1959b521e4e728bfe87a94febeb005533691f78f79"
+              }
+            ]
+          },
+          {
+            "id": "a5",
+            "package": "@earendil-works/pi-coding-agent",
+            "symbol": "prepareBranchEntries",
+            "declaredIn": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.d.ts",
+            "exportedAs": [
+              "prepareBranchEntries"
+            ],
+            "declarationsOmitted": 0,
+            "excerpts": [
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.d.ts",
+                "startLine": 77,
+                "endLine": 90,
+                "kind": "declaration",
+                "truncated": false,
+                "bytes": 613,
+                "sha256": "9adc2f24cab61c8d463814b999390e9d6f3f2cc830644abc925fe3a37bb8d72f"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.js",
+                "startLine": 85,
+                "endLine": 102,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 747,
+                "sha256": "0d63fdaf90ffc399754ce1a957e891a34559a9c8d4d37b47a0185bf19acbca1c"
+              },
+              {
+                "path": "node_modules/@earendil-works/pi-coding-agent/dist/core/compaction/branch-summarization.js",
+                "startLine": 131,
+                "endLine": 145,
+                "kind": "implementation",
+                "truncated": true,
+                "bytes": 541,
+                "sha256": "4d6ce0e05ebc83dd8d3b3b943be4373042831a7af5038ff907dc29996e446b4a"
+              }
+            ]
+          }
+        ],
+        "elapsedMs": 748,
+        "decisions": []
+      },
+      "acceptance": {
+        "ordinary": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 45,
+          "pass": 45,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "visible": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 1,
+          "pass": 1,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "holdout": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 8,
+          "pass": 8,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "check": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        },
+        "build": {
+          "exitCode": 0,
+          "timedOut": false,
+          "outputExceeded": false,
+          "tests": 0,
+          "pass": 0,
+          "fail": 0,
+          "cancelled": 0,
+          "skipped": 0,
+          "failures": []
+        }
+      },
+      "logs": {
+        "ordinary": "lexical-2-ordinary.txt",
+        "visible": "lexical-2-visible.txt",
+        "holdout": "lexical-2-holdout.txt",
+        "check": "lexical-2-check.txt",
+        "build": "lexical-2-build.txt"
+      },
+      "candidate": {
+        "patch": "lexical-2.patch",
+        "patchSha256": "31809a7c07b1e828ab04ce407493725160ea3805e3f3c82426346c3bb408a6f6",
+        "patchBase": "4e1cdefd9144beb6bb43d3f0ed7189b0609c4254",
+        "providedReproductionIncluded": false,
+        "files": {
+          "src/extension.ts": "14a05f2e6319ab9035d3d810b2f076371d425ee0121a12d2be86a471fd5adc93",
+          "test/mode-persistence.test.ts": "3c483983a5c2a682bb28665e7be60e37d2fe9b436c991ae7342527f32dc6e13e"
+        },
+        "replay": {
+          "applied": true,
+          "fileHashesMatched": true,
+          "files": 2,
+          "baseOnlyCheckout": true,
+          "providedReproductionCopiedByFixture": true
+        }
+      }
+    }
+  ]
+}

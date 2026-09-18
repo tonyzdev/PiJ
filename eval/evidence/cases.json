@@ -1,0 +1,146 @@
+[
+  {
+    "id": "c01",
+    "requirement": "When two readers share the same in-flight document request, aborting the first reader rejects it with AbortError while the other reader can still receive the document.",
+    "files": [
+      {
+        "path": "test/workspace.spec.js",
+        "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createWorkspaceClient } from '../src/index.js';\n\ntest('closing one tab never cancels a neighboring tab', async () => {\n  // Regression: subscriber cancellation is isolated from other readers.\n  const client = createWorkspaceClient({\n    transport: { async fetchDocument() {\n      return { id: 'handbook', title: 'Handbook', body: { blocks: [] }, labels: [] };\n    } },\n  });\n  const document = await client.documents.get({ tenantId: 'studio', userId: 'editor' }, 'handbook');\n  assert.equal(document.title, 'Handbook');\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c02",
+    "requirement": "Document-cache TTL starts at successful completion; an entry is expired when now equals completion time plus ttlMs.",
+    "files": [
+      {
+        "path": "test/workspace.spec.js",
+        "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createWorkspaceClient } from '../src/index.js';\n\ntest('document reads across the cache boundary', async () => {\n  let now = 100;\n  let release;\n  let calls = 0;\n  const pending = new Promise(resolve => { release = resolve; });\n  const make = title => ({ id: 'policy', title, body: { blocks: [] }, labels: [] });\n  const client = createWorkspaceClient({ now: () => now, ttlMs: 10,\n    transport: { fetchDocument() { return ++calls === 1 ? pending : Promise.resolve(make('revised')); } },\n  });\n  const ctx = { tenantId: 'studio', userId: 'editor' };\n  const first = client.documents.get(ctx, 'policy');\n  await Promise.resolve();\n  now = 125;\n  release(make('original'));\n  assert.equal((await first).title, 'original');\n  now = 134;\n  assert.equal((await client.documents.get(ctx, 'policy')).title, 'original');\n  assert.equal(calls, 1);\n  now = 135;\n  assert.equal((await client.documents.get(ctx, 'policy')).title, 'revised');\n  assert.equal(calls, 2);\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c03",
+    "requirement": "Queue order is createdAt descending with microsecond precision, then priority descending when createdAt values are equal.",
+    "files": [
+      {
+        "path": "test/moderation.spec.js",
+        "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createModerationQueue } from '../src/index.js';\n\ntest('review ordering', async () => {\n  const rows = [\n    { id: 'a', tenantId: 'studio', createdAt: '2026-08-01T12:00:00.000001Z', priority: 4, status: 'open' },\n    { id: 'z', tenantId: 'studio', createdAt: '2026-08-01T12:00:00.000002Z', priority: 4, status: 'open' },\n  ];\n  const page = await createModerationQueue(rows).list({ tenantId: 'studio' });\n  assert.deepEqual(page.items.map(row => row.id), ['z', 'a']);\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c04",
+    "requirement": "An after cursor continues strictly beyond its anchor tuple even if the anchor ticket has been removed from the queue.",
+    "files": [
+      {
+        "path": "test/moderation.spec.js",
+        "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createModerationQueue } from '../src/index.js';\n\nconst rows = ['a', 'b', 'c', 'd', 'e'].map((id, index) => ({\n  id, tenantId: 'studio', createdAt: `2026-08-0${5-index}T12:00:00.000000Z`,\n  priority: 3, status: 'open', title: `Review ${id}`,\n}));\n\ntest('continuation after a repository mutation', async () => {\n  const queue = createModerationQueue(rows);\n  const ctx = { tenantId: 'studio' };\n  const first = await queue.list(ctx, { limit: 2 });\n  assert.deepEqual(first.items.map(row => row.id), ['a', 'b']);\n  assert.equal(typeof first.nextCursor, 'string');\n  queue.remove('b');\n  const second = await queue.list(ctx, { limit: 2, after: first.nextCursor });\n  assert.deepEqual(second.items.map(row => row.id), ['c', 'd']);\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c05",
+    "requirement": "When one of two in-flight document subscribers aborts, it rejects with AbortError and the other subscriber remains able to complete.",
+    "files": [
+      {
+        "path": "test/workspace.spec.js",
+        "source": "import test from 'node:test';\nimport { createWorkspaceClient } from '../src/index.js';\nimport { checkReaders } from './support/readers.js';\n\ntest('document reader lifecycle', async () => {\n  await checkReaders({ createClient: createWorkspaceClient, mode: 'cancel-one' });\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c06",
+    "requirement": "A queue cursor can be reused when the same status set is reordered or contains duplicate entries.",
+    "files": [
+      {
+        "path": "test/moderation.spec.js",
+        "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createModerationQueue } from '../src/index.js';\n\nfor (const limit of [1, 2, 5, 10, 20, 30, 40, 50]) {\n  test(`empty queue at limit ${limit}`, async () => {\n    const queue = createModerationQueue([]);\n    assert.deepEqual(await queue.list({ tenantId: 'studio' }, { limit }), {\n      items: [], nextCursor: null, previousCursor: null,\n    });\n  });\n}\nfor (const status of ['open', 'closed', 'snoozed']) {\n  test(`summary includes ${status}`, async () => {\n    const queue = createModerationQueue([{ id: 'r1', tenantId: 'studio',\n      createdAt: '2026-08-01T12:00:00.000000Z', priority: 3, status }]);\n    assert.equal((await queue.summary({ tenantId: 'studio' }))[status], 1);\n  });\n}\ntest('rejects an empty status filter', async () => {\n  await assert.rejects(createModerationQueue([]).list({ tenantId: 'studio' }, { statuses: [] }),\n    { code: 'INVALID_QUERY' });\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c07",
+    "requirement": "Moving backward with before returns the nearest preceding tickets, presented in canonical display order.",
+    "files": [
+      {
+        "path": "test/moderation.spec.js",
+        "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createModerationQueue } from '../src/index.js';\nimport { rows, options, expectedIds } from './support/navigation-data.js';\n\ntest('queue navigation', async () => {\n  const page = await createModerationQueue(rows).list({ tenantId: 'studio' }, options);\n  assert.deepEqual(page.items.map(row => row.id), expectedIds);\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c08",
+    "requirement": "A document read and a preview read of the same tenant, user, document ID, and locale share exactly one in-flight transport operation.",
+    "files": [
+      {
+        "path": "test/workspace.spec.js",
+        "source": "import { describe, it } from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createWorkspaceClient } from '../src/index.js';\n\ndescribe('workspace views', () => {\n  it('loads a tab and its card', async () => {\n    let finish;\n    let calls = 0;\n    const pending = new Promise(resolve => { finish = resolve; });\n    const client = createWorkspaceClient({ transport: {\n      fetchDocument() { calls += 1; return pending; },\n    } });\n    const ctx = { tenantId: 'studio', userId: 'editor' };\n    const tab = client.documents.get(ctx, 'release', { locale: 'fr' });\n    const card = client.previews.get(ctx, 'release', { locale: 'fr' });\n    await Promise.resolve();\n    assert.equal(calls, 1);\n    finish({ id: 'release', title: 'Release', body: { blocks: [{ text: 'Notes' }] }, labels: ['team'] });\n    const [document, preview] = await Promise.all([tab, card]);\n    assert.equal(document.body.blocks[0].text, 'Notes');\n    assert.deepEqual(preview, { id: 'release', title: 'Release', excerpt: 'Notes', labels: ['team'] });\n    assert.equal(calls, 1);\n  });\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c09",
+    "requirement": "Mutating a nested object in one returned document does not change a later cached document read of the same identity.",
+    "files": [
+      {
+        "path": "test/workspace.spec.js",
+        "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createWorkspaceClient } from '../src/index.js';\n\ntest('workspace client smoke', async () => {\n  const client = createWorkspaceClient({ transport: { async fetchDocument() {\n    return { id: 'guide', title: 'Guide', body: { blocks: [{ text: 'Hello' }] }, labels: ['docs'] };\n  } } });\n  const result = await client.documents.get({ tenantId: 'studio', userId: 'reader' }, 'guide');\n  assert.ok(result);\n  assert.equal(result.id, 'guide');\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c10",
+    "requirement": "A full queue page has nextCursor equal to null when no additional matching ticket exists after its last item.",
+    "files": [
+      {
+        "path": "test/moderation.spec.js",
+        "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createModerationQueue } from '../src/index.js';\nimport { navigationChecksEnabled } from './support/environment.js';\n\ntest('queue endpoint boundary', { skip: !navigationChecksEnabled }, async () => {\n  const queue = createModerationQueue(['a', 'b'].map((id, index) => ({\n    id, tenantId: 'studio', status: 'open', priority: 2,\n    createdAt: `2026-08-0${2-index}T12:00:00.000000Z`,\n  })));\n  const page = await queue.list({ tenantId: 'studio' }, { limit: 2 });\n  assert.deepEqual(page.items.map(row => row.id), ['a', 'b']);\n  assert.equal(page.nextCursor, null);\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c11",
+    "requirement": "Queue list rejects a cursor with an unsupported envelope version using code INVALID_CURSOR.",
+    "files": [
+      {
+        "path": "test/moderation.spec.js",
+        "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createModerationQueue } from '../src/index.js';\n\ntest('cursor protocol validation', async () => {\n  const rows = ['a', 'b'].map((id, i) => ({ id, tenantId: 'studio',\n    createdAt: `2026-08-0${2-i}T12:00:00.000000Z`, priority: 1, status: 'open' }));\n  const queue = createModerationQueue(rows);\n  const ctx = { tenantId: 'studio' };\n  const first = await queue.list(ctx, { limit: 1 });\n  assert.equal(typeof first.nextCursor, 'string');\n  const envelope = JSON.parse(Buffer.from(first.nextCursor, 'base64url').toString('utf8'));\n  envelope.version = 42;\n  const token = Buffer.from(JSON.stringify(envelope)).toString('base64url');\n  await assert.rejects(queue.list(ctx, { after: token }), { code: 'INVALID_CURSOR' });\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c12",
+    "requirement": "If one in-flight document subscriber aborts while another is active, the upstream transport signal must remain un-aborted.",
+    "files": [
+      {
+        "path": "test/workspace.spec.js",
+        "source": "import { test, expect, vi } from 'vitest';\nimport { createWorkspaceClient } from '../src/index.js';\n\ntest('two readers and one cancellation', async () => {\n  const controller = new AbortController();\n  const ctx = { tenantId: 'studio', userId: 'editor' };\n  const value = { id: 'guide', title: 'Guide' };\n  const client = { documents: { get: vi.fn().mockResolvedValue(value) } };\n  const first = client.documents.get(ctx, 'guide', { signal: controller.signal });\n  const second = client.documents.get(ctx, 'guide');\n  controller.abort();\n  await Promise.all([first, second]);\n  expect(client.documents.get).toHaveBeenCalledTimes(2);\n  expect(client.documents.get).toHaveBeenCalledWith(ctx, 'guide', { signal: controller.signal });\n});\n"
+      }
+    ]
+  },
+  {
+    "id": "c13",
+    "requirement": "After a document transport request rejects, a later read of the same identity starts a new transport operation and can succeed.",
+    "files": [
+      {
+        "path": "test/workspace.spec.js",
+        "source": "import test from 'node:test';\nimport { createWorkspaceClient } from '../src/index.js';\nimport { checkRecovery } from './support/recovery.js';\n\ntest('document recovery', async () => {\n  await checkRecovery(createWorkspaceClient);\n});\n"
+      },
+      {
+        "path": "test/support/recovery.js",
+        "source": "import assert from 'node:assert/strict';\n\nexport async function checkRecovery(createClient) {\n  let requests = 0;\n  const client = createClient({ transport: { async fetchDocument() {\n    if (++requests === 1) throw Object.assign(new Error('Temporary'), { status: 503 });\n    return { id: 'guide', title: 'Recovered', body: { blocks: [] }, labels: [] };\n  } } });\n  const ctx = { tenantId: 'studio', userId: 'reader' };\n  await assert.rejects(client.documents.get(ctx, 'guide'), { status: 503 });\n  const result = await client.documents.get(ctx, 'guide');\n  assert.equal(result.title, 'Recovered');\n  assert.equal(requests, 2);\n}\n"
+      }
+    ]
+  },
+  {
+    "id": "c14",
+    "requirement": "Queue order preserves timestamp differences smaller than one millisecond, placing the later microsecond timestamp first.",
+    "files": [
+      {
+        "path": "test/moderation.spec.js",
+        "source": "import test from 'node:test';\nimport assert from 'node:assert/strict';\nimport { createModerationQueue } from '../src/index.js';\n\ntest('timestamp ordering', { skip: true }, async () => {\n  const rows = [\n    { id: 'a', tenantId: 'studio', createdAt: '2026-08-01T12:00:00.000001Z', priority: 2, status: 'open' },\n    { id: 'z', tenantId: 'studio', createdAt: '2026-08-01T12:00:00.000002Z', priority: 2, status: 'open' },\n  ];\n  const page = await createModerationQueue(rows).list({ tenantId: 'studio' });\n  assert.deepEqual(page.items.map(row => row.id), ['z', 'a']);\n});\n"
+      }
+    ]
+  }
+]
