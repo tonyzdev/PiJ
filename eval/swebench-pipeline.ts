@@ -1,5 +1,5 @@
 import { execFile } from "node:child_process";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { mkdir, readFile, stat, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { parseArgs, promisify } from "node:util";
 import { loadConfig } from "../src/config.js";
@@ -40,6 +40,17 @@ if (import.meta.url === `file://${process.argv[1]}`) {
     const rankMs = Math.round(performance.now() - t1);
     const order = ranked.map(c => c.path);
     const applied = ranked.some(c => c.relevance !== undefined);
+    // What reaching the gold file would cost a model that reads down the ranking
+    // itself: one tool call per file, and that file's text in its context.
+    const bytes = new Map<string, number>();
+    for (const path of pool) bytes.set(path, await stat(join(repo, path)).then(s => s.size).catch(() => 0));
+    const readCost = (ordering: string[]) => {
+      const depth = ordering.findIndex(p => gold.includes(p));
+      if (depth < 0) return null;
+      const opened = ordering.slice(0, depth + 1);
+      return { calls: opened.length, fileBytes: opened.reduce((sum, p) => sum + (bytes.get(p) ?? 0), 0),
+        excerptBytes: opened.reduce((sum, p) => sum + Math.min(1800, bytes.get(p) ?? 0), 0) };
+    };
     const ks = [1, 5, 10, 20, 100];
     const rec = {
       instance_id: inst.instance_id, repo: inst.repo, difficulty: inst.difficulty, gold,
@@ -47,7 +58,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       goldInShortlist: gold.filter(g => pool.includes(g)).length,
       bm25: { recall: Object.fromEntries(ks.map(k => [k, recallAt(pool, gold, k)])), firstGoldRank: firstGoldRank(pool, gold) },
       jev: { applied, recall: Object.fromEntries(ks.map(k => [k, recallAt(order, gold, k)])), firstGoldRank: firstGoldRank(order, gold) },
+      readCost: { bm25: readCost(pool), jev: readCost(order) },
       decisions, discoverMs, rankMs, topBm25: pool.slice(0, 10), topJev: order.slice(0, 10),
+      ranking: order.map((path, i) => ({ path, jevRank: i + 1, bm25Rank: pool.indexOf(path) + 1, bytes: bytes.get(path) ?? 0, gold: gold.includes(path) })),
     };
     records.push(rec);
     console.log(`${rec.instance_id.padEnd(24)} scan=${String(rec.filesScanned).padStart(5)} shortlist=${String(rec.shortlist).padStart(3)} inList=${rec.goldInShortlist}/${gold.length}`
