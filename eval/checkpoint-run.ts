@@ -13,6 +13,7 @@ import { loadConfig } from "../src/config.js";
 import { JevClient } from "../src/jev.js";
 import { dependencyEvidence, formatDependencyEvidence } from "./dependency-evidence.js";
 import { dependencyApiEvidence, formatDependencyApiEvidence } from "./dependency-api-evidence.js";
+import { projectSourceEvidence, formatProjectSourceEvidence } from "./project-source-evidence.js";
 
 const { values } = parseArgs({ options: {
   mode: { type: "string", default: "off" }, model: { type: "string", default: "anthropic/claude-sonnet-4.6" },
@@ -22,6 +23,7 @@ const { values } = parseArgs({ options: {
   briefing: { type: "boolean", default: false },
   "dependency-evidence": { type: "string", default: "none" },
   "dependency-policy": { type: "string", default: "windows" },
+  "project-evidence": { type: "string", default: "none" },
   task: { type: "string", default: "attribution" },
   sample: { type: "string", default: "1" },
 } });
@@ -33,6 +35,8 @@ const evidenceMode = values["dependency-evidence"]!;
 if (!["none", "lexical", "jev"].includes(evidenceMode) || (evidenceMode !== "none" && values.checkpoint !== "manual")) throw new Error("Dependency evidence requires none, lexical or jev and manual checkpoints.");
 if (!["windows", "api"].includes(values["dependency-policy"]!) || (values["dependency-policy"] === "api" && evidenceMode === "none")) throw new Error("Use --dependency-policy windows, or api with lexical/jev evidence.");
 const apiEvidence = values["dependency-policy"] === "api";
+const projectEvidenceMode = values["project-evidence"]!;
+if (!["none", "lexical", "jev"].includes(projectEvidenceMode) || (projectEvidenceMode !== "none" && (evidenceMode !== "none" || values.checkpoint !== "manual"))) throw new Error("Project evidence requires lexical/jev, manual checkpoints, and no dependency evidence.");
 if (values.task !== "attribution" && values.task !== "session-mode") throw new Error("Use --task attribution or session-mode.");
 if (!/^[1-9]\d{0,2}$/.test(values.sample!)) throw new Error("Use a positive --sample label from 1 to 999.");
 const fixtureDirectory = values.task === "attribution" ? "checkpoint-fixture" : "session-mode-fixture";
@@ -42,7 +46,7 @@ if (!key) throw new Error("Load AI_GATEWAY_API_KEY in the harness environment.")
 const project = resolve(dirname(fileURLToPath(import.meta.url)), "..");
 // Capture this in the parent before shellEnvironment rewrites the child's HOME.
 const protectedHome = await realpath(homedir());
-const runId = `${new Date().toISOString().replaceAll(":", "-")}-${values.task === "attribution" ? "" : `${values.task}-${values.sample}-`}${evidenceMode === "none" ? `checkpoint-${values.checkpoint}` : `${apiEvidence ? "api" : "dependency"}-${evidenceMode}`}`;
+const runId = `${new Date().toISOString().replaceAll(":", "-")}-${values.task === "attribution" ? "" : `${values.task}-${values.sample}-`}${projectEvidenceMode !== "none" ? `project-${projectEvidenceMode}` : evidenceMode === "none" ? `checkpoint-${values.checkpoint}` : `${apiEvidence ? "api" : "dependency"}-${evidenceMode}`}`;
 const source = await captureSourceProvenance(project);
 const output = join(project, ".pij", "evals", runId);
 const root = await realpath(await mkdtemp(join(process.platform === "darwin" ? "/private/tmp" : tmpdir(), "pij-df-")));
@@ -62,7 +66,24 @@ const evidence = evidenceMode === "none" ? undefined : await (apiEvidence ? depe
 });
 if (evidence) await writeFile(join(output, "dependency-evidence.json"), JSON.stringify(evidence, null, 2), { mode: 0o600 });
 const formattedEvidence = evidence ? "policy" in evidence ? formatDependencyApiEvidence(evidence) : formatDependencyEvidence(evidence) : "";
-const prompt = task + "\nWork autonomously. Inspect and fix the implementation, run type checks, the full test suite and build, and document the change. Do not publish or commit." + (evidence ? `\n\n${formattedEvidence}` : "");
+let projectEvidence: Awaited<ReturnType<typeof projectSourceEvidence>> | undefined;
+const preprocessingStarted = performance.now();
+try {
+  projectEvidence = projectEvidenceMode === "none" ? undefined : await projectSourceEvidence({
+    cwd, query: task, mode: projectEvidenceMode as "lexical" | "jev",
+    provider: projectEvidenceMode === "jev" ? new JevClient({ ...loadConfig({ ...process.env, PIJ_JEV_PROVIDER: "vercel" }), timeoutMs: 10000 }) : undefined,
+    signal: AbortSignal.timeout(45000),
+    onBatch: async (batch, index) => { await writeFile(join(output, `project-batch-${index}.json`), JSON.stringify(batch, null, 2), { mode: 0o600 }); },
+  });
+} catch (error) {
+  // Preserve a terminal diagnostic even if no main-model process was started.
+  // Already completed batch files retain paid usage; never return a partial ranking.
+  const terminal = { runId, task: values.task, sample: Number(values.sample), projectEvidenceMode, termination: "preprocessing_error", errorName: error instanceof Error ? error.name : "unknown", source, baseline, workspace: cwd, elapsedMs: Math.round(performance.now() - preprocessingStarted), requests: 0 };
+  await writeFile(join(output, "preprocessing-terminal.json"), JSON.stringify(terminal, null, 2), { mode: 0o600 });
+  throw new Error(`Project preprocessing failed; terminal and completed batch diagnostics saved in ${output}`);
+}
+if (projectEvidence) await writeFile(join(output, "project-evidence.json"), JSON.stringify(projectEvidence, null, 2), { mode: 0o600 });
+const prompt = task + "\nWork autonomously. Inspect and fix the implementation, run type checks, the full test suite and build, and document the change. Do not publish or commit." + (evidence ? `\n\n${formattedEvidence}` : "") + (projectEvidence ? `\n\n${formatProjectSourceEvidence(projectEvidence)}` : "");
 await writeFile(join(output, "task.txt"), prompt, { mode: 0o600 });
 const trace = createWriteStream(join(output, "cli-trace.jsonl"), { mode: 0o600 });
 const errors = createWriteStream(join(output, "stderr.txt"), { mode: 0o600 });
@@ -125,7 +146,7 @@ child.on("message", (message) => {
 });
 const clean = (text: string) => text.replaceAll(key, "[redacted]");
 const start = performance.now();
-console.log(JSON.stringify({ event: "start", runId, task: values.task, sample: Number(values.sample), mode: values.mode, evidenceMode, evidencePolicy: values["dependency-policy"], briefing: values.briefing, model: values.model, budgets, baseline, source, workspace: cwd, output, pid: child.pid }));
+console.log(JSON.stringify({ event: "start", runId, task: values.task, sample: Number(values.sample), mode: values.mode, evidenceMode, projectEvidenceMode, evidencePolicy: values["dependency-policy"], briefing: values.briefing, model: values.model, budgets, baseline, source, workspace: cwd, output, pid: child.pid }));
 child.stdout!.setEncoding("utf8");
 child.stdout!.on("data", (data: string) => {
   pending += data;
@@ -189,7 +210,7 @@ const result = { runId, checkpoint, thinking: values.thinking, mode: values.mode
 const evidenceSummary = !evidence ? { mode: "none" } : "policy" in evidence
   ? { mode: evidenceMode, ...evidence, pool: undefined, candidates: evidence.candidates.map(({ excerpts, ...unit }) => ({ ...unit, excerpts: excerpts.map(({ excerpt, ...span }) => ({ ...span, bytes: Buffer.byteLength(excerpt) })) })) }
   : { mode: evidenceMode, policy: "windows", ...evidence, candidates: evidence.candidates.map(({path,startLine,excerpt})=>({path,startLine,bytes:Buffer.byteLength(excerpt)})), windowPool: undefined };
-const summary = { ...result, task: values.task, sample: Number(values.sample), dependencyEvidence: evidenceSummary, evidenceAndAgentElapsedMs: result.elapsedMs + (evidence?.elapsedMs ?? 0) };
+const summary = { ...result, task: values.task, sample: Number(values.sample), dependencyEvidence: evidenceSummary, projectEvidence, evidenceAndAgentElapsedMs: result.elapsedMs + (evidence?.elapsedMs ?? 0) + (projectEvidence?.elapsedMs ?? 0) };
 await writeFile(join(output, "result.json"), JSON.stringify(summary, null, 2), { mode: 0o600 });
 console.log(JSON.stringify({ event: "result", ...summary }));
 process.off("SIGTERM", interrupt);
