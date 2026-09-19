@@ -118,6 +118,27 @@ test: a far stronger main model, so that finding the file is the binding constra
 often; and larger, more foreign codebases where grep localisation genuinely fails — here it
 still succeeded on 9–10 of 13. Both are affordable: these runs cost $0.22 and $0.51.
 
+## The frontier, drawn honestly
+
+![localization vs cost](figures/localization-cost-frontier.png)
+
+A launch-style Pareto chart needs many systems and a y-axis that varies. Task completion does
+not vary across these configurations, so the chart uses the quantity that does: the share of
+runs whose first tool call touches the file the reference patch edits. Cost is per task,
+main model plus Jev (Jev at the gateway's measured ≈$0.28 per million input tokens); the
+dashed segment on each PiJ + Jev point is Jev's share of it. Each panel has its own frontier
+because the two task sets are not comparable on the y-axis.
+
+Two readings. Jev buys localisation with money: on django the frontier runs Pi → PiJ (BM25)
+→ PiJ + Jev v4 → v3, and on the unfamiliar set Pi → BM25 → PiJ + Jev; nothing is both
+cheaper and better-localising than the Jev arms, and nothing on the frontier localises as
+well. But at deepseek-v4-flash prices, **Jev's cost per task ($0.011–0.014) is three to
+four times the main model's**, and the main-model tokens it saves are worth less than the
+Jev requests it spends — the v4-pro pair shows the same shape at twice the main-model
+price. The ledger only turns positive with a main model whose tokens cost enough for a
+quarter fewer of them to outweigh $0.013 of ranking; the earlier Sonnet-class runs
+(~$0.5–1.3 per task) are in that regime, the DeepSeek runs are not.
+
 ## Limitations
 
 - 13 instances, 7 repositories, one run each. Outcome differences of one task are noise.
