@@ -50,11 +50,18 @@ if META.get("hero")=="paired":
         pb=Bp[pa["id"]]; x0,y0=x(pa["tokens"]),y(pa["tools"]); x1,y1=x(pb["tokens"]),y(pb["tools"])
         both=pb["tools"]<=pa["tools"] and pb["tokens"]<=pa["tokens"]; better+=both
         col="#d55181" if both else "#8c8c8c"
-        o.append(f'<line x1="{x0:.1f}" y1="{y0:.1f}" x2="{x1:.1f}" y2="{y1:.1f}" stroke="{col}" stroke-width="2" stroke-opacity="0.75"/>')
-        # arrowhead at the PiJ end
+        # The segment stops short of both markers so the arrowhead sits outside the diamond.
         import math as _m
-        ang=_m.atan2(y1-y0,x1-x0); ax,ay=x1-10*_m.cos(ang),y1-10*_m.sin(ang)
-        o.append(f'<path d="M{x1:.1f},{y1:.1f} L{ax-5*_m.sin(ang):.1f},{ay+5*_m.cos(ang):.1f} L{ax+5*_m.sin(ang):.1f},{ay-5*_m.cos(ang):.1f} Z" fill="{col}" fill-opacity="0.75"/>')
+        dx,dy=x1-x0,y1-y0; dist=_m.hypot(dx,dy)
+        if dist>30:
+            ux,uy=dx/dist,dy/dist
+            sx,sy=x0+ux*13,y0+uy*13              # leave the Pi circle
+            ex,ey=x1-ux*15,y1-uy*15              # stop before the PiJ diamond
+            o.append(f'<line x1="{sx:.1f}" y1="{sy:.1f}" x2="{ex-ux*9:.1f}" y2="{ey-uy*9:.1f}" stroke="{col}" stroke-width="2" stroke-opacity="0.75"/>')
+            bx,by=ex-ux*10,ey-uy*10
+            o.append(f'<path d="M{ex:.1f},{ey:.1f} L{bx-uy*5:.1f},{by+ux*5:.1f} L{bx+uy*5:.1f},{by-ux*5:.1f} Z" fill="{col}" fill-opacity="0.9"/>')
+        elif dist>0:
+            o.append(f'<line x1="{x0:.1f}" y1="{y0:.1f}" x2="{x1:.1f}" y2="{y1:.1f}" stroke="{col}" stroke-width="2" stroke-opacity="0.5"/>')
     # Marks first, then labels placed to avoid every mark, ring and earlier label.
     boxes=[]
     for pa in A:
