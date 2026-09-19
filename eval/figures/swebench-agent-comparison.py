@@ -55,12 +55,33 @@ if META.get("hero")=="paired":
         import math as _m
         ang=_m.atan2(y1-y0,x1-x0); ax,ay=x1-10*_m.cos(ang),y1-10*_m.sin(ang)
         o.append(f'<path d="M{x1:.1f},{y1:.1f} L{ax-5*_m.sin(ang):.1f},{ay+5*_m.cos(ang):.1f} L{ax+5*_m.sin(ang):.1f},{ay-5*_m.cos(ang):.1f} Z" fill="{col}" fill-opacity="0.75"/>')
+    # Marks first, then labels placed to avoid every mark, ring and earlier label.
+    boxes=[]
     for pa in A:
         pb=Bp[pa["id"]]
-        mark(x(pa["tokens"]),y(pa["tools"]),"#9a9a9a","c",8); mark(x(pb["tokens"]),y(pb["tools"]),"#d55181","d",9)
-        for pp,xx,yy in ((pa,x(pa["tokens"]),y(pa["tools"])),(pb,x(pb["tokens"]),y(pb["tools"]))):
+        for pp,xx,yy,col,shape in ((pa,x(pa["tokens"]),y(pa["tools"]),"#9a9a9a","c"),(pb,x(pb["tokens"]),y(pb["tools"]),"#d55181","d")):
+            mark(xx,yy,col,shape,8 if shape=="c" else 9)
             if pp["resolved"]: o.append(f'<circle cx="{xx:.1f}" cy="{yy:.1f}" r="13" fill="none" stroke="#ededed" stroke-width="1.5"/>')
-        t(x(pb["tokens"])-14,y(pb["tools"])-12,pb["name"],INK2,12.5,"400","end",halo=True)
+            boxes.append((xx-15,yy-15,xx+15,yy+15))
+    hit=lambda a,b: a[0]<b[2] and b[0]<a[2] and a[1]<b[3] and b[1]<a[3]
+    SLOTS=[(18,5,"start"),(-18,5,"end"),(0,-20,"middle"),(0,26,"middle"),(18,-14,"start"),(18,22,"start"),(-18,-14,"end"),(-18,22,"end")]
+    FAR=[(dx*2.6,dy*2.2,an) for dx,dy,an in SLOTS]+[(dx*4.2,dy*3.4,an) for dx,dy,an in SLOTS]+[(dx*6,dy*4.6,an) for dx,dy,an in SLOTS]
+    for pa in sorted(A,key=lambda q:(x(Bp[q["id"]]["tokens"]),y(Bp[q["id"]]["tools"]))):
+        pb=Bp[pa["id"]]; px,py=x(pb["tokens"]),y(pb["tools"]); label=pb["name"]
+        w=sum(7.5 if ord(c)<128 else 12.5 for c in label)
+        placed=False
+        for far,slots in ((False,SLOTS),(True,FAR)):
+            for dx,dy,an in slots:
+                x0 = px+dx if an=="start" else px+dx-w if an=="end" else px+dx-w/2
+                bb=(x0-3,py+dy-12,x0+w+3,py+dy+4)
+                if bb[0]<L or bb[2]>PW-R or bb[1]<T or bb[3]>PH-B: continue
+                if any(hit(bb,b) for b in boxes): continue
+                if far:
+                    ex = bb[0] if px<bb[0] else bb[2] if px>bb[2] else px
+                    ey = bb[1] if py<bb[1] else bb[3] if py>bb[3] else py
+                    o.append(f'<line x1="{px:.1f}" y1="{py:.1f}" x2="{ex:.1f}" y2="{ey:.1f}" stroke="{INK3}" stroke-width="1"/>')
+                t(px+dx,py+dy,label,INK2,12.5,"400",an,halo=True); boxes.append(bb); placed=True; break
+            if placed: break
     # legend, top-left under the title
     lx=22
     mark(lx+7,61,"#9a9a9a","c",7); t(lx+22,66,"Pi（bash grep）",INK2,15); lx+=22+15*9+34
