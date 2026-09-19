@@ -78,9 +78,9 @@ the same reason.
 
 Plain Pi and PiJ + Jev only (26 runs, $0.51); `eval/swebench-agent-results/unfamiliar-pro/`.
 
-![comparison, v4-pro](figures/unfamiliar-pro-agent-comparison.png)
+![flash vs pro](figures/unfamiliar-flash-vs-pro.png)
 
-*Top panel: each task as an arrow from its plain-Pi run (grey) to its PiJ + Jev run (magenta) in tool calls against prompt tokens; magenta arrows are cheaper on both axes, white rings mark resolved runs. Two arm means would hide this — the per-task pairing is the evidence.*
+*Each task as an arrow from its plain-Pi run (grey) to its PiJ + Jev run (magenta) in tool calls against prompt tokens, flash on the left and pro on the right, numbered by the table between them; magenta arrows are cheaper on both axes, white rings mark resolved runs. Two arm means would hide this — the per-task pairing is the evidence. (`eval/figures/unfamiliar-flash-vs-pro.py`)*
 
 | | Pi | PiJ + Jev |
 |---|---:|---:|

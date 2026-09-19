@@ -1,0 +1,739 @@
+{
+ "tasks": [
+  {
+   "n": 1,
+   "id": "2akouwu__reverify-13",
+   "name": "reverify #13"
+  },
+  {
+   "n": 2,
+   "id": "air-embodied-brain__Zetta-Embodiment-23",
+   "name": "Zetta-Embodiment #23"
+  },
+  {
+   "n": 3,
+   "id": "air-embodied-brain__Zetta-Embodiment-26",
+   "name": "Zetta-Embodiment #26"
+  },
+  {
+   "n": 4,
+   "id": "air-embodied-brain__Zetta-Embodiment-31",
+   "name": "Zetta-Embodiment #31"
+  },
+  {
+   "n": 5,
+   "id": "mubaraknumann__unifideck-449",
+   "name": "unifideck #449"
+  },
+  {
+   "n": 6,
+   "id": "openonion__connectonion-1556",
+   "name": "connectonion #1556"
+  },
+  {
+   "n": 7,
+   "id": "openonion__connectonion-1588",
+   "name": "connectonion #1588"
+  },
+  {
+   "n": 8,
+   "id": "pinchbench__skill-385",
+   "name": "pinchbench/skill #385"
+  },
+  {
+   "n": 9,
+   "id": "sentient-agi__EvoSkill-18",
+   "name": "EvoSkill #18"
+  },
+  {
+   "n": 10,
+   "id": "sentient-agi__EvoSkill-38",
+   "name": "EvoSkill #38"
+  },
+  {
+   "n": 11,
+   "id": "sentient-agi__EvoSkill-51",
+   "name": "EvoSkill #51"
+  },
+  {
+   "n": 12,
+   "id": "stabldev__torrra-323",
+   "name": "torrra #323"
+  },
+  {
+   "n": 13,
+   "id": "stabldev__torrra-336",
+   "name": "torrra #336"
+  }
+ ],
+ "models": {
+  "flash": {
+   "per": {
+    "2akouwu__reverify-13": {
+     "pi": {
+      "tools": 25,
+      "tokens": 336528,
+      "resolved": false,
+      "search": 6,
+      "seconds": 41.085,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.006885961600000002
+     },
+     "pij": {
+      "tools": 19,
+      "tokens": 384194,
+      "resolved": false,
+      "search": 7,
+      "seconds": 32.282,
+      "firstgold": true,
+      "jev_s": 3.312,
+      "usd": 0.0060748016
+     }
+    },
+    "air-embodied-brain__Zetta-Embodiment-23": {
+     "pi": {
+      "tools": 29,
+      "tokens": 588328,
+      "resolved": false,
+      "search": 10,
+      "seconds": 77.018,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.009438856000000002
+     },
+     "pij": {
+      "tools": 28,
+      "tokens": 610435,
+      "resolved": false,
+      "search": 4,
+      "seconds": 131.162,
+      "firstgold": false,
+      "jev_s": 25.974,
+      "usd": 0.008225621599999998
+     }
+    },
+    "air-embodied-brain__Zetta-Embodiment-26": {
+     "pi": {
+      "tools": 33,
+      "tokens": 570534,
+      "resolved": false,
+      "search": 11,
+      "seconds": 119.092,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.0070364896
+     },
+     "pij": {
+      "tools": 35,
+      "tokens": 600462,
+      "resolved": false,
+      "search": 12,
+      "seconds": 71.435,
+      "firstgold": false,
+      "jev_s": 27.974,
+      "usd": 0.0078010128
+     }
+    },
+    "air-embodied-brain__Zetta-Embodiment-31": {
+     "pi": {
+      "tools": 39,
+      "tokens": 594457,
+      "resolved": false,
+      "search": 26,
+      "seconds": 217.66,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.009234831200000002
+     },
+     "pij": {
+      "tools": 33,
+      "tokens": 590802,
+      "resolved": false,
+      "search": 16,
+      "seconds": 255.025,
+      "firstgold": true,
+      "jev_s": 7.097,
+      "usd": 0.0118969536
+     }
+    },
+    "mubaraknumann__unifideck-449": {
+     "pi": {
+      "tools": 14,
+      "tokens": 92446,
+      "resolved": true,
+      "search": 5,
+      "seconds": 21.513,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.0026244512
+     },
+     "pij": {
+      "tools": 9,
+      "tokens": 86354,
+      "resolved": true,
+      "search": 3,
+      "seconds": 18.714,
+      "firstgold": false,
+      "jev_s": 3.059,
+      "usd": 0.0025441248000000003
+     }
+    },
+    "openonion__connectonion-1556": {
+     "pi": {
+      "tools": 36,
+      "tokens": 610929,
+      "resolved": true,
+      "search": 17,
+      "seconds": 53.4,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.009229253599999999
+     },
+     "pij": {
+      "tools": 24,
+      "tokens": 593631,
+      "resolved": true,
+      "search": 7,
+      "seconds": 49.709,
+      "firstgold": true,
+      "jev_s": 2.892,
+      "usd": 0.008632932000000003
+     }
+    },
+    "openonion__connectonion-1588": {
+     "pi": {
+      "tools": 11,
+      "tokens": 35523,
+      "resolved": true,
+      "search": 7,
+      "seconds": 19.927,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.0011607848000000003
+     },
+     "pij": {
+      "tools": 2,
+      "tokens": 16176,
+      "resolved": true,
+      "search": 1,
+      "seconds": 14.608,
+      "firstgold": false,
+      "jev_s": 2.936,
+      "usd": 0.0009251424000000001
+     }
+    },
+    "pinchbench__skill-385": {
+     "pi": {
+      "tools": 23,
+      "tokens": 436668,
+      "resolved": false,
+      "search": 10,
+      "seconds": 27.46,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.0066298848
+     },
+     "pij": {
+      "tools": 29,
+      "tokens": 457262,
+      "resolved": false,
+      "search": 12,
+      "seconds": 53.635,
+      "firstgold": false,
+      "jev_s": 2.155,
+      "usd": 0.006748918399999998
+     }
+    },
+    "sentient-agi__EvoSkill-18": {
+     "pi": {
+      "tools": 32,
+      "tokens": 217850,
+      "resolved": false,
+      "search": 18,
+      "seconds": 114.532,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.004110030400000001
+     },
+     "pij": {
+      "tools": 23,
+      "tokens": 237423,
+      "resolved": false,
+      "search": 13,
+      "seconds": 105.413,
+      "firstgold": false,
+      "jev_s": 25.891,
+      "usd": 0.0041314168
+     }
+    },
+    "sentient-agi__EvoSkill-38": {
+     "pi": {
+      "tools": 29,
+      "tokens": 530834,
+      "resolved": false,
+      "search": 8,
+      "seconds": 158.882,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.007388998399999999
+     },
+     "pij": {
+      "tools": 28,
+      "tokens": 541877,
+      "resolved": false,
+      "search": 9,
+      "seconds": 146.863,
+      "firstgold": true,
+      "jev_s": 3.597,
+      "usd": 0.0072000152
+     }
+    },
+    "sentient-agi__EvoSkill-51": {
+     "pi": {
+      "tools": 9,
+      "tokens": 77176,
+      "resolved": true,
+      "search": 1,
+      "seconds": 31.782,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.0021243712
+     },
+     "pij": {
+      "tools": 7,
+      "tokens": 59768,
+      "resolved": true,
+      "search": 1,
+      "seconds": 13.726,
+      "firstgold": true,
+      "jev_s": 2.113,
+      "usd": 0.0018195296
+     }
+    },
+    "stabldev__torrra-323": {
+     "pi": {
+      "tools": 14,
+      "tokens": 117667,
+      "resolved": false,
+      "search": 3,
+      "seconds": 27.27,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.0027880776
+     },
+     "pij": {
+      "tools": 4,
+      "tokens": 45467,
+      "resolved": false,
+      "search": 0,
+      "seconds": 12.67,
+      "firstgold": true,
+      "jev_s": 2.044,
+      "usd": 0.0017899224
+     }
+    },
+    "stabldev__torrra-336": {
+     "pi": {
+      "tools": 36,
+      "tokens": 618620,
+      "resolved": false,
+      "search": 12,
+      "seconds": 42.048,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.008045699199999999
+     },
+     "pij": {
+      "tools": 30,
+      "tokens": 608457,
+      "resolved": false,
+      "search": 6,
+      "seconds": 50.754,
+      "firstgold": false,
+      "jev_s": 3.456,
+      "usd": 0.007704799200000002
+     }
+    }
+   },
+   "pi": {
+    "search": {
+     "mean": 10.307692307692308,
+     "median": 10
+    },
+    "tools": {
+     "mean": 25.384615384615383,
+     "median": 29
+    },
+    "tokens": {
+     "mean": 371350.76923076925,
+     "median": 436668
+    },
+    "seconds": {
+     "mean": 73.2053076923077,
+     "median": 42.048
+    },
+    "resolved": 4,
+    "firstgold": 0,
+    "jev_s": 0.0,
+    "usd": 0.07669768960000001
+   },
+   "pij": {
+    "search": {
+     "mean": 7,
+     "median": 7
+    },
+    "tools": {
+     "mean": 20.846153846153847,
+     "median": 24
+    },
+    "tokens": {
+     "mean": 371716,
+     "median": 457262
+    },
+    "seconds": {
+     "mean": 73.53815384615385,
+     "median": 50.754
+    },
+    "resolved": 4,
+    "firstgold": 6,
+    "jev_s": 8.653846153846153,
+    "usd": 0.0754951904
+   }
+  },
+  "pro": {
+   "per": {
+    "2akouwu__reverify-13": {
+     "pi": {
+      "tools": 28,
+      "tokens": 526262,
+      "resolved": false,
+      "search": 7,
+      "seconds": 85.022,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.019343116
+     },
+     "pij": {
+      "tools": 26,
+      "tokens": 454495,
+      "resolved": false,
+      "search": 8,
+      "seconds": 93.01,
+      "firstgold": true,
+      "jev_s": 3.011,
+      "usd": 0.020462139000000004
+     }
+    },
+    "air-embodied-brain__Zetta-Embodiment-23": {
+     "pi": {
+      "tools": 18,
+      "tokens": 282703,
+      "resolved": true,
+      "search": 3,
+      "seconds": 82.085,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.013940213000000003
+     },
+     "pij": {
+      "tools": 11,
+      "tokens": 160851,
+      "resolved": false,
+      "search": 2,
+      "seconds": 37.493,
+      "firstgold": false,
+      "jev_s": 2.91,
+      "usd": 0.008946239
+     }
+    },
+    "air-embodied-brain__Zetta-Embodiment-26": {
+     "pi": {
+      "tools": 40,
+      "tokens": 503000,
+      "resolved": false,
+      "search": 16,
+      "seconds": 95.221,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.017245546
+     },
+     "pij": {
+      "tools": 25,
+      "tokens": 461933,
+      "resolved": false,
+      "search": 8,
+      "seconds": 86.397,
+      "firstgold": false,
+      "jev_s": 3.533,
+      "usd": 0.015504763
+     }
+    },
+    "air-embodied-brain__Zetta-Embodiment-31": {
+     "pi": {
+      "tools": 37,
+      "tokens": 582707,
+      "resolved": false,
+      "search": 19,
+      "seconds": 330.011,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.05777748300000001
+     },
+     "pij": {
+      "tools": 31,
+      "tokens": 588233,
+      "resolved": false,
+      "search": 16,
+      "seconds": 279.404,
+      "firstgold": true,
+      "jev_s": 4.504,
+      "usd": 0.04359688900000001
+     }
+    },
+    "mubaraknumann__unifideck-449": {
+     "pi": {
+      "tools": 28,
+      "tokens": 424454,
+      "resolved": true,
+      "search": 18,
+      "seconds": 66.183,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.016279265999999997
+     },
+     "pij": {
+      "tools": 19,
+      "tokens": 247036,
+      "resolved": true,
+      "search": 9,
+      "seconds": 46.429,
+      "firstgold": false,
+      "jev_s": 7.914,
+      "usd": 0.01234443
+     }
+    },
+    "openonion__connectonion-1556": {
+     "pi": {
+      "tools": 20,
+      "tokens": 594685,
+      "resolved": false,
+      "search": 8,
+      "seconds": 97.799,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.029569472999999995
+     },
+     "pij": {
+      "tools": 21,
+      "tokens": 625933,
+      "resolved": true,
+      "search": 6,
+      "seconds": 193.243,
+      "firstgold": true,
+      "jev_s": 2.997,
+      "usd": 0.040964095000000006
+     }
+    },
+    "openonion__connectonion-1588": {
+     "pi": {
+      "tools": 8,
+      "tokens": 72758,
+      "resolved": true,
+      "search": 3,
+      "seconds": 21.372,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.005503214
+     },
+     "pij": {
+      "tools": 2,
+      "tokens": 16506,
+      "resolved": true,
+      "search": 0,
+      "seconds": 16.688,
+      "firstgold": false,
+      "jev_s": 3.222,
+      "usd": 0.002950112
+     }
+    },
+    "pinchbench__skill-385": {
+     "pi": {
+      "tools": 14,
+      "tokens": 641931,
+      "resolved": false,
+      "search": 7,
+      "seconds": 33.135,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.027767935
+     },
+     "pij": {
+      "tools": 9,
+      "tokens": 170767,
+      "resolved": false,
+      "search": 3,
+      "seconds": 26.592,
+      "firstgold": false,
+      "jev_s": 2.17,
+      "usd": 0.010511020999999999
+     }
+    },
+    "sentient-agi__EvoSkill-18": {
+     "pi": {
+      "tools": 31,
+      "tokens": 461792,
+      "resolved": false,
+      "search": 9,
+      "seconds": 133.881,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.016284312
+     },
+     "pij": {
+      "tools": 30,
+      "tokens": 474815,
+      "resolved": false,
+      "search": 10,
+      "seconds": 184.288,
+      "firstgold": false,
+      "jev_s": 6.337,
+      "usd": 0.017768967
+     }
+    },
+    "sentient-agi__EvoSkill-38": {
+     "pi": {
+      "tools": 27,
+      "tokens": 596241,
+      "resolved": false,
+      "search": 11,
+      "seconds": 199.79,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.033974978999999995
+     },
+     "pij": {
+      "tools": 17,
+      "tokens": 370115,
+      "resolved": false,
+      "search": 3,
+      "seconds": 126.093,
+      "firstgold": false,
+      "jev_s": 3.085,
+      "usd": 0.020434879000000003
+     }
+    },
+    "sentient-agi__EvoSkill-51": {
+     "pi": {
+      "tools": 17,
+      "tokens": 180132,
+      "resolved": true,
+      "search": 5,
+      "seconds": 105.55,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.010758478000000002
+     },
+     "pij": {
+      "tools": 5,
+      "tokens": 47027,
+      "resolved": true,
+      "search": 1,
+      "seconds": 25.256,
+      "firstgold": true,
+      "jev_s": 2.469,
+      "usd": 0.005438746999999998
+     }
+    },
+    "stabldev__torrra-323": {
+     "pi": {
+      "tools": 6,
+      "tokens": 45001,
+      "resolved": false,
+      "search": 1,
+      "seconds": 19.035,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.004747909
+     },
+     "pij": {
+      "tools": 5,
+      "tokens": 55530,
+      "resolved": false,
+      "search": 0,
+      "seconds": 20.318,
+      "firstgold": true,
+      "jev_s": 1.977,
+      "usd": 0.005447592
+     }
+    },
+    "stabldev__torrra-336": {
+     "pi": {
+      "tools": 27,
+      "tokens": 598199,
+      "resolved": false,
+      "search": 4,
+      "seconds": 62.548,
+      "firstgold": false,
+      "jev_s": 0.0,
+      "usd": 0.020164077000000006
+     },
+     "pij": {
+      "tools": 24,
+      "tokens": 604816,
+      "resolved": false,
+      "search": 2,
+      "seconds": 146.265,
+      "firstgold": true,
+      "jev_s": 2.198,
+      "usd": 0.031330556
+     }
+    }
+   },
+   "pi": {
+    "search": {
+     "mean": 8.538461538461538,
+     "median": 7
+    },
+    "tools": {
+     "mean": 23.153846153846153,
+     "median": 27
+    },
+    "tokens": {
+     "mean": 423835.76923076925,
+     "median": 503000
+    },
+    "seconds": {
+     "mean": 102.43323076923078,
+     "median": 85.022
+    },
+    "resolved": 4,
+    "firstgold": 0,
+    "jev_s": 0.0,
+    "usd": 0.273356001
+   },
+   "pij": {
+    "search": {
+     "mean": 5.230769230769231,
+     "median": 3
+    },
+    "tools": {
+     "mean": 17.307692307692307,
+     "median": 19
+    },
+    "tokens": {
+     "mean": 329081.3076923077,
+     "median": 370115
+    },
+    "seconds": {
+     "mean": 98.57507692307692,
+     "median": 86.397
+    },
+    "resolved": 4,
+    "firstgold": 6,
+    "jev_s": 3.5636153846153844,
+    "usd": 0.23570042900000002
+   }
+  }
+ }
+}
