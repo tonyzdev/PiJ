@@ -212,6 +212,23 @@ with each design change (tools 16.1 → 14.8 → 14.3).** Ranking configurations
 needs several seeds per instance, which this task set does not justify: on 13 of 20 the
 model already opens the right file with at most one search.
 
+## Every tool call, drawn
+
+![execution strips](figures/execution-strips-django.png)
+
+*Every run of plain Pi and PiJ + Jev v4 as a strip of tool calls, one block per call coloured
+by kind; a white frame on the first `read` or `edit` of a gold file; the magenta block is the
+briefing PiJ receives in its first prompt. (`eval/figures/execution-strips.py`; per-call data in
+`eval/swebench-agent-results/execution-strips.json`.)*
+
+The PiJ strip is shorter on 15 of 20 tasks, −16% calls in total, and the first gold touch moves
+from a median second call to the first: 10 of the 20 PiJ strips open with a white-framed block,
+and on five of those it is orange — the model edited the briefed file without a single `read`.
+Plain Pi is already good at this repository (a gold file on the first call on 5 of 20, by the
+second on 12 of 20), so the saving per task is small, and PiJ is longer on four (`11087`, the
+run that alternates resolved / budget across configurations, `11211`, `10880`, `11163`). The
+long rows at the top, where both arms exhaust the budget, are the same tasks in both strips.
+
 ## Limitations
 
 - 20 instances, one repository, one main model, one run per configuration. A single

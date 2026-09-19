@@ -109,6 +109,28 @@ were solved by no arm under either model. The stronger model did not raise the f
 same five or six tasks are solvable and the rest are not, for reasons that are not
 localisation.
 
+## Every tool call, drawn
+
+![execution strips, v4-pro](figures/execution-strips-unfamiliar-pro.png)
+
+*Every run as a strip of tool calls (v4-pro; the flash pair is
+`figures/execution-strips-unfamiliar-flash.png`): plain Pi above, PiJ + Jev below, one block per
+call coloured by kind, a white frame on the first `read` or `edit` of a file the reference patch
+edits, and a magenta block for the briefing PiJ receives in its first prompt without a call.
+(`eval/figures/execution-strips.py`; per-call data in
+`eval/swebench-agent-results/execution-strips.json`.)*
+
+The tables above are summaries of these strips, and the strips say it more plainly. With v4-pro
+the PiJ strip is shorter on 12 of 13 tasks, −25% calls in total (flash: 11 of 13, −18%). Plain
+Pi's strips open with blue: it reaches a gold file at a median of the third call (flash: the
+fourth), after one or two searches, and never on the first; PiJ's open with the white frame on
+the first call on 7 of 13, because the briefing already named the file. What Jev buys at the
+start is therefore one or two searches per task — grep finds these files too — and the rest of
+the shortening happens after the file is found, between the first gold read and the first
+edit. The one task where PiJ's strip is longer under pro, `connectonion-1556`, is the one it
+resolved and Pi exhausted the budget on. The row ends show what the tables show: 4 vs 4, and
+the same long, budget-exhausted strips on the tasks neither arm solves.
+
 ## What would move the outcome
 
 The resolve rate can only separate arms on tasks in the band "solved if the file is found,

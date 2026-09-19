@@ -18,7 +18,7 @@ PiJ is a terminal coding agent built on [Pi](https://github.com/earendil-works/p
   /pij status & modes    /model coding model    /login connect
 ```
 
-Early alpha. The integration is runnable, and real Jev access through Vercel Gateway has been verified. Coding-task quality, speed, and cost improvements still need comparative evaluation.
+Early alpha. The integration is runnable, and real Jev access through Vercel Gateway has been verified. On SWE-bench django tasks and on repositories the model has never seen, PiJ makes fewer tool calls and reaches the right file sooner than plain Pi, at the same resolve rate; see [Evidence](#evidence) for the figure and the caveats, including cost.
 
 ## What Jev does
 
@@ -37,6 +37,14 @@ flowchart LR
     PiJ <--> Model["Coding model: reasoning and code"]
     PiJ --> Pi["Pi runtime: files, shell, sessions"]
 ```
+
+## Evidence
+
+![Every tool call of Pi and PiJ + Jev on 13 tasks in unfamiliar repositories](docs/figures/execution-strips-unfamiliar-pro.png)
+
+Thirteen SWE-bench-style tasks built from pull requests in repositories created after mid-2025 — outside the main model's training data — each run once by plain Pi and once by PiJ + Jev with deepseek-v4-pro. One block per tool call. The PiJ strip is shorter on 12 of 13 tasks (−25% calls, −22% prompt tokens) and opens on a file the reference patch edits, because Jev ranks the repository's files before the first call and the briefing hands the top one to the model; plain Pi reaches that file at a median of the third call. The resolve rate is unchanged, 4 vs 4: Jev shortens the path, not the outcome, and at DeepSeek prices its ranking costs more per task than the main-model tokens it saves.
+
+The same picture on 20 SWE-bench Verified django tasks (shorter on 15 of 20, −16%) and with deepseek-v4-flash, the retrieval measurements behind it, and the cost ledger: [unfamiliar repositories](docs/unfamiliar-repo-experiment.md) · [django](docs/swebench-agent-experiment.md) · [retrieval recall](docs/swebench-retrieval-experiment.md).
 
 ## Quick start
 
@@ -138,7 +146,7 @@ In `assist` and `observe`, task text, candidate skill instructions, retrieved so
 - Local decision logs contain mode, stage, latency, token use, fallback reason, and the actual Pi session/user-message entry IDs. These IDs link a decision to its user prompt across model/tool rounds; old records without IDs remain readable. They exclude prompts, answers, source, and tool output. **Pi session transcripts separately retain normal conversation and tool content.**
 - `pij_search` respects ignore files and excludes hidden files, common credential files, dependencies, and build output. It retrieves a bounded shortlist and reports truncation. These filters do not detect secrets embedded in source code.
 - Omit `patterns` in `pij_search` to discover source windows from a natural-language question. Discovery reads at most 1,000 eligible files, 256 KiB per file and 4 MiB total, then offers at most 32 excerpts for ranking. Files beyond the enumeration budget are not searched.
-- `PIJ_SOURCE_BRIEFING=1` optionally provides up to six files' exact excerpts before the coding model starts. Assist uses Jev ranking; off and observe use deterministic selection. Each new prompt refreshes the snapshot; edits can make it stale. This may add latency and source disclosure to the configured Jev provider. It is disabled by default and has no demonstrated task-performance advantage. See the [experiment design](docs/experiments.md) and [results](docs/experiment-results.md).
+- `PIJ_SOURCE_BRIEFING=1` optionally provides up to three files' exact excerpts before the coding model starts — the top file whole when Jev's relevance is at least 0.8 and it fits Pi's 50 KB read bound. Assist uses Jev ranking; off and observe use BM25. Each new prompt refreshes the snapshot; edits can make it stale. This may add latency and source disclosure to the configured Jev provider. It is disabled by default; in the [evidence](#evidence) above it is what shortens the strips, and it has not changed the resolve rate.
 - Jev is advisory. Model confidence and relevance scores are not probabilities that a code change is correct.
 
 ## Development and evidence

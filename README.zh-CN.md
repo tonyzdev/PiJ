@@ -60,13 +60,21 @@ cd /path/to/your/project
 pij
 ```
 
+## 实测
+
+![13 个陌生仓库任务上 Pi 与 PiJ + Jev 的每一次工具调用](docs/figures/execution-strips-unfamiliar-pro.zh.png)
+
+13 个 SWE-bench 风格任务，取自 2025 年中以后创建、不在主模型训练数据里的仓库的真实 PR；每个任务分别由原版 Pi 和 PiJ + Jev 各跑一次，主模型 deepseek-v4-pro，每格一次工具调用。PiJ 的带子在 13 个任务里有 12 个更短（调用 −25%，prompt token −22%），并且第一步就打开了参考补丁要改的文件：Jev 在第一次调用前已把仓库文件排好序，briefing 把排名最高的那个直接交给模型；原版 Pi 中位数要到第 3 步才碰到它。解决率没有变化，4 比 4：Jev 缩短的是路径，不是结果；而且按 DeepSeek 的价格，排序花掉的钱高于它省下的主模型 token。
+
+同样的图在 20 个 SWE-bench Verified django 任务上（15/20 更短，−16%）和 deepseek-v4-flash 下的版本、背后的检索测量以及成本账，见 [陌生仓库实验](docs/unfamiliar-repo-experiment.md) · [django 实验](docs/swebench-agent-experiment.md) · [检索召回实验](docs/swebench-retrieval-experiment.md)（英文）。
+
 ## 三项 Jev 能力
 
 **技能建议。** 每次用户请求开始时，Jev 根据请求筛选技能，再阅读最多三个候选的说明和指令片段，确认是否适用。主模型收到最多两个建议，完整技能目录仍保留。只处理允许模型调用的技能；超过 254 个候选时跳过推荐。技能判断具有建议性质，不保证主模型一定加载或正确使用它。
 
 **源码搜索。** `pij_search` 提供字面关键词时使用 ripgrep 检索；省略 `patterns` 时，根据自然语言问题扫描真实源码窗口，再让 Jev 排序。保留原文件路径、行号和原文；最多提供 32 个候选，默认返回 8 个片段。自然语言扫描最多枚举 1,000 个合规文件、每文件 256 KiB、总计 4 MiB，超出部分不被检索。它不是全仓库语义索引。
 
-**实验性源码摘录。** 设置 `PIJ_SOURCE_BRIEFING=1` 后，每条新请求开始时自动提供最多六个文件的真实摘录。`assist` 使用 Jev 排序；`off` 和 `observe` 使用确定性选择。`assist` 仍包含失败分流，当前对照不能把效果单独归因给排序。摘录是编辑前的快照，后续仍需核对当前源码。这项实验默认关闭，尚未证明有稳定的完整任务收益；详见[实验设计](docs/experiments.md)和[实测记录](docs/experiment-results.md)。
+**实验性源码摘录。** 设置 `PIJ_SOURCE_BRIEFING=1` 后，每条新请求开始时自动提供最多三个文件的真实摘录；Jev 相关度不低于 0.8 且不超过 Pi 的 50 KB 读取上限的首位文件会整篇提供。`assist` 使用 Jev 排序；`off` 和 `observe` 使用 BM25。摘录是编辑前的快照，后续仍需核对当前源码。这项实验默认关闭；在上方[实测](#实测)里正是它让带子变短，但没有改变解决率。
 
 **失败分流。** 工具返回错误后，Jev 判断更像代码、环境、依赖、网络、权限问题，还是无法判断，再附上固定的调查建议。每轮最多分析两个失败结果。原始错误和失败状态保留，不自动重试，不自动扩大权限。
 
@@ -129,7 +137,7 @@ node bin/pij.mjs doctor
 
 测试使用本地 HTTP 服务替代远程模型；真实 Pi runtime 会运行搜索、失败工具和文件写入，验证三种模式的集成行为。测试不会请求真实模型或使用付费凭据。
 
-见 [验证记录](docs/verification.md)、[产品设计](docs/design.md) 和 [实现计划](docs/implementation-plan.md)。真实 Jev 的鉴权、连通和响应格式已验证；主模型的完整编码任务效果及速度、成本改善仍待对照测试。
+见 [验证记录](docs/verification.md)、[产品设计](docs/design.md) 和 [实现计划](docs/implementation-plan.md)。真实 Jev 的鉴权、连通和响应格式已验证；完整任务的对照实验见[实测](#实测)：工具调用更少、更早找到文件，解决率持平，按 DeepSeek 价格成本尚未占优。
 
 ## 结构
 
