@@ -8,7 +8,7 @@ META=D.pop("_meta",{})
 ARMS=[("pi","Pi（bash grep）","#9a9a9a","c"),("pij-off","PiJ · 无 Jev（BM25 briefing）","#3987e5","c"),("pij-jev","PiJ · Jev 重排 briefing","#d55181","d")]
 FIRST_GOLD={k:D[k].get("first_gold",0) for k in ("pi","pij-off","pij-jev")}
 ARMS=[a for a in ARMS if D[a[0]].get("n",0)>0]
-W,H=1672,1060
+W,H=1672,1110
 PANEL,BORDER,GRID="#1e1e1e","#3a3a3a","#2e2e2e"; INK,INK2,INK3="#ededed","#b4b4b4","#8c8c8c"; FRONT="#9a9a9a"
 SANS="'Helvetica Neue',Helvetica,Arial,'PingFang SC',sans-serif"
 o=[f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" font-family="{SANS}">']
@@ -21,7 +21,7 @@ def mark(x,y,col,shape,r=8):
 def panel(x,y,w,h): o.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx="6" fill="{PANEL}" stroke="{BORDER}" stroke-width="1.5"/>')
 
 # ---------- top: resolve rate vs context (log), their scatter ----------
-PX,PY,PW,PH=0,0,W,560
+PX,PY,PW,PH=0,0,W,760
 panel(PX,PY,PW,PH)
 t(22,34,META.get("title","SWE-bench Verified 20 个 django 实例 · 同一主模型 DeepSeek v4-flash：完成率 vs 每任务进入上下文的 token（越靠左上越好）"),INK,19,"600")
 if META.get("hero")!="paired":
@@ -148,7 +148,8 @@ for i,(title,sub,fmean,fmed,fmt,ymax) in enumerate(metrics):
     for j,(k,label,col,shape) in enumerate(ARMS):
         cx=ax0+slot*(j+0.5); v=vals[j]; m=fmed(k)
         o.append(f'<rect x="{cx-barw/2:.1f}" y="{yy(v):.1f}" width="{barw}" height="{base-yy(v):.1f}" rx="2" fill="{col}"/>')
-        t(cx,yy(v)-8,fmt(v),INK,13,"500","middle")
+        top_y=min(yy(v), yy(m) if m is not None else yy(v))   # value label clears the median tick too
+        t(cx,top_y-8,fmt(v),INK,13,"500","middle")
         if m is not None: o.append(f'<line x1="{cx-barw/2-6:.1f}" x2="{cx+barw/2+6:.1f}" y1="{yy(m):.1f}" y2="{yy(m):.1f}" stroke="#ffffff" stroke-width="2"/>')
         short={"pi":"Pi","pij-off":"PiJ 无 Jev","pij-jev":"PiJ + Jev"}[k]
         t(cx,base+20,short,col,12.5,"500","middle")
