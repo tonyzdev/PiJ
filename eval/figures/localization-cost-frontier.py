@@ -19,7 +19,7 @@ for key,lab in (("pi","Pi（bash grep）"),("off","PiJ 无 Jev（BM25 briefing�
 mark(lx+7,61,INK2,"c",7); t(lx+20,66,"主模型 v4-flash",INK2,15); lx+=20+wid("主模型 v4-flash",15)+28
 mark(lx+7,61,INK2,"d",7); t(lx+20,66,"v4-pro",INK2,15); lx+=20+wid("v4-pro",15)+28
 o.append(f'<line x1="{lx}" x2="{lx+26}" y1="61" y2="61" stroke="{FRONT}" stroke-width="1.6"/>'); t(lx+32,66,"frontier：没有既更省又定位更准的配置",INK2,15); lx+=32+wid("frontier：没有既更省又定位更准的配置",15)+28
-o.append(f'<line x1="{lx}" x2="{lx+26}" y1="61" y2="61" stroke="{COL["jev"]}" stroke-width="1.5" stroke-dasharray="3 3"/>'); t(lx+32,66,"虚线段 = 其中 Jev 的成本",INK2,15)
+o.append(f'<circle cx="{lx+6}" cy="61" r="6" fill="{PANEL}" stroke="{COL["jev"]}" stroke-width="1.8"/><line x1="{lx+12}" x2="{lx+38}" y1="61" y2="61" stroke="{COL["jev"]}" stroke-width="1.5" stroke-dasharray="3 3"/>'); t(lx+44,66,"空心 = 不含 Jev 时的成本，虚线 = Jev 的那部分",INK2,15)
 XMIN,XMAX=0.002,0.05; YMIN,YMAX=-0.04,0.85
 lg=math.log10
 def sub(px0,pw,title,task):
@@ -39,7 +39,12 @@ def sub(px0,pw,title,task):
     front.sort(key=lambda p:p["cost"])
     if len(front)>1: o.append('<polyline points="'+" ".join(f"{x(p['cost']):.1f},{y(p['rate']):.1f}" for p in front)+f'" fill="none" stroke="{FRONT}" stroke-width="1.6"/>')
     for p in pts:
-        if p["jev"]>0: o.append(f'<line x1="{x(p["main"]):.1f}" x2="{x(p["cost"]):.1f}" y1="{y(p["rate"]):.1f}" y2="{y(p["rate"]):.1f}" stroke="{COL["jev"]}" stroke-width="1.5" stroke-dasharray="3 3" stroke-opacity="0.8"/>')
+        if p["jev"]>0:
+            xm,xc,yy=x(p["main"]),x(p["cost"]),y(p["rate"])
+            o.append(f'<line x1="{xm:.1f}" x2="{xc:.1f}" y1="{yy:.1f}" y2="{yy:.1f}" stroke="{COL["jev"]}" stroke-width="1.5" stroke-dasharray="3 3" stroke-opacity="0.8"/>')
+            # hollow marker: where this configuration would sit on cost without Jev
+            if p["model"]=="pro": o.append(f'<path d="M{xm:.1f},{yy-7:.1f} L{xm+7:.1f},{yy:.1f} L{xm:.1f},{yy+7:.1f} L{xm-7:.1f},{yy:.1f} Z" fill="{PANEL}" stroke="{COL["jev"]}" stroke-width="1.8"/>')
+            else: o.append(f'<circle cx="{xm:.1f}" cy="{yy:.1f}" r="6.5" fill="{PANEL}" stroke="{COL["jev"]}" stroke-width="1.8"/>')
     for p in pts: mark(x(p["cost"]),y(p["rate"]),COL[p["family"]],"d" if p["model"]=="pro" else "c",9)
     # labels: right of the point, nudged apart when two share a row
     used=[]   # label bounding boxes already placed
