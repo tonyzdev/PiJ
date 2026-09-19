@@ -62,11 +62,46 @@ pij
 
 ## 实测
 
+五组对照实验：20 次检索测量和 232 次 agent 运行，两组任务集都有 ground truth——参考补丁能让哪些测试从失败变通过。原版 Pi 和 PiJ 跑同一个任务、同一个主模型、同样的预算（600k token / 40 轮 / 9 分钟）和沙箱，唯一区别是 Jev。下面每一项比较都是按任务配对的。全部主模型花费约 $1.20；Jev 检索测量约 $0.35，agent 任务每题 $0.011–0.014。
+
+| | SWE-bench Verified django · 20 题 · v4-flash | 陌生仓库 · 13 题 · v4-flash | 陌生仓库 · 13 题 · v4-pro |
+|---|---:|---:|---:|
+| 第一次工具调用就打开补丁要改的文件 | 5/20 → **10/20** | 0/13 → **7/13** | 0/13 → **7/13** |
+| 碰到该文件的中位步数 | 2 → **1** | 4 → **1** | 3 → **1** |
+| 每题搜索次数 | 4.6 → **3.5**（−24%） | 10.3 → **7.0**（−32%） | 8.5 → **5.2**（−39%） |
+| 每题工具调用（更少的任务数） | −16%（15/20） | −18%（11/13） | **−25%**（12/13） |
+| 每题 prompt token | 192k → 178k | 371k → 372k | 424k → **329k**（−22%） |
+| 找到文件到第一次修改之间的调用 | — | 11.2 → 8.7 | 11.9 → **5.4** |
+| 解决（Pi vs PiJ + Jev） | 15/20 vs 14/20 | 4/13 vs 4/13 | 4/13 vs 4/13 |
+
 ![13 个陌生仓库任务上 Pi 与 PiJ + Jev 的每一次工具调用](docs/figures/execution-strips-unfamiliar-pro.zh.png)
 
-13 个 SWE-bench 风格任务，取自 2025 年中以后创建、不在主模型训练数据里的仓库的真实 PR；每个任务分别由原版 Pi 和 PiJ + Jev 各跑一次，主模型 deepseek-v4-pro，每格一次工具调用。PiJ 的带子在 13 个任务里有 12 个更短（调用 −25%，prompt token −22%），并且第一步就打开了参考补丁要改的文件：Jev 在第一次调用前已把仓库文件排好序，briefing 把排名最高的那个直接交给模型；原版 Pi 中位数要到第 3 步才碰到它。解决率没有变化，4 比 4：Jev 缩短的是路径，不是结果；而且按 DeepSeek 的价格，排序花掉的钱高于它省下的主模型 token。
+*13 个 SWE-bench 风格任务，取自 2025 年中以后创建、不在主模型训练数据里的仓库的真实 PR；每题由原版 Pi 和 PiJ + Jev 各跑一次，主模型 deepseek-v4-pro。每格一次工具调用；白框 = 第一次读或改到参考补丁涉及的文件；粉块 = PiJ 在第一次调用前收到的 briefing。*
 
-同样的图在 20 个 SWE-bench Verified django 任务上（15/20 更短，−16%）和 deepseek-v4-flash 下的版本、背后的检索测量以及成本账，见 [陌生仓库实验](docs/unfamiliar-repo-experiment.md) · [django 实验](docs/swebench-agent-experiment.md) · [检索召回实验](docs/swebench-retrieval-experiment.md)（英文）。
+### Jev 改变了什么
+
+**在第一次调用之前就把正确的文件放到模型面前。** 在仓库规模的语料上（django 各实例的 base commit，约 2,000 个 Python 文件），Jev 对 BM25 前 100 名重排后，参考补丁所改文件的 recall@1 从 0.25 升到 **0.74**，recall@10 从 0.74 升到 **0.96**；第一个目标文件的中位排名从 4 到 **1**，排在第 1 位的实例从 5/20 变为 17/20，没有任何实例变差。这不是"把测试文件往后排"的规则能解释的——Jev 的前 10 里测试文件反而比 BM25 *更多*，因为它把对应的测试留在实现旁边。整轮测量花 $0.35，没有调用任何主模型。（[细节](docs/swebench-retrieval-experiment.md)，英文）
+
+**于是 agent 不再花调用去找它。** PiJ 里 Jev 相关度不低于 0.8 的首位文件会整篇进入第一轮 prompt。在模型没见过的仓库上，原版 Pi 第一步从不打开目标文件（0/13），中位要到第 3–4 步才碰到；PiJ + Jev 在 13 次里有 7 次第一步就打开了。grep 当然也能找到这些文件——晚一到三步，省下的正是这一到三步：搜索次数减少四分之一到五分之二。
+
+**整条路径变短，主模型越强越明显。** 工具调用在 django 上减 16%，陌生仓库 v4-flash 减 18%、v4-pro 减 25%，更短的任务分别是 15/20、11/13、12/13。v4-pro 下，从找到文件到第一次修改的阶段减半（11.9 → 5.4 次），prompt token 减 22%——更强的模型直接按 briefing 行动，而不是自己再推导一遍；django 上有 5 个运行连一次 `read` 都没有就改了 briefing 给的文件。（[陌生仓库](docs/unfamiliar-repo-experiment.md) · [django](docs/swebench-agent-experiment.md)，英文）
+
+**效果可归因、可复现。** 一条同样有 briefing 但用 BM25 而非 Jev 排序的对照臂落在两者之间（第一步打开目标文件：django 5 → 7 → 10，陌生仓库 0 → 2 → 6），说明收益来自排序本身，不是 briefing 这个形式。三次设计迭代里，努力类指标每次都朝同一个方向动（django 工具调用 16.1 → 14.8 → 14.3），这才让每题一次运行的数据能被解读。
+
+![每个任务从 Pi 到 PiJ + Jev 的箭头，flash 与 pro 并排](docs/figures/unfamiliar-flash-vs-pro.png)
+
+*每个任务一支箭，从原版 Pi（灰）指向 PiJ + Jev（洋红），横轴 prompt token、纵轴工具调用；洋红箭头两项都更省，白圈是解决了的运行。下方柱状图在两个主模型上比较两条臂。*
+
+### Jev（目前）没有改变什么
+
+- **解决率。** 陌生仓库两个模型下都是 4 比 4，django 15 比 14——每题一次运行，这是噪声。13 个陌生仓库任务里有 8 个没有任何一条臂解出来：败在修复本身，不在找文件。Jev 缩短的是路径，不是结果。
+- **DeepSeek 价位下的成本。** Jev 排序每题 $0.011–0.014，是主模型的 3–4 倍，省下的主模型 token 抵不回来。账要翻正需要更贵的主模型——Sonnet 级别每题 $0.5–1.3 的区间可以，DeepSeek 不行。（[前沿图与成本账](docs/unfamiliar-repo-experiment.md#the-frontier-drawn-honestly)，英文）
+- **墙钟时间。** 陌生仓库持平（pro 下 Jev 每题多 3.6 秒），django 变慢（42 → 55 秒）。
+- **证据规模。** 33 题，每种配置一次运行。努力类指标稳定到可以比较，差一题的结果指标不行。
+
+![20 个 SWE-bench Verified django 任务上 Pi 与 PiJ + Jev 的每一次工具调用](docs/figures/execution-strips-django.zh.png)
+
+全部可从仓库复现：harness（`eval/swebench-agent.ts`、`eval/swebench-retrieval.ts`）、陌生仓库任务的构造（`eval/unfamiliar/`）、每次运行的结果（`eval/swebench-agent-results/`）和画图脚本（`eval/figures/`）。完整记录（英文）：[检索召回](docs/swebench-retrieval-experiment.md) · [django agent](docs/swebench-agent-experiment.md) · [陌生仓库](docs/unfamiliar-repo-experiment.md)。
 
 ## 三项 Jev 能力
 

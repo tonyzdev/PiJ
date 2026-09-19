@@ -1,7 +1,17 @@
 """Flash and pro side by side: per-task paired arrows with a shared numbering, then grouped bars."""
 import json, math, sys
 SC = "/private/tmp/claude-501/-Users-tonglin-Documents-PiJ/b9b0a3fa-096c-42ee-957d-c89d2ec7782c/scratchpad"
-D = json.load(open(f"{SC}/unfamiliar-both.json")); NAME = sys.argv[1] if len(sys.argv) > 1 else "unfamiliar-both"
+D = json.load(open(f"{SC}/unfamiliar-both.json")); NAME = sys.argv[1] if len(sys.argv) > 1 else "unfamiliar-both"; LANG = sys.argv[2] if len(sys.argv) > 2 else "zh"
+S = {"zh": dict(title="同一批 13 个陌生仓库任务 · 每个任务从 Pi（灰）到 PiJ + Jev（洋红）的工具调用与上下文变化 · 左：DeepSeek v4-flash，右：v4-pro（越靠左下越省）",
+        pi="Pi（bash grep）", arrow="箭头 Pi → PiJ，洋红 = 调用与上下文都更少，灰 = 只省其一或未省", ring="白圈 = 该 run 解决了任务", num="编号", numsub="= 任务，见下表",
+        xaxis="进入主模型上下文的 prompt tokens（对数）", yaxis="工具调用次数", both="{both}/13 个任务两项都更省",
+        metrics=[("首步即读到目标文件", "（越高越好）"), ("search 调用次数", "（越低越好）"), ("工具调用总数", "（越低越好）"), ("prompt tokens / 任务", "（越低越好）"), ("耗时 / 任务", "（越低越好）")],
+        foot="柱 = 均值 · 白线 = 中位数 · 完成率：flash 两条 arm 各 {rf}/13，pro 各 {rp}/13 · 完成 = PR 测试补丁下 FAIL_TO_PASS 全过且无回归 · 预算 600k token / 40 轮 / 9 分钟 · 主模型 flash ${uf:.2f}、pro ${up:.2f} · Jev 平均每任务 flash +{jf:.1f}s、pro +{jp:.1f}s"),
+     "en": dict(title="The same 13 unfamiliar-repository tasks · each task as an arrow from Pi (grey) to PiJ + Jev (magenta), tool calls against prompt tokens · left: DeepSeek v4-flash, right: v4-pro",
+        pi="Pi (bash grep)", arrow="arrow Pi → PiJ; magenta = fewer calls and fewer tokens, grey = only one or neither", ring="white ring = run resolved the task", num="number", numsub="= task, see the table below",
+        xaxis="prompt tokens entering the main model's context (log scale)", yaxis="tool calls", both="{both}/13 tasks cheaper on both axes",
+        metrics=[("gold file on call 1", "(higher is better)"), ("search calls", "(lower is better)"), ("tool calls", "(lower is better)"), ("prompt tokens / task", "(lower is better)"), ("wall time / task", "(lower is better)")],
+        foot="bar = mean · white line = median · resolved: flash {rf}/13 in both arms, pro {rp}/13 · resolved = every FAIL_TO_PASS test passes under the PR's test patch with no regression · budget 600k tokens / 40 turns / 9 min · main model flash ${uf:.2f}, pro ${up:.2f} · Jev per task flash +{jf:.1f} s, pro +{jp:.1f} s")}[LANG]
 TASKS = D["tasks"]; M = D["models"]
 W = 1672
 PANEL, BORDER, GRID = "#1e1e1e", "#3a3a3a", "#2e2e2e"; INK, INK2, INK3 = "#ededed", "#b4b4b4", "#8c8c8c"
@@ -19,12 +29,12 @@ wid = lambda s, size: sum((size * 0.55 if ord(c) < 128 else size) for c in s)
 
 # ---- header: title + legend ----
 HH = 92; panel(0, 0, W, HH)
-t(22, 34, "同一批 13 个陌生仓库任务 · 每个任务从 Pi（灰）到 PiJ + Jev（洋红）的工具调用与上下文变化 · 左：DeepSeek v4-flash，右：v4-pro（越靠左下越省）", INK, 19, "600")
-lx = 22; dot(lx + 7, 66, 7, 0.7); t(lx + 22, 71, "Pi（bash grep）", INK2, 15); lx += 22 + wid("Pi（bash grep）", 15) + 30
+t(22, 34, S["title"], INK, 19, "600")
+lx = 22; dot(lx + 7, 66, 7, 0.7); t(lx + 22, 71, S["pi"], INK2, 15); lx += 22 + wid(S["pi"], 15) + 30
 dia(lx + 7, 66, 7); t(lx + 22, 71, "PiJ + Jev", INK2, 15); lx += 22 + wid("PiJ + Jev", 15) + 30
-o.append(f'<line x1="{lx}" x2="{lx+26}" y1="66" y2="66" stroke="{JEV}" stroke-width="2"/>'); lab = "箭头 Pi → PiJ，洋红 = 调用与上下文都更少，灰 = 只省其一或未省"; t(lx + 32, 71, lab, INK2, 15); lx += 32 + wid(lab, 15) + 30
-ring(lx + 7, 66); t(lx + 24, 71, "白圈 = 该 run 解决了任务", INK2, 15); lx += 24 + wid("白圈 = 该 run 解决了任务", 15) + 30
-t(lx, 71, "编号", LAB, 15, "600"); t(lx + wid("编号", 15) + 4, 71, "= 任务，见下表", INK2, 15)
+o.append(f'<line x1="{lx}" x2="{lx+26}" y1="66" y2="66" stroke="{JEV}" stroke-width="2"/>'); lab = S["arrow"]; t(lx + 32, 71, lab, INK2, 15); lx += 32 + wid(lab, 15) + 30
+ring(lx + 7, 66); t(lx + 24, 71, S["ring"], INK2, 15); lx += 24 + wid(S["ring"], 15) + 30
+t(lx, 71, S["num"], LAB, 15, "600"); t(lx + wid(S["num"], 15) + (4 if LANG == "zh" else 12), 71, S["numsub"], INK2, 15)
 
 # ---- two paired panels ----
 PY0 = HH + 14; PH = 600; PW = (W - 14) / 2
@@ -41,8 +51,8 @@ def hero(px0, label, model):
     for v in (10_000, 30_000, 100_000, 300_000, 600_000):
         o.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{T}" y2="{PY0+PH-B}" stroke="{GRID}" stroke-width="1"/>'); t(x(v), PY0 + PH - B + 22, f"{v//1000}k", INK3, 13, "400", "middle")
     o.append(f'<line x1="{L}" x2="{px0+PW-R}" y1="{PY0+PH-B}" y2="{PY0+PH-B}" stroke="{BORDER}" stroke-width="1.5"/><line x1="{L}" x2="{L}" y1="{T}" y2="{PY0+PH-B}" stroke="{BORDER}" stroke-width="1.5"/>')
-    t(L + (px0 + PW - R - L) / 2, PY0 + PH - B + 46, "进入主模型上下文的 prompt tokens（对数）", INK2, 14, "400", "middle")
-    o.append(f'<g transform="rotate(-90 {px0+22} {T+(PY0+PH-B-T)/2:.1f})">'); t(px0 + 22, T + (PY0 + PH - B - T) / 2, "工具调用次数", INK2, 14, "400", "middle"); o.append("</g>")
+    t(L + (px0 + PW - R - L) / 2, PY0 + PH - B + 46, S["xaxis"], INK2, 14, "400", "middle")
+    o.append(f'<g transform="rotate(-90 {px0+22} {T+(PY0+PH-B-T)/2:.1f})">'); t(px0 + 22, T + (PY0 + PH - B - T) / 2, S["yaxis"], INK2, 14, "400", "middle"); o.append("</g>")
     per = M[model]["per"]; both = 0; boxes = []
     pts = []
     for tk in TASKS:
@@ -80,7 +90,7 @@ def hero(px0, label, model):
                     o.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{ex:.1f}" y2="{ey:.1f}" stroke="{LAB}" stroke-width="1" stroke-opacity="0.8"/>')
                 t(x1 + dx, y1 + dy, s, LAB, 14, "700", an, halo=True); boxes.append(bb); placed = True; break
             if placed: break
-    t(px0 + PW - R, PY0 + 32, f"{both}/13 个任务两项都更省", INK, 16, "600", "end")
+    t(px0 + PW - R, PY0 + 32, S["both"].format(both=both), INK, 16, "600", "end")
 hero(0, "DeepSeek v4-flash", "flash"); hero(PW + 14, "DeepSeek v4-pro", "pro")
 
 # ---- numbered task legend ----
@@ -92,11 +102,11 @@ for i, tk in enumerate(TASKS):
 
 # ---- grouped bars: flash vs pro ----
 BY = LY + LH + 14; BH = 300; gap = 14; n = 5; bw = (W - gap * (n - 1)) / n
-metrics = [("首步即读到目标文件", "（越高越好）", "firstgold", lambda v: f"{v}/13", 13),
-           ("search 调用次数", "（越低越好）", "search", lambda v: f"{v:.1f}", None),
-           ("工具调用总数", "（越低越好）", "tools", lambda v: f"{v:.1f}", None),
-           ("prompt tokens / 任务", "（越低越好）", "tokens", lambda v: f"{v/1000:.0f}k", None),
-           ("耗时 / 任务", "（越低越好）", "seconds", lambda v: f"{v:.0f}s", None)]
+metrics = [(*S["metrics"][0], "firstgold", lambda v: f"{v}/13", 13),
+           (*S["metrics"][1], "search", lambda v: f"{v:.1f}", None),
+           (*S["metrics"][2], "tools", lambda v: f"{v:.1f}", None),
+           (*S["metrics"][3], "tokens", lambda v: f"{v/1000:.0f}k", None),
+           (*S["metrics"][4], "seconds", lambda v: f"{v:.0f}s", None)]
 for i, (title, sub, key, fmt, ymax) in enumerate(metrics):
     px = i * (bw + gap); panel(px, BY, bw, BH)
     t(px + 18, BY + 30, title, INK, 16, "600"); t(px + 18 + wid(title, 16) + 6, BY + 30, sub, INK3, 13)
@@ -122,7 +132,7 @@ for i, (title, sub, key, fmt, ymax) in enumerate(metrics):
     for g, model in enumerate(("flash", "pro")):
         t(ax0 + gw * g + gw / 2, base + 38, f"v4-{model}", INK3, 12, "400", "middle")
 H = BY + BH + 40
-t(18, H - 12, f"柱 = 均值 · 白线 = 中位数 · 完成率：flash 两条 arm 各 {M['flash']['pi']['resolved']}/13，pro 各 {M['pro']['pi']['resolved']}/13 · 完成 = PR 测试补丁下 FAIL_TO_PASS 全过且无回归 · 预算 600k token / 40 轮 / 9 分钟 · 主模型 flash ${M['flash']['pi']['usd']+M['flash']['pij']['usd']:.2f}、pro ${M['pro']['pi']['usd']+M['pro']['pij']['usd']:.2f} · Jev 平均每任务 flash +{M['flash']['pij']['jev_s']:.1f}s、pro +{M['pro']['pij']['jev_s']:.1f}s", INK3, 12.5)
+t(18, H - 12, S["foot"].format(rf=M['flash']['pi']['resolved'], rp=M['pro']['pi']['resolved'], uf=M['flash']['pi']['usd']+M['flash']['pij']['usd'], up=M['pro']['pi']['usd']+M['pro']['pij']['usd'], jf=M['flash']['pij']['jev_s'], jp=M['pro']['pij']['jev_s']), INK3, 12.5)
 svg = f'<svg xmlns="http://www.w3.org/2000/svg" width="{W}" height="{H}" viewBox="0 0 {W} {H}" font-family="{SANS}">' + "\n".join(o) + "</svg>"
 open(f"{SC}/fig/{NAME}.html", "w").write('<style>*{margin:0;padding:0}html,body{background:#abbab9}body{padding:36px}</style>\n' + svg)
 print("written", W, H)

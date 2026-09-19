@@ -40,11 +40,46 @@ flowchart LR
 
 ## Evidence
 
+Five controlled experiments: 20 retrieval sweeps and 232 agent runs on two task sets, each with ground truth — the tests that the reference patch makes pass. Plain Pi and PiJ run the same task with the same main model, budget (600k tokens / 40 turns / 9 min) and sandbox; the only difference is Jev. Every comparison below is paired per task. Main-model spend for all of it: about $1.20; Jev: about $0.35 for the retrieval sweep and $0.011–0.014 per agent task.
+
+| | SWE-bench Verified django · 20 tasks · v4-flash | unfamiliar repositories · 13 tasks · v4-flash | unfamiliar repositories · 13 tasks · v4-pro |
+|---|---:|---:|---:|
+| first tool call opens a file the patch edits | 5/20 → **10/20** | 0/13 → **7/13** | 0/13 → **7/13** |
+| median call that reaches such a file | 2 → **1** | 4 → **1** | 3 → **1** |
+| search calls per task | 4.6 → **3.5** (−24%) | 10.3 → **7.0** (−32%) | 8.5 → **5.2** (−39%) |
+| tool calls per task (tasks with fewer) | −16% (15/20) | −18% (11/13) | **−25%** (12/13) |
+| prompt tokens per task | 192k → 178k | 371k → 372k | 424k → **329k** (−22%) |
+| calls from finding the file to the first edit | — | 11.2 → 8.7 | 11.9 → **5.4** |
+| resolved (Pi vs PiJ + Jev) | 15/20 vs 14/20 | 4/13 vs 4/13 | 4/13 vs 4/13 |
+
 ![Every tool call of Pi and PiJ + Jev on 13 tasks in unfamiliar repositories](docs/figures/execution-strips-unfamiliar-pro.png)
 
-Thirteen SWE-bench-style tasks built from pull requests in repositories created after mid-2025 — outside the main model's training data — each run once by plain Pi and once by PiJ + Jev with deepseek-v4-pro. One block per tool call. The PiJ strip is shorter on 12 of 13 tasks (−25% calls, −22% prompt tokens) and opens on a file the reference patch edits, because Jev ranks the repository's files before the first call and the briefing hands the top one to the model; plain Pi reaches that file at a median of the third call. The resolve rate is unchanged, 4 vs 4: Jev shortens the path, not the outcome, and at DeepSeek prices its ranking costs more per task than the main-model tokens it saves.
+*Thirteen SWE-bench-style tasks built from pull requests in repositories created after mid-2025 — outside the main model's training data — each run once by plain Pi and once by PiJ + Jev with deepseek-v4-pro. One block per tool call; the white frame marks the first read or edit of a file the reference patch touches; the magenta block is the briefing PiJ receives before its first call.*
 
-The same picture on 20 SWE-bench Verified django tasks (shorter on 15 of 20, −16%) and with deepseek-v4-flash, the retrieval measurements behind it, and the cost ledger: [unfamiliar repositories](docs/unfamiliar-repo-experiment.md) · [django](docs/swebench-agent-experiment.md) · [retrieval recall](docs/swebench-retrieval-experiment.md).
+### What Jev changes
+
+**It puts the right file in front of the model before the first call.** On a repository-scale corpus (django at each instance's base commit, ~2,000 Python files), Jev reranking BM25's top-100 lifts recall@1 of the files the reference patch edits from 0.25 to **0.74** and recall@10 from 0.74 to **0.96**; the first gold file moves from a median rank of 4 to **1**, sits at rank 1 on 17 of 20 instances instead of 5, and gets worse on none. The gain is not a "down-rank the tests" heuristic — Jev's top-10 contains *more* test files than BM25's, because it keeps the matching test next to the implementation. The whole sweep cost $0.35 and called no main model. ([details](docs/swebench-retrieval-experiment.md))
+
+**So the agent stops searching for it.** In PiJ the top-ranked file goes verbatim into the first prompt when Jev's relevance is at least 0.8. On repositories the model has never seen, plain Pi never opens a gold file on its first call (0/13) and needs a median of three to four calls to reach one; PiJ + Jev opens one on the first call in 7 of 13 runs. Grep finds these files too — one to three calls later, and that is exactly the saving: searches fall by a quarter to two fifths.
+
+**The whole run gets shorter, and more so with a stronger model.** Tool calls fall 16% on django, 18% on the unfamiliar set with v4-flash and 25% with v4-pro, with PiJ shorter on 15 of 20, 11 of 13 and 12 of 13 tasks. With v4-pro the phase from finding the file to the first edit halves (11.9 → 5.4 calls) and prompt tokens fall 22%, because the stronger model acts on the briefing instead of re-deriving it; on django, five runs edit the briefed file without a single `read`. ([unfamiliar repositories](docs/unfamiliar-repo-experiment.md) · [django](docs/swebench-agent-experiment.md))
+
+**The effect is attributable and stable.** A control arm with the same briefing but BM25 ranking instead of Jev lands between the two (first-call gold file 5 → 7 → 10 on django, 0 → 2 → 6 on the unfamiliar set), so the gain is the ranking, not the briefing format. Across three design iterations the effort metrics moved the same way each time (django tool calls 16.1 → 14.8 → 14.3), which is what lets them be read at one run per task.
+
+![Per-task arrows from Pi to PiJ + Jev, flash and pro side by side](docs/figures/unfamiliar-flash-vs-pro-en.png)
+
+*Each task as an arrow from its plain-Pi run (grey) to its PiJ + Jev run (magenta) in tool calls against prompt tokens; magenta arrows are cheaper on both axes, white rings mark resolved runs. The bars below compare the arms on both main models.*
+
+### What Jev does not change (yet)
+
+- **Resolve rate.** 4 vs 4 on the unfamiliar set under both models, 15 vs 14 on django — noise at one run per task. Eight of the thirteen unfamiliar tasks are solved by no arm: they fail in the fix, not in finding the file. Jev shortens the path, not the outcome.
+- **Cost at DeepSeek prices.** Jev's ranking is $0.011–0.014 per task, three to four times the main model, and the main-model tokens it saves are worth less than that. The ledger turns positive with a main model whose tokens cost enough — a Sonnet-class model at $0.5–1.3 per task is in that regime, DeepSeek is not. ([frontier and cost ledger](docs/unfamiliar-repo-experiment.md#the-frontier-drawn-honestly))
+- **Wall time.** Flat on the unfamiliar set (Jev adds 3.6 s per task under pro), slower on django (42 → 55 s).
+- **Scale of evidence.** 33 tasks, one run per configuration. Effort metrics are stable enough to compare; outcome differences of one task are not.
+
+![Every tool call of Pi and PiJ + Jev on 20 SWE-bench Verified django tasks](docs/figures/execution-strips-django.png)
+
+Everything is reproducible from the repository: the harness (`eval/swebench-agent.ts`, `eval/swebench-retrieval.ts`), task construction for the unfamiliar set (`eval/unfamiliar/`), per-run results (`eval/swebench-agent-results/`) and the figure scripts (`eval/figures/`). Full write-ups: [retrieval recall](docs/swebench-retrieval-experiment.md) · [django agents](docs/swebench-agent-experiment.md) · [unfamiliar repositories](docs/unfamiliar-repo-experiment.md).
 
 ## Quick start
 
