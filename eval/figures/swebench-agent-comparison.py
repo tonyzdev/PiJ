@@ -67,7 +67,8 @@ if META.get("hero")=="paired":
     for pa in A:
         pb=Bp[pa["id"]]
         for pp,xx,yy,col,shape in ((pa,x(pa["tokens"]),y(pa["tools"]),"#9a9a9a","c"),(pb,x(pb["tokens"]),y(pb["tools"]),"#d55181","d")):
-            mark(xx,yy,col,shape,8 if shape=="c" else 9)
+            if shape=="c": o.append(f'<circle cx="{xx:.1f}" cy="{yy:.1f}" r="7" fill="{col}" fill-opacity="0.7"/>')
+            else: mark(xx,yy,col,shape,9)
             if pp["resolved"]: o.append(f'<circle cx="{xx:.1f}" cy="{yy:.1f}" r="13" fill="none" stroke="#ededed" stroke-width="1.5"/>')
             boxes.append((xx-15,yy-15,xx+15,yy+15))
     hit=lambda a,b: a[0]<b[2] and b[0]<a[2] and a[1]<b[3] and b[1]<a[3]
@@ -86,8 +87,8 @@ if META.get("hero")=="paired":
                 if far:
                     ex = bb[0] if px<bb[0] else bb[2] if px>bb[2] else px
                     ey = bb[1] if py<bb[1] else bb[3] if py>bb[3] else py
-                    o.append(f'<line x1="{px:.1f}" y1="{py:.1f}" x2="{ex:.1f}" y2="{ey:.1f}" stroke="{INK3}" stroke-width="1"/>')
-                t(px+dx,py+dy,label,INK2,12.5,"400",an,halo=True); boxes.append(bb); placed=True; break
+                    o.append(f'<line x1="{px:.1f}" y1="{py:.1f}" x2="{ex:.1f}" y2="{ey:.1f}" stroke="#e07aa8" stroke-width="1" stroke-opacity="0.8"/>')
+                t(px+dx,py+dy,label,"#f0a3c4",12.5,"500",an,halo=True); boxes.append(bb); placed=True; break
             if placed: break
     # legend, top-left under the title
     lx=22
@@ -95,7 +96,8 @@ if META.get("hero")=="paired":
     mark(lx+7,61,"#d55181","d",7); t(lx+22,66,"PiJ + Jev",INK2,15); lx+=22+8.2*9+34
     lab="箭头：同一任务 Pi → PiJ，洋红 = 调用与上下文都更少"
     o.append(f'<line x1="{lx}" x2="{lx+26}" y1="61" y2="61" stroke="#d55181" stroke-width="2"/>'); t(lx+32,66,lab,INK2,15); lx+=32+sum(15 if ord(c)>0x2E80 else 8.2 for c in lab)+34
-    o.append(f'<circle cx="{lx+7}" cy="61" r="9" fill="none" stroke="#ededed" stroke-width="1.5"/>'); t(lx+24,66,"白圈 = 该 run 解决了任务",INK2,15)
+    o.append(f'<circle cx="{lx+7}" cy="61" r="9" fill="none" stroke="#ededed" stroke-width="1.5"/>'); t(lx+24,66,"白圈 = 该 run 解决了任务",INK2,15); lx+=24+15*13+34
+    t(lx,66,"任务名",'#f0a3c4',15,"500"); t(lx+15*3+4,66,"标在 PiJ 那端",INK2,15)
     t(PW-R,T+22,f"{better}/{len(A)} 个任务 PiJ 的调用与上下文同时更少",INK,17,"600","end",halo=True)
 else:
     L,R,T,B=90,60,110,70
