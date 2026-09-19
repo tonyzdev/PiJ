@@ -24,40 +24,81 @@ def panel(x,y,w,h): o.append(f'<rect x="{x}" y="{y}" width="{w}" height="{h}" rx
 PX,PY,PW,PH=0,0,W,560
 panel(PX,PY,PW,PH)
 t(22,34,META.get("title","SWE-bench Verified 20 个 django 实例 · 同一主模型 DeepSeek v4-flash：完成率 vs 每任务进入上下文的 token（越靠左上越好）"),INK,19,"600")
-lx=22
-for key,label,col,shape in ARMS:
-    mark(lx+7,61,col,shape,7); t(lx+22,66,label,INK2,15)
-    lx+=22+sum(15 if ord(c)>0x2E80 else 8.2 for c in label)+34
-o.append(f'<line x1="{lx}" x2="{lx+26}" y1="61" y2="61" stroke="{FRONT}" stroke-width="1.6"/>'); t(lx+32,66,"frontier：没有既更省又更准的配置",INK2,15)
-L,R,T,B=90,60,110,70
-XMIN,XMAX=META.get("xmin",100_000),META.get("xmax",400_000); YMIN,YMAX=META.get("ymin",0.55),META.get("ymax",0.90)
-lg=math.log10
-x=lambda v: L+(lg(v)-lg(XMIN))/(lg(XMAX)-lg(XMIN))*(PW-L-R)
-y=lambda v: T+(YMAX-v)/(YMAX-YMIN)*(PH-T-B)
-for r in META.get("yticks",(0.6,0.7,0.8,0.9)):
-    o.append(f'<line x1="{L}" x2="{PW-R}" y1="{y(r):.1f}" y2="{y(r):.1f}" stroke="{GRID}" stroke-width="1"/>'); t(L-12,y(r)+5,f"{int(r*100)}%",INK3,14,"400","end")
-for v in META.get("xticks",(100_000,150_000,200_000,300_000,400_000)):
-    o.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{T}" y2="{PH-B}" stroke="{GRID}" stroke-width="1"/>'); t(x(v),PH-B+26,f"{v//1000}k",INK3,14,"400","middle")
-o.append(f'<line x1="{L}" x2="{PW-R}" y1="{PH-B}" y2="{PH-B}" stroke="{BORDER}" stroke-width="1.5"/><line x1="{L}" x2="{L}" y1="{T}" y2="{PH-B}" stroke="{BORDER}" stroke-width="1.5"/>')
-t(L+(PW-L-R)/2,PH-B+54,"每任务进入主模型上下文的 prompt tokens，均值（对数）",INK2,15,"400","middle")
-pts=[(k,D[k]["tokens"]["mean"],D[k]["resolved"]/D[k]["n"],col,shape,label) for k,label,col,shape in ARMS]
-front=[p for p in pts if not any(q is not p and q[1]<=p[1] and q[2]>=p[2] and (q[1]<p[1] or q[2]>p[2]) for q in pts)]
-front.sort(key=lambda p:p[1])
-if len(front)>1: o.append('<polyline points="'+" ".join(f"{x(p[1]):.1f},{y(p[2]):.1f}" for p in front)+f'" fill="none" stroke="{FRONT}" stroke-width="1.6"/>')
-# faint per-instance context spread per arm, as small ticks on a rug below the axis
-for k,label,col,shape in ARMS:
-    for inst in D[k]["per_instance"]:
-        v=max(XMIN,min(XMAX,inst["tokens"])); yy=PH-B-14 if k=="pi" else PH-B-9 if k=="pij-off" else PH-B-4
-        o.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{yy}" y2="{yy+4}" stroke="{col}" stroke-width="2" stroke-opacity="0.55"/>')
-t(PW-R,PH-B-20,f"底部刻度：各 arm {D['pi']['n']} 个任务的逐任务 token（含超出 {XMAX//1000}k 者贴边）",INK3,12,"400","end")
-# Labels: leftmost point labelled to its left, rightmost to its right, any middle one below.
-order=sorted(pts,key=lambda p:p[1]); offsets={}
-for idx,pp in enumerate(order):
-    offsets[pp[0]]=(-16,-14,"end") if idx==0 else (16,-14,"start") if idx==len(order)-1 else (0,30,"middle")
-for k,v,r,col,shape,label in pts:
-    mark(x(v),y(r),col,shape,10)
-    dx,dy,an=offsets[k]; d=D[k]
-    t(x(v)+dx,y(r)+dy,f"{label.split('（')[0].split(' ·')[0] if k=='pi' else ('PiJ 无 Jev' if k=='pij-off' else 'PiJ + Jev')}  {d['resolved']}/{d['n']} · {v/1000:.0f}k tok · {d['seconds']['mean']:.0f}s",INK2,14,"400",an,halo=True)
+if META.get("hero")!="paired":
+    lx=22
+    for key,label,col,shape in ARMS:
+        mark(lx+7,61,col,shape,7); t(lx+22,66,label,INK2,15)
+        lx+=22+sum(15 if ord(c)>0x2E80 else 8.2 for c in label)+34
+    o.append(f'<line x1="{lx}" x2="{lx+26}" y1="61" y2="61" stroke="{FRONT}" stroke-width="1.6"/>'); t(lx+32,66,"frontier：没有既更省又更准的配置",INK2,15)
+if META.get("hero")=="paired":
+    # legend override: ends of the pair plus a note on what a line means
+    L,R,T,B=90,60,110,70
+    XMIN,XMAX=META.get("pxmin",10_000),META.get("pxmax",700_000); YMIN,YMAX=0,46
+    lg=math.log10
+    x=lambda v: L+(lg(max(v,XMIN))-lg(XMIN))/(lg(XMAX)-lg(XMIN))*(PW-L-R)
+    y=lambda v: T+(YMAX-v)/(YMAX-YMIN)*(PH-T-B)
+    for r in (10,20,30,40):
+        o.append(f'<line x1="{L}" x2="{PW-R}" y1="{y(r):.1f}" y2="{y(r):.1f}" stroke="{GRID}" stroke-width="1"/>'); t(L-12,y(r)+5,str(r),INK3,14,"400","end")
+    for v in META.get("pxticks",(10_000,30_000,100_000,300_000,600_000)):
+        o.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{T}" y2="{PH-B}" stroke="{GRID}" stroke-width="1"/>'); t(x(v),PH-B+26,f"{v//1000}k",INK3,14,"400","middle")
+    o.append(f'<line x1="{L}" x2="{PW-R}" y1="{PH-B}" y2="{PH-B}" stroke="{BORDER}" stroke-width="1.5"/><line x1="{L}" x2="{L}" y1="{T}" y2="{PH-B}" stroke="{BORDER}" stroke-width="1.5"/>')
+    t(L+(PW-L-R)/2,PH-B+54,"该任务进入主模型上下文的 prompt tokens（对数）",INK2,15,"400","middle")
+    o.append(f'<g transform="rotate(-90 40 {T+(PH-T-B)/2:.1f})">'); t(40,T+(PH-T-B)/2,"该任务的工具调用次数",INK2,15,"400","middle"); o.append('</g>')
+    A=D["pi"]["per_instance"]; Bp={p["id"]:p for p in D["pij-jev"]["per_instance"]}
+    better=0
+    for pa in A:
+        pb=Bp[pa["id"]]; x0,y0=x(pa["tokens"]),y(pa["tools"]); x1,y1=x(pb["tokens"]),y(pb["tools"])
+        both=pb["tools"]<=pa["tools"] and pb["tokens"]<=pa["tokens"]; better+=both
+        col="#d55181" if both else "#8c8c8c"
+        o.append(f'<line x1="{x0:.1f}" y1="{y0:.1f}" x2="{x1:.1f}" y2="{y1:.1f}" stroke="{col}" stroke-width="2" stroke-opacity="0.75"/>')
+        # arrowhead at the PiJ end
+        import math as _m
+        ang=_m.atan2(y1-y0,x1-x0); ax,ay=x1-10*_m.cos(ang),y1-10*_m.sin(ang)
+        o.append(f'<path d="M{x1:.1f},{y1:.1f} L{ax-5*_m.sin(ang):.1f},{ay+5*_m.cos(ang):.1f} L{ax+5*_m.sin(ang):.1f},{ay-5*_m.cos(ang):.1f} Z" fill="{col}" fill-opacity="0.75"/>')
+    for pa in A:
+        pb=Bp[pa["id"]]
+        mark(x(pa["tokens"]),y(pa["tools"]),"#9a9a9a","c",8); mark(x(pb["tokens"]),y(pb["tools"]),"#d55181","d",9)
+        for pp,xx,yy in ((pa,x(pa["tokens"]),y(pa["tools"])),(pb,x(pb["tokens"]),y(pb["tools"]))):
+            if pp["resolved"]: o.append(f'<circle cx="{xx:.1f}" cy="{yy:.1f}" r="13" fill="none" stroke="#ededed" stroke-width="1.5"/>')
+        t(x(pb["tokens"])-14,y(pb["tools"])-12,pb["name"],INK2,12.5,"400","end",halo=True)
+    # legend, top-left under the title
+    lx=22
+    mark(lx+7,61,"#9a9a9a","c",7); t(lx+22,66,"Pi（bash grep）",INK2,15); lx+=22+15*9+34
+    mark(lx+7,61,"#d55181","d",7); t(lx+22,66,"PiJ + Jev",INK2,15); lx+=22+8.2*9+34
+    lab="箭头：同一任务 Pi → PiJ，洋红 = 调用与上下文都更少"
+    o.append(f'<line x1="{lx}" x2="{lx+26}" y1="61" y2="61" stroke="#d55181" stroke-width="2"/>'); t(lx+32,66,lab,INK2,15); lx+=32+sum(15 if ord(c)>0x2E80 else 8.2 for c in lab)+34
+    o.append(f'<circle cx="{lx+7}" cy="61" r="9" fill="none" stroke="#ededed" stroke-width="1.5"/>'); t(lx+24,66,"白圈 = 该 run 解决了任务",INK2,15)
+    t(PW-R,T+22,f"{better}/{len(A)} 个任务 PiJ 的调用与上下文同时更少",INK,17,"600","end",halo=True)
+else:
+    L,R,T,B=90,60,110,70
+    XMIN,XMAX=META.get("xmin",100_000),META.get("xmax",400_000); YMIN,YMAX=META.get("ymin",0.55),META.get("ymax",0.90)
+    lg=math.log10
+    x=lambda v: L+(lg(v)-lg(XMIN))/(lg(XMAX)-lg(XMIN))*(PW-L-R)
+    y=lambda v: T+(YMAX-v)/(YMAX-YMIN)*(PH-T-B)
+    for r in META.get("yticks",(0.6,0.7,0.8,0.9)):
+        o.append(f'<line x1="{L}" x2="{PW-R}" y1="{y(r):.1f}" y2="{y(r):.1f}" stroke="{GRID}" stroke-width="1"/>'); t(L-12,y(r)+5,f"{int(r*100)}%",INK3,14,"400","end")
+    for v in META.get("xticks",(100_000,150_000,200_000,300_000,400_000)):
+        o.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{T}" y2="{PH-B}" stroke="{GRID}" stroke-width="1"/>'); t(x(v),PH-B+26,f"{v//1000}k",INK3,14,"400","middle")
+    o.append(f'<line x1="{L}" x2="{PW-R}" y1="{PH-B}" y2="{PH-B}" stroke="{BORDER}" stroke-width="1.5"/><line x1="{L}" x2="{L}" y1="{T}" y2="{PH-B}" stroke="{BORDER}" stroke-width="1.5"/>')
+    t(L+(PW-L-R)/2,PH-B+54,"每任务进入主模型上下文的 prompt tokens，均值（对数）",INK2,15,"400","middle")
+    pts=[(k,D[k]["tokens"]["mean"],D[k]["resolved"]/D[k]["n"],col,shape,label) for k,label,col,shape in ARMS]
+    front=[p for p in pts if not any(q is not p and q[1]<=p[1] and q[2]>=p[2] and (q[1]<p[1] or q[2]>p[2]) for q in pts)]
+    front.sort(key=lambda p:p[1])
+    if len(front)>1: o.append('<polyline points="'+" ".join(f"{x(p[1]):.1f},{y(p[2]):.1f}" for p in front)+f'" fill="none" stroke="{FRONT}" stroke-width="1.6"/>')
+    # faint per-instance context spread per arm, as small ticks on a rug below the axis
+    for k,label,col,shape in ARMS:
+        for inst in D[k]["per_instance"]:
+            v=max(XMIN,min(XMAX,inst["tokens"])); yy=PH-B-14 if k=="pi" else PH-B-9 if k=="pij-off" else PH-B-4
+            o.append(f'<line x1="{x(v):.1f}" x2="{x(v):.1f}" y1="{yy}" y2="{yy+4}" stroke="{col}" stroke-width="2" stroke-opacity="0.55"/>')
+    t(PW-R,PH-B-20,f"底部刻度：各 arm {D['pi']['n']} 个任务的逐任务 token（含超出 {XMAX//1000}k 者贴边）",INK3,12,"400","end")
+    # Labels: leftmost point labelled to its left, rightmost to its right, any middle one below.
+    order=sorted(pts,key=lambda p:p[1]); offsets={}
+    for idx,pp in enumerate(order):
+        offsets[pp[0]]=(-16,-14,"end") if idx==0 else (16,-14,"start") if idx==len(order)-1 else (0,30,"middle")
+    for k,v,r,col,shape,label in pts:
+        mark(x(v),y(r),col,shape,10)
+        dx,dy,an=offsets[k]; d=D[k]
+        t(x(v)+dx,y(r)+dy,f"{label.split('（')[0].split(' ·')[0] if k=='pi' else ('PiJ 无 Jev' if k=='pij-off' else 'PiJ + Jev')}  {d['resolved']}/{d['n']} · {v/1000:.0f}k tok · {d['seconds']['mean']:.0f}s",INK2,14,"400",an,halo=True)
 
 # ---------- bottom: small bar panels, their "(lower is better)" style ----------
 metrics=[("首步即读到目标文件","（越高越好）",lambda k:FIRST_GOLD[k],lambda k:None,lambda v:f"{v}/{D['pi']['n']}",D["pi"]["n"]),
@@ -87,4 +128,4 @@ for i,(title,sub,fmean,fmed,fmt,ymax) in enumerate(metrics):
 t(18,H-12,META.get("footnote","柱 = 均值 · 白线 = 中位数 · 完成 = 参考测试补丁下 FAIL_TO_PASS 全过且无回归"),INK3,12.5)
 o.append("</svg>")
 open(f"{SC}/fig/{NAME}.html","w").write('<style>*{margin:0;padding:0}html,body{background:#abbab9}body{padding:36px}</style>\n'+"\n".join(o))
-print("agent.html written; frontier:", [p[0] for p in front])
+print("written")

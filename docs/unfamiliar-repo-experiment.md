@@ -80,6 +80,8 @@ Plain Pi and PiJ + Jev only (26 runs, $0.51); `eval/swebench-agent-results/unfam
 
 ![comparison, v4-pro](figures/unfamiliar-pro-agent-comparison.png)
 
+*Top panel: each task as an arrow from its plain-Pi run (grey) to its PiJ + Jev run (magenta) in tool calls against prompt tokens; magenta arrows are cheaper on both axes, white rings mark resolved runs. Two arm means would hide this — the per-task pairing is the evidence.*
+
 | | Pi | PiJ + Jev |
 |---|---:|---:|
 | **resolved** | 4/13 | 4/13 |
